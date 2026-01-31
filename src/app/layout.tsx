@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/components/providers/auth-provider';
 
 export const metadata: Metadata = {
-  title: 'Desa data Connest',
+  title: 'Desa data Connect',
   description: 'Connecting village data across Indonesia.',
 };
 

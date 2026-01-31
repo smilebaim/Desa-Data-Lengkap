@@ -39,7 +39,7 @@ export default function SettingsPage() {
               <Label htmlFor="subdomain">New Subdomain</Label>
               <div className="flex items-center space-x-2">
                 <Input id="subdomain" placeholder="e.g., majujaya" />
-                <span className="text-muted-foreground">.desadataconnest.com</span>
+                <span className="text-muted-foreground">.desadataconnect.com</span>
               </div>
             </div>
             <Button>Create Subdomain</Button>

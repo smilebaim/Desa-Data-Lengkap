@@ -32,7 +32,7 @@ export function VillageMap({ villages }: MapProps) {
       <Map
         defaultCenter={defaultCenter}
         defaultZoom={5}
-        mapId="desa_data_connest_map"
+        mapId="desa_data_connect_map"
         className="w-full h-full rounded-lg"
         gestureHandling={'greedy'}
         disableDefaultUI={true}

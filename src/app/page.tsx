@@ -64,7 +64,7 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center gap-2 mb-4">
               <Mountain className="h-10 w-10 text-primary" />
               <h1 className="font-headline text-4xl font-bold tracking-tighter text-foreground">
-                Desa data Connest
+                Desa data Connect
               </h1>
             </div>
           <p className="text-muted-foreground">
