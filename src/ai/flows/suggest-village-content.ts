@@ -4,24 +4,15 @@
  * @fileOverview Provides AI-driven suggestions for village-related content based on current trends and news.
  *
  * - suggestVillageContent - A function that generates content suggestions.
- * - SuggestVillageContentInput - The input type for the suggestVillageContent function.
- * - SuggestVillageContentOutput - The return type for the suggestVillageContent function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-export const SuggestVillageContentInputSchema = z.object({
-  villageName: z.string().describe('The name of the village.'),
-  recentNews: z.string().describe('The latest news related to the village.'),
-  currentTrends: z.string().describe('The current trends in village development.'),
-});
-export type SuggestVillageContentInput = z.infer<typeof SuggestVillageContentInputSchema>;
-
-export const SuggestVillageContentOutputSchema = z.object({
-  suggestions: z.array(z.string()).describe('A list of content suggestions for the village.'),
-});
-export type SuggestVillageContentOutput = z.infer<typeof SuggestVillageContentOutputSchema>;
+import {
+    SuggestVillageContentInput,
+    SuggestVillageContentInputSchema,
+    SuggestVillageContentOutput,
+    SuggestVillageContentOutputSchema,
+} from './suggest-village-content.schema';
 
 export async function suggestVillageContent(input: SuggestVillageContentInput): Promise<SuggestVillageContentOutput> {
   return suggestVillageContentFlow(input);
