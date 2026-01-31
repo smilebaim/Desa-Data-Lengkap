@@ -1,6 +1,6 @@
 'use server';
 
-import { suggestVillageContent, SuggestVillageContentInput, SuggestVillageContentOutput } from '@/ai/flows/suggest-village-content';
+import { suggestVillageContent, SuggestVillageContentInput, SuggestVillageContentOutput, SuggestVillageContentOutputSchema } from '@/ai/flows/suggest-village-content';
 import { z } from 'zod';
 
 const ActionResponseSchema = z.object({
