@@ -41,7 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadUserFromStorage]);
 
   useEffect(() => {
-    if (!isLoading && !user && pathname !== '/login') {
+    const publicPaths = ['/login', '/'];
+    if (!isLoading && !user && !publicPaths.includes(pathname)) {
         router.push('/login');
     }
   }, [isLoading, user, pathname, router]);
