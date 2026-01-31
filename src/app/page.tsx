@@ -22,7 +22,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Dynamically import the map component to prevent SSR issues
-const SatelliteMap = dynamic(() => import('@/components/satellite-map'), {
+const LeafletMap = dynamic(() => import('@/components/leaflet-map'), {
   ssr: false,
   loading: () => <div className="h-screen w-screen bg-gray-800 animate-pulse" />,
 });
@@ -31,7 +31,7 @@ export default function HomePage() {
   return (
     <TooltipProvider>
       <div className="relative h-screen w-screen overflow-hidden bg-gray-900 text-white">
-        <SatelliteMap />
+        <LeafletMap />
 
         {/* Header */}
         <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-3 bg-blue-950/60 backdrop-blur-sm shadow-lg">

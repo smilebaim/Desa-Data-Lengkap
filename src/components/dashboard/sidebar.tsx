@@ -28,7 +28,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['superadmin', 'admin', 'operator', 'village_staff'] },
   { href: '/dashboard/villages', label: 'Village Data', icon: Map, roles: ['superadmin', 'admin', 'operator'] },
   { href: '/dashboard/reports', label: 'Pelaporan', icon: FileText, roles: ['superadmin', 'admin', 'operator', 'village_staff'] },
-  { href: '/dashboard/ai-suggestions', label: 'AI Suggestions', icon: Lightbulb, roles: ['superadmin', 'admin', 'operator'] },
+  // { href: '/dashboard/ai-suggestions', label: 'AI Suggestions', icon: Lightbulb, roles: ['superadmin', 'admin', 'operator'] },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings, roles: ['superadmin'] },
 ];
 

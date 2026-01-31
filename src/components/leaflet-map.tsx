@@ -2,7 +2,6 @@
 
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon, LatLngExpression } from 'leaflet';
-import { MapPin } from 'lucide-react';
 import "leaflet/dist/leaflet.css"
 
 
@@ -16,8 +15,6 @@ const mapMarker = new Icon({
     shadowSize: [41, 41]
 });
 
-// Center of Indonesia for initial view
-const indonesiaCenter: LatLngExpression = [-2.5489, 118.0149];
 // Location from image, approximately
 const villageLocation: LatLngExpression = [-1.48, 103.58];
 
