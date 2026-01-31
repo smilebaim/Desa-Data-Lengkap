@@ -22,7 +22,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Dynamically import the map component to prevent SSR issues
-const HomeMap = dynamic(() => import('@/components/home-map'), {
+const SatelliteMap = dynamic(() => import('@/components/satellite-map'), {
   ssr: false,
   loading: () => <div className="h-screen w-screen bg-gray-800 animate-pulse" />,
 });
@@ -31,10 +31,10 @@ export default function HomePage() {
   return (
     <TooltipProvider>
       <div className="relative h-screen w-screen overflow-hidden bg-gray-900 text-white">
-        <HomeMap />
+        <SatelliteMap />
 
         {/* Header */}
-        <header className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-3 bg-blue-950/60 backdrop-blur-sm shadow-lg">
+        <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-3 bg-blue-950/60 backdrop-blur-sm shadow-lg">
           <div className="flex items-center gap-3">
             <Shield className="h-10 w-10 text-yellow-400" />
             <div>
@@ -53,7 +53,7 @@ export default function HomePage() {
         </header>
 
         {/* Left Toolbar */}
-        <aside className="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-1 rounded-lg bg-blue-950/70 p-1.5 backdrop-blur-sm border border-blue-800/50">
+        <aside className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1 rounded-lg bg-blue-950/70 p-1.5 backdrop-blur-sm border border-blue-800/50">
           <LeftToolbarButton tooltip="Layers">
             <Layers />
           </LeftToolbarButton>
@@ -79,7 +79,7 @@ export default function HomePage() {
         </aside>
 
         {/* Bottom Navigation & Footer */}
-        <footer className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-full px-4">
+        <footer className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 w-full px-4">
             <p className="mb-2 text-center text-xs text-gray-200 drop-shadow-[0_1px_1px_rgba(0,0,0,0.7)]">
                 ©2024 spasial.net
             </p>
