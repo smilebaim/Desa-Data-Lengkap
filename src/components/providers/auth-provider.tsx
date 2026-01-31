@@ -41,8 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadUserFromStorage]);
 
   useEffect(() => {
-    if (!isLoading && !user && pathname !== '/') {
-        router.push('/');
+    if (!isLoading && !user && pathname !== '/login') {
+        router.push('/login');
     }
   }, [isLoading, user, pathname, router]);
 
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    router.push('/');
+    router.push('/login');
   };
 
   const value = { user, login, logout, isLoading };
