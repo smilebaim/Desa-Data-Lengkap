@@ -1,19 +1,8 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Icon, LatLngExpression } from 'leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import type { LatLngExpression } from 'leaflet';
 import "leaflet/dist/leaflet.css"
-
-
-// Custom marker icon to match default Leaflet look
-const mapMarker = new Icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    shadowSize: [41, 41]
-});
 
 // Location from image, approximately
 const villageLocation: LatLngExpression = [-1.48, 103.58];
@@ -33,11 +22,6 @@ const LeafletMap = () => {
         subdomains={['mt0','mt1','mt2','mt3']}
         maxZoom={20}
       />
-      <Marker position={villageLocation} icon={mapMarker}>
-        <Popup>
-            Desa Remau Bako Tuo
-        </Popup>
-      </Marker>
     </MapContainer>
   );
 };
