@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Layers,
@@ -84,23 +85,23 @@ export default function HomePage() {
                 ©2024 spasial.net
             </p>
             <nav className="flex items-center justify-center gap-2 rounded-full bg-blue-950/70 p-2 backdrop-blur-sm shadow-2xl max-w-md mx-auto border border-blue-800/50">
-                <BottomNavButton tooltip="Profil">
+                <BottomNavButton tooltip="Profil" href="/dashboarddev/profil">
                     <User className="h-5 w-5" />
                     <span className="text-[10px] mt-0.5">Profil</span>
                 </BottomNavButton>
-                <BottomNavButton tooltip="Tata Ruang">
+                <BottomNavButton tooltip="Tata Ruang" href="/dashboarddev/tata-ruang">
                     <LayoutGrid className="h-5 w-5" />
                     <span className="text-[10px] mt-0.5">Tata Ruang</span>
                 </BottomNavButton>
-                <BottomNavButton tooltip="Pembangunan">
+                <BottomNavButton tooltip="Pembangunan" href="/dashboarddev/pembangunan">
                     <Building2 className="h-5 w-5" />
                     <span className="text-[10px] mt-0.5">Pembangunan</span>
                 </BottomNavButton>
-                <BottomNavButton tooltip="Dana Desa">
+                <BottomNavButton tooltip="Dana Desa" href="/dashboarddev/dana-desa">
                     <Landmark className="h-5 w-5" />
                     <span className="text-[10px] mt-0.5">Dana Desa</span>
                 </BottomNavButton>
-                 <BottomNavButton tooltip="Indeks">
+                 <BottomNavButton tooltip="Indeks" href="/dashboarddev/indeks">
                     <BarChart className="h-5 w-5" />
                     <span className="text-[10px] mt-0.5">Indeks</span>
                 </BottomNavButton>
@@ -124,11 +125,13 @@ const LeftToolbarButton = ({ children, tooltip }: { children: React.ReactNode, t
     </Tooltip>
 );
 
-const BottomNavButton = ({ children, tooltip }: { children: React.ReactNode, tooltip: string }) => (
+const BottomNavButton = ({ children, tooltip, href }: { children: React.ReactNode, tooltip: string, href: string }) => (
      <Tooltip>
         <TooltipTrigger asChild>
-            <Button variant="ghost" className="flex flex-col items-center h-auto px-3 py-1 gap-0.5 rounded-full text-gray-300 hover:bg-white/10 hover:text-white">
+            <Button asChild variant="ghost" className="flex flex-col items-center h-auto px-3 py-1 gap-0.5 rounded-full text-gray-300 hover:bg-white/10 hover:text-white">
+              <Link href={href}>
                 {children}
+              </Link>
             </Button>
         </TooltipTrigger>
         <TooltipContent className="bg-gray-800 text-white border-gray-700">
