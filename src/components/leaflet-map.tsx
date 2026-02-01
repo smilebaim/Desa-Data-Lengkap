@@ -1,18 +1,26 @@
 'use client';
 
 import { MapContainer, TileLayer } from 'react-leaflet';
-import type { LatLngExpression } from 'leaflet';
+import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import "leaflet/dist/leaflet.css"
 
-// Location from image, approximately
-const villageLocation: LatLngExpression = [-1.48, 103.58];
+// Center of Indonesia
+const indonesiaCenter: LatLngExpression = [-2.5489, 118.0149];
+// Bounding box for Indonesia
+const indonesiaBounds: LatLngBoundsExpression = [
+    [6.0769, 95.0108], // North-West
+    [-11.0058, 141.0194] // South-East
+];
 
 const LeafletMap = () => {
   return (
     <MapContainer 
         className="h-full w-full z-10"
-        center={villageLocation} 
-        zoom={12} 
+        center={indonesiaCenter} 
+        zoom={5}
+        minZoom={5}
+        maxBounds={indonesiaBounds}
+        maxBoundsViscosity={1.0}
         scrollWheelZoom={true} 
         zoomControl={false}
     >
