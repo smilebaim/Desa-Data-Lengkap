@@ -38,8 +38,8 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             <Shield className="h-10 w-10 text-yellow-400" />
             <div>
-              <h1 className="text-lg font-bold text-white">Desa Remau Bako Tuo</h1>
-              <p className="text-xs text-gray-200">Kabupaten Tanjung Jabung Timur</p>
+              <h1 className="text-lg font-bold text-white">Desa Lengkap</h1>
+              <p className="text-xs text-gray-200">Platform Data Desa</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
