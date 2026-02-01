@@ -44,7 +44,7 @@ export function DashboardSidebar() {
              <div className="inline-flex items-center justify-center gap-2">
               <Mountain className="h-8 w-8 text-primary" />
               <span className="font-headline text-2xl font-bold text-sidebar-foreground">
-                DDC
+                DL
               </span>
             </div>
           </Link>
