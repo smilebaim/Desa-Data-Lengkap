@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Data profil pengguna Desa Lengkap",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nama lengkap pengguna"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["superadmin", "admin", "operator", "village_staff"],
+          "description": "Peran pengguna dalam sistem"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "description": "URL foto profil"
+        },
+        "username": {
+          "type": "string",
+          "description": "Email atau username"
+        }
+      },
+      "required": ["name", "role"]
+    },
+    "Village": {
+      "title": "Village",
+      "description": "Informasi data desa",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "province": { "type": "string" },
+        "population": { "type": "number" },
+        "area": { "type": "number" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" }
+      },
+      "required": ["name", "province"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Laporan pembangunan desa",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "villageId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "date": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["title", "villageId", "authorId"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Dokumen profil masing-masing pengguna"
+    },
+    "/villages/{villageId}": {
+      "schema": { "$ref": "#/entities/Village" },
+      "description": "Koleksi data desa seluruh Indonesia"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "Koleksi laporan kegiatan desa"
+    }
+  }
+}
