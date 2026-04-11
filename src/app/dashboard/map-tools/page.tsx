@@ -13,7 +13,11 @@ import {
   Plus, Trash2, Edit2, Save, Search, HelpCircle, Loader2,
   Layers, Filter, Settings, Shield, MapPin, 
   Navigation, Layout, Camera, Image,
-  Database, Globe, Compass, Info, MousePointer2
+  Database, Globe, Compass, Info, MousePointer2,
+  Maximize, Minimize, ZoomIn, ZoomOut, Target,
+  Eye, EyeOff, Ruler, Grid, Map as MapIcon,
+  Wind, Thermometer, Cloud, Droplets,
+  Zap, Flame, AlertTriangle, Radio
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -22,7 +26,11 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const TOOL_ICONS = [
   'Layers', 'Filter', 'Search', 'Settings', 'Shield', 'MapPin', 
-  'Navigation', 'Layout', 'Camera', 'Image', 'Database', 'Globe', 'Compass', 'Info', 'MousePointer2'
+  'Navigation', 'Layout', 'Camera', 'Image', 'Database', 'Globe', 
+  'Compass', 'Info', 'MousePointer2', 'Maximize', 'Minimize', 
+  'ZoomIn', 'ZoomOut', 'Target', 'Eye', 'EyeOff', 'Ruler', 
+  'Grid', 'Map', 'Wind', 'Thermometer', 'Cloud', 'Droplets',
+  'Zap', 'Flame', 'AlertTriangle', 'Radio'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -44,6 +52,7 @@ export default function PengaturanAlatPetaPage() {
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [iconSearch, setIconSearch] = useState('');
   const [formData, setFormData] = useState({
     label: '',
     icon: 'Layers',
@@ -51,6 +60,10 @@ export default function PengaturanAlatPetaPage() {
     order: 0,
     position: 'left' as const
   });
+
+  const filteredIcons = TOOL_ICONS.filter(icon => 
+    icon.toLowerCase().includes(iconSearch.toLowerCase())
+  );
 
   const resetForm = () => {
     setIsEditing(null);
@@ -61,6 +74,7 @@ export default function PengaturanAlatPetaPage() {
         order: (tools?.length || 0) + 1, 
         position: 'left' 
     });
+    setIconSearch('');
   };
 
   const handleAction = async (e: React.FormEvent) => {
@@ -151,9 +165,17 @@ export default function PengaturanAlatPetaPage() {
                       <Search className="h-4 w-4 text-slate-400" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-64 p-2" align="start">
-                    <div className="grid grid-cols-4 gap-1 p-1 max-h-60 overflow-y-auto">
-                      {TOOL_ICONS.map(icon => (
+                  <PopoverContent className="w-72 p-0" align="start">
+                    <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+                      <Input 
+                        placeholder="Cari ikon alat..." 
+                        className="h-9 bg-white" 
+                        value={iconSearch} 
+                        onChange={e => setIconSearch(e.target.value)} 
+                      />
+                    </div>
+                    <div className="p-2 grid grid-cols-5 gap-1 max-h-60 overflow-y-auto">
+                      {filteredIcons.map(icon => (
                         <Button 
                           key={icon} 
                           type="button" 
@@ -176,13 +198,13 @@ export default function PengaturanAlatPetaPage() {
               </div>
 
               <div className="pt-2 flex flex-col gap-2">
-                <Button type="submit" className="w-full h-11 bg-slate-900 hover:bg-slate-800 shadow-md" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-11 bg-slate-900 hover:bg-slate-800 shadow-md text-white" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
-                  {isEditing ? 'Simpan' : 'Tambah'}
+                  {isEditing ? 'Simpan Perubahan' : 'Tambah Alat Baru'}
                 </Button>
                 {isEditing && (
                   <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>
-                    Batal
+                    Batal Edit
                   </Button>
                 )}
               </div>
@@ -192,13 +214,13 @@ export default function PengaturanAlatPetaPage() {
 
         <Card className="lg:col-span-8 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle className="text-lg">Daftar Alat Peta</CardTitle>
+            <CardTitle className="text-lg">Daftar Alat Peta Samping</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
-                  <TableHead>Label & Ikon</TableHead>
+                  <TableHead className="w-[300px]">Label & Ikon</TableHead>
                   <TableHead className="text-center">Urutan</TableHead>
                   <TableHead className="text-right pr-6">Aksi</TableHead>
                 </TableRow>
@@ -207,23 +229,30 @@ export default function PengaturanAlatPetaPage() {
                 {isLoading ? (
                   <TableRow><TableCell colSpan={3} className="text-center py-16"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
                 ) : tools.length === 0 ? (
-                  <TableRow><TableCell colSpan={3} className="text-center py-16 text-slate-400">Belum ada alat peta dikonfigurasi.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={3} className="text-center py-16 text-slate-400 italic">Belum ada alat peta yang dikonfigurasi di panel kiri.</TableCell></TableRow>
                 ) : tools.map((tool: any) => (
                   <TableRow key={tool.id} className="hover:bg-slate-50/50">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-accent">
+                        <div className="h-10 w-10 bg-accent/5 rounded-xl flex items-center justify-center text-accent border border-accent/10">
                           <DynamicIcon name={tool.icon} className="h-5 w-5" />
                         </div>
-                        <span className="font-semibold text-slate-700">{tool.label}</span>
+                        <div>
+                          <p className="font-bold text-slate-900">{tool.label}</p>
+                          <p className="text-[10px] text-slate-400 uppercase tracking-tight">Posisi: Samping Kiri</p>
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center font-mono text-xs">{tool.order}</TableCell>
+                    <TableCell className="text-center">
+                      <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-slate-100 text-[10px] font-mono font-bold text-slate-600">
+                        {tool.order}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-right space-x-1 pr-6">
-                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-accent" onClick={() => { setIsEditing(tool.id); setFormData(tool); }}>
+                      <Button size="icon" variant="ghost" className="h-9 w-9 hover:text-accent hover:bg-accent/5" onClick={() => { setIsEditing(tool.id); setFormData(tool); }}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-red-500" onClick={() => handleDelete(tool.id)}>
+                      <Button size="icon" variant="ghost" className="h-9 w-9 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(tool.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
