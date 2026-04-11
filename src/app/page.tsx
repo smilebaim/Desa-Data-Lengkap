@@ -103,8 +103,15 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* Ultra-Slim Floating Dock (Bottom) - Re-sized to be slightly larger */}
+        {/* Ultra-Slim Floating Dock (Bottom) */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-6 flex flex-col items-center gap-3">
+          {/* Credit text moved to top of the dock */}
+          <div className="flex items-center gap-2">
+            <div className="h-[1px] w-6 bg-white/10" />
+            <span className="text-[8px] text-white/30 font-bold uppercase tracking-[0.4em]">Indonesian Village Network</span>
+            <div className="h-[1px] w-6 bg-white/10" />
+          </div>
+          
           <nav className="flex items-center justify-center gap-1.5 p-1.5 bg-slate-950/50 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label}>
@@ -117,11 +124,6 @@ export default function HomePage() {
               </div>
             )}
           </nav>
-          <div className="flex items-center gap-2">
-            <div className="h-[1px] w-6 bg-white/10" />
-            <span className="text-[8px] text-white/30 font-bold uppercase tracking-[0.4em]">Indonesian Village Network</span>
-            <div className="h-[1px] w-6 bg-white/10" />
-          </div>
         </div>
 
         {/* Minimalist Zoom Controls */}
