@@ -1,57 +1,29 @@
+
 {
   "entities": {
     "UserProfile": {
       "title": "User Profile",
-      "description": "Data profil pengguna Desa Lengkap",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Nama lengkap pengguna"
-        },
-        "role": {
-          "type": "string",
-          "enum": ["superadmin", "admin", "operator", "village_staff"],
-          "description": "Peran pengguna dalam sistem"
-        },
-        "avatarUrl": {
-          "type": "string",
-          "description": "URL foto profil"
-        },
-        "username": {
-          "type": "string",
-          "description": "Email atau username"
-        }
-      },
-      "required": ["name", "role"]
-    },
-    "Village": {
-      "title": "Village",
-      "description": "Informasi data desa",
+      "description": "Data profil pengguna",
       "type": "object",
       "properties": {
         "name": { "type": "string" },
-        "province": { "type": "string" },
-        "population": { "type": "number" },
-        "area": { "type": "number" },
-        "lat": { "type": "number" },
-        "lng": { "type": "number" }
+        "role": { "type": "string", "enum": ["admin", "staff"] },
+        "avatarUrl": { "type": "string" }
       },
-      "required": ["name", "province"]
+      "required": ["name", "role"]
     },
-    "Report": {
-      "title": "Report",
-      "description": "Laporan pembangunan desa",
+    "MenuItem": {
+      "title": "Menu Item",
+      "description": "Konfigurasi item menu navigasi",
       "type": "object",
       "properties": {
-        "title": { "type": "string" },
-        "content": { "type": "string" },
-        "villageId": { "type": "string" },
-        "authorId": { "type": "string" },
-        "date": { "type": "string" },
-        "imageUrl": { "type": "string" }
+        "label": { "type": "string" },
+        "icon": { "type": "string", "description": "Nama ikon Lucide (misal: User, Map, Layers)" },
+        "href": { "type": "string" },
+        "order": { "type": "number" },
+        "position": { "type": "string", "enum": ["bottom", "left", "header"] }
       },
-      "required": ["title", "villageId", "authorId"]
+      "required": ["label", "icon", "position", "order"]
     }
   },
   "auth": {
@@ -60,15 +32,11 @@
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Dokumen profil masing-masing pengguna"
+      "description": "Data pengguna sistem"
     },
-    "/villages/{villageId}": {
-      "schema": { "$ref": "#/entities/Village" },
-      "description": "Koleksi data desa seluruh Indonesia"
-    },
-    "/reports/{reportId}": {
-      "schema": { "$ref": "#/entities/Report" },
-      "description": "Koleksi laporan kegiatan desa"
+    "/menus/{menuId}": {
+      "schema": { "$ref": "#/entities/MenuItem" },
+      "description": "Koleksi item menu dinamis untuk navigasi utama"
     }
   }
 }
