@@ -1,9 +1,8 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy, where } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,13 +34,16 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
 
 export default function AlatPetaPage() {
   const db = useFirestore();
-  const menuQuery = query(
-    collection(db, 'menus'), 
-    where('position', 'in', ['left', 'header']),
-    orderBy('order', 'asc')
-  );
-  const { data: tools, isLoading } = useCollection(menuQuery);
+  // Menggunakan kueri sederhana tanpa filter posisi untuk menghindari kebutuhan indeks komposit
+  const allMenusQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
+  const { data: allMenus, isLoading } = useCollection(allMenusQuery);
   const { toast } = useToast();
+
+  // Filter sisi klien untuk stabilitas SDK
+  const tools = useMemo(() => 
+    (allMenus || []).filter((m: any) => ['left', 'header'].includes(m.position)), 
+    [allMenus]
+  );
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,10 +55,6 @@ export default function AlatPetaPage() {
     position: 'left' as 'left' | 'header'
   });
   const [iconSearch, setIconSearch] = useState('');
-
-  const filteredIcons = TOOL_ICONS.filter(icon => 
-    icon.toLowerCase().includes(iconSearch.toLowerCase())
-  );
 
   const resetForm = () => {
     setIsEditing(null);

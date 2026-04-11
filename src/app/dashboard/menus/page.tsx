@@ -1,9 +1,8 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy, where } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
-  Plus, Trash2, Edit2, Save, Search, HelpCircle, X,
+  Plus, Trash2, Edit2, Save, Search, HelpCircle, 
   Home, BarChart, Users, Database, Map, Navigation, Info, FileText,
   PieChart, Activity, Shield, MapPin, Filter, GraduationCap, 
   Briefcase, HeartPulse, Wheat, Droplets, Zap, 
@@ -36,13 +35,16 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
 
 export default function NavigasiUtamaPage() {
   const db = useFirestore();
-  const menuQuery = query(
-    collection(db, 'menus'), 
-    where('position', '==', 'bottom'),
-    orderBy('order', 'asc')
-  );
-  const { data: menus, isLoading } = useCollection(menuQuery);
+  // Menggunakan kueri sederhana untuk menghindari kebutuhan indeks komposit yang belum terdaftar
+  const allMenusQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
+  const { data: allMenus, isLoading } = useCollection(allMenusQuery);
   const { toast } = useToast();
+
+  // Filter sisi klien untuk stabilitas
+  const menus = useMemo(() => 
+    (allMenus || []).filter((m: any) => m.position === 'bottom'), 
+    [allMenus]
+  );
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

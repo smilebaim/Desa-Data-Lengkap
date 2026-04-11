@@ -6,13 +6,13 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Menu Navigasi: Publik bisa baca, hanya staf terautentikasi bisa tulis
+    // Menu Navigasi: Publik bisa baca, hanya pengguna terautentikasi bisa tulis
     match /menus/{menuId} {
       allow read: if true;
       allow write: if request.auth != null;
     }
     
-    // Desa dan Laporan: Publik bisa baca, hanya staf terautentikasi bisa tulis
+    // Desa dan Laporan: Akses publik baca, tulis untuk staf terautentikasi
     match /villages/{villageId} {
       allow read: if true;
       allow write: if request.auth != null;
