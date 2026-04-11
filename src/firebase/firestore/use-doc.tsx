@@ -8,7 +8,7 @@ import {
   DocumentData 
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
-import { FirestorePermissionError } from '../errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '../errors';
 
 export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
   const [data, setData] = useState<T | null>(null);
@@ -32,7 +32,7 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
         const permissionError = new FirestorePermissionError({
           path: ref.path,
           operation: 'get',
-        });
+        } satisfies SecurityRuleContext);
 
         errorEmitter.emit('permission-error', permissionError);
         setError(permissionError);
