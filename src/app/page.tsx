@@ -103,24 +103,24 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* Ultra-Slim Floating Dock (Bottom) */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm px-6 flex flex-col items-center gap-3">
-          <nav className="flex items-center justify-center gap-1 p-1 bg-slate-950/50 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5">
+        {/* Ultra-Slim Floating Dock (Bottom) - Re-sized to be slightly larger */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-6 flex flex-col items-center gap-3">
+          <nav className="flex items-center justify-center gap-1.5 p-1.5 bg-slate-950/50 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label}>
-                <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
+                <DynamicIcon name={menu.icon} className="h-4 w-4" />
               </NavButton>
             ))}
             {bottomMenus.length === 0 && (
-              <div className="py-2 px-8">
-                <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest italic">No Items</p>
+              <div className="py-3 px-10">
+                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">No Items</p>
               </div>
             )}
           </nav>
           <div className="flex items-center gap-2">
-            <div className="h-[1px] w-4 bg-white/10" />
-            <span className="text-[7px] text-white/30 font-bold uppercase tracking-[0.4em]">Indonesian Village Network</span>
-            <div className="h-[1px] w-4 bg-white/10" />
+            <div className="h-[1px] w-6 bg-white/10" />
+            <span className="text-[8px] text-white/30 font-bold uppercase tracking-[0.4em]">Indonesian Village Network</span>
+            <div className="h-[1px] w-6 bg-white/10" />
           </div>
         </div>
 
@@ -157,11 +157,11 @@ function NavButton({ children, label }: { children: React.ReactNode, label: stri
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 w-14 gap-0.5 rounded-full text-slate-400 hover:bg-primary/20 hover:text-white transition-all duration-300 group">
+        <Button variant="ghost" className="flex flex-col items-center justify-center h-12 w-16 gap-1 rounded-full text-slate-400 hover:bg-primary/20 hover:text-white transition-all duration-300 group">
           <div className="transition-transform group-hover:scale-110">
             {children}
           </div>
-          <span className="text-[7px] font-bold uppercase tracking-tighter opacity-40 group-hover:opacity-100">
+          <span className="text-[8px] font-bold uppercase tracking-tight opacity-50 group-hover:opacity-100">
             {label}
           </span>
         </Button>
