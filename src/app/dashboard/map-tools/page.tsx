@@ -32,14 +32,12 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
   return <IconComponent className={className} />;
 };
 
-export default function AlatPetaPage() {
+export default function PengaturanAlatPetaPage() {
   const db = useFirestore();
-  // Menggunakan kueri sederhana tanpa filter posisi untuk menghindari kebutuhan indeks komposit
-  const allMenusQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
-  const { data: allMenus, isLoading } = useCollection(allMenusQuery);
+  const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
+  const { data: allMenus, isLoading } = useCollection(menuQuery);
   const { toast } = useToast();
 
-  // Filter sisi klien untuk stabilitas SDK
   const tools = useMemo(() => 
     (allMenus || []).filter((m: any) => ['left', 'header'].includes(m.position)), 
     [allMenus]
@@ -54,11 +52,16 @@ export default function AlatPetaPage() {
     order: 0,
     position: 'left' as 'left' | 'header'
   });
-  const [iconSearch, setIconSearch] = useState('');
 
   const resetForm = () => {
     setIsEditing(null);
-    setFormData({ label: '', icon: 'Layers', href: '#', order: (tools?.length || 0) + 1, position: 'left' });
+    setFormData({ 
+        label: '', 
+        icon: 'Layers', 
+        href: '#', 
+        order: (tools?.length || 0) + 1, 
+        position: 'left' 
+    });
   };
 
   const handleAction = async (e: React.FormEvent) => {
@@ -103,7 +106,7 @@ export default function AlatPetaPage() {
     const docRef = doc(db, 'menus', id);
     deleteDoc(docRef)
       .then(() => {
-        toast({ title: "Berhasil", description: "Alat peta telah dihapus." });
+        toast({ title: "Berhasil", description: "Alat telah dihapus." });
       })
       .catch(async () => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({ 
@@ -116,7 +119,7 @@ export default function AlatPetaPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat & Header</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat & Header Peta</h1>
         <p className="text-muted-foreground">Konfigurasi panel alat di sisi kiri dan tombol informasi di bagian atas peta.</p>
       </div>
 
@@ -136,7 +139,7 @@ export default function AlatPetaPage() {
               </div>
               
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Ikon Representasi</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Pilih Ikon</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-between gap-2 h-11 border-slate-200">
@@ -150,7 +153,7 @@ export default function AlatPetaPage() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-2" align="start">
-                    <div className="grid grid-cols-4 gap-1 p-1">
+                    <div className="grid grid-cols-4 gap-1 p-1 max-h-60 overflow-y-auto">
                       {TOOL_ICONS.map(icon => (
                         <Button 
                           key={icon} 
@@ -169,7 +172,7 @@ export default function AlatPetaPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Panel</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Tampilan</Label>
                 <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
@@ -189,7 +192,7 @@ export default function AlatPetaPage() {
               <div className="pt-2 flex flex-col gap-2">
                 <Button type="submit" className="w-full h-11 bg-slate-900 hover:bg-slate-800 shadow-md" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
-                  {isEditing ? 'Simpan Alat' : 'Tambahkan Alat'}
+                  {isEditing ? 'Simpan' : 'Tambah'}
                 </Button>
                 {isEditing && (
                   <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>
@@ -203,7 +206,7 @@ export default function AlatPetaPage() {
 
         <Card className="lg:col-span-8 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle className="text-lg">Konfigurasi Visual Peta</CardTitle>
+            <CardTitle className="text-lg">Alat Peta Terdaftar</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -217,13 +220,11 @@ export default function AlatPetaPage() {
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-16">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" />
-                  </TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-16"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
                 ) : tools.length === 0 ? (
                   <TableRow><TableCell colSpan={4} className="text-center py-16 text-slate-400">Belum ada alat peta dikonfigurasi.</TableCell></TableRow>
                 ) : tools.map((tool: any) => (
-                  <TableRow key={tool.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableRow key={tool.id} className="hover:bg-slate-50/50">
                     <TableCell className="font-semibold text-slate-700">{tool.label}</TableCell>
                     <TableCell>
                       <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
@@ -238,10 +239,10 @@ export default function AlatPetaPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right space-x-1 pr-6">
-                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-slate-100" onClick={() => { setIsEditing(tool.id); setFormData(tool); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-accent" onClick={() => { setIsEditing(tool.id); setFormData(tool); }}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-red-500 hover:bg-red-50" onClick={() => handleDelete(tool.id)}>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-red-500" onClick={() => handleDelete(tool.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>

@@ -4,7 +4,7 @@ import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, Loader2, Settings2 } from 'lucide-react';
+import { LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, Loader2, Settings2, Map as MapIcon } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 import Link from 'next/link';
@@ -38,8 +38,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user) return null;
 
   const navItems = [
-    { href: '/dashboard', label: 'Dasbor', icon: LayoutDashboard },
-    { href: '/dashboard/menus', label: 'Pengaturan Menu', icon: MenuIcon },
+    { href: '/dashboard', label: 'Ringkasan', icon: LayoutDashboard },
+    { href: '/dashboard/menus', label: 'Navigasi Utama', icon: MenuIcon },
+    { href: '/dashboard/map-tools', label: 'Alat Peta', icon: MapIcon },
   ];
 
   return (
