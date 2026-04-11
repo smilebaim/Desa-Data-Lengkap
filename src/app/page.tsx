@@ -104,12 +104,12 @@ export default function HomePage() {
         </aside>
 
         {/* Ultra-Slim Floating Dock (Bottom) */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-6 flex flex-col items-center gap-3">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-6 flex flex-col items-center gap-2">
           {/* Credit text moved to top of the dock */}
           <div className="flex items-center gap-2">
-            <div className="h-[1px] w-6 bg-white/10" />
-            <span className="text-[8px] text-white/30 font-bold uppercase tracking-[0.4em]">Indonesian Village Network</span>
-            <div className="h-[1px] w-6 bg-white/10" />
+            <div className="h-[1px] w-4 bg-white/10" />
+            <span className="text-[7px] text-white/20 font-bold uppercase tracking-[0.4em]">Indonesian Village Network</span>
+            <div className="h-[1px] w-4 bg-white/10" />
           </div>
           
           <nav className="flex items-center justify-center gap-1.5 p-1.5 bg-slate-950/50 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5">
@@ -119,7 +119,7 @@ export default function HomePage() {
               </NavButton>
             ))}
             {bottomMenus.length === 0 && (
-              <div className="py-3 px-10">
+              <div className="py-2 px-10">
                 <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest italic">No Items</p>
               </div>
             )}
@@ -127,7 +127,7 @@ export default function HomePage() {
         </div>
 
         {/* Minimalist Zoom Controls */}
-        <div className="absolute bottom-8 right-8 z-20 flex flex-col gap-1.5">
+        <div className="absolute bottom-6 right-6 z-20 flex flex-col gap-1.5">
           <button className="h-8 w-8 bg-slate-950/40 backdrop-blur-md border border-white/5 rounded-full flex items-center justify-center hover:bg-primary transition-all group shadow-xl ring-1 ring-white/5">
             <Plus className="h-3.5 w-3.5 text-white/60 group-hover:text-white" />
           </button>
