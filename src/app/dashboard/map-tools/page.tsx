@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
-  Plus, Trash2, Edit2, Save, Search, HelpCircle,
-  Settings, Layers, Filter, Search as SearchIcon, 
-  MapPin, Navigation, Layout, Camera, Image,
-  Shield, Database, Globe, Compass
+  Plus, Trash2, Edit2, Save, Search, HelpCircle, Loader2,
+  Layers, Filter, Settings, Shield, MapPin, 
+  Navigation, Layout, Camera, Image,
+  Database, Globe, Compass, Info, MousePointer2
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const TOOL_ICONS = [
   'Layers', 'Filter', 'Search', 'Settings', 'Shield', 'MapPin', 
-  'Navigation', 'Layout', 'Camera', 'Image', 'Database', 'Globe', 'Compass'
+  'Navigation', 'Layout', 'Camera', 'Image', 'Database', 'Globe', 'Compass', 'Info', 'MousePointer2'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -44,6 +44,7 @@ export default function AlatPetaPage() {
   const { toast } = useToast();
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     label: '',
     icon: 'Layers',
@@ -57,67 +58,110 @@ export default function AlatPetaPage() {
     icon.toLowerCase().includes(iconSearch.toLowerCase())
   );
 
+  const resetForm = () => {
+    setIsEditing(null);
+    setFormData({ label: '', icon: 'Layers', href: '#', order: (tools?.length || 0) + 1, position: 'left' });
+  };
+
   const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const collRef = collection(db, 'menus');
     const data = { ...formData, order: Number(formData.order) };
 
     if (isEditing) {
       const docRef = doc(db, 'menus', isEditing);
-      updateDoc(docRef, data).catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: data }));
-      });
-      setIsEditing(null);
+      updateDoc(docRef, data)
+        .then(() => {
+          toast({ title: "Berhasil", description: "Alat peta telah diperbarui." });
+          resetForm();
+        })
+        .catch(async () => {
+          errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+            path: docRef.path, 
+            operation: 'update', 
+            requestResourceData: data 
+          }));
+        })
+        .finally(() => setIsSubmitting(false));
     } else {
-      addDoc(collRef, data).catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: data }));
-      });
+      addDoc(collRef, data)
+        .then(() => {
+          toast({ title: "Berhasil", description: "Alat peta baru telah ditambahkan." });
+          resetForm();
+        })
+        .catch(async () => {
+          errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+            path: collRef.path, 
+            operation: 'create', 
+            requestResourceData: data 
+          }));
+        })
+        .finally(() => setIsSubmitting(false));
     }
-
-    setFormData({ label: '', icon: 'Layers', href: '#', order: (tools?.length || 0) + 1, position: 'left' });
-    toast({ title: "Berhasil", description: "Alat peta telah diperbarui." });
   };
 
   const handleDelete = async (id: string) => {
     const docRef = doc(db, 'menus', id);
-    deleteDoc(docRef).catch(async () => {
-      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' }));
-    });
-    toast({ title: "Berhasil", description: "Alat peta dihapus." });
+    deleteDoc(docRef)
+      .then(() => {
+        toast({ title: "Berhasil", description: "Alat peta telah dihapus." });
+      })
+      .catch(async () => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+          path: docRef.path, 
+          operation: 'delete' 
+        }));
+      });
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat & Header Peta</h1>
-        <p className="text-muted-foreground">Kelola alat bantu di sisi kiri dan tombol informasi di header peta.</p>
+    <div className="space-y-8 pb-10">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat & Header</h1>
+        <p className="text-muted-foreground">Konfigurasi panel alat di sisi kiri dan tombol informasi di bagian atas peta.</p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        <Card className="shadow-sm border-slate-200">
+      <div className="grid gap-8 lg:grid-cols-12 items-start">
+        <Card className="lg:col-span-4 shadow-sm border-slate-200 sticky top-6">
           <CardHeader>
-            <CardTitle>{isEditing ? 'Edit Alat' : 'Tambah Alat'}</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              {isEditing ? <Edit2 className="h-5 w-5 text-accent" /> : <Plus className="h-5 w-5 text-accent" />}
+              {isEditing ? 'Edit Alat' : 'Tambah Alat'}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAction} className="space-y-4">
+            <form onSubmit={handleAction} className="space-y-5">
               <div className="space-y-2">
-                <Label>Nama Alat / Label</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Label Alat</Label>
                 <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Lapisan" required />
               </div>
               
               <div className="space-y-2">
-                <Label>Ikon Alat</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Ikon Representasi</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start gap-2 h-10">
-                      <DynamicIcon name={formData.icon} className="h-4 w-4 text-primary" />
-                      <span>{formData.icon}</span>
+                    <Button variant="outline" className="w-full justify-between gap-2 h-11 border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-accent/10 rounded-lg">
+                          <DynamicIcon name={formData.icon} className="h-4 w-4 text-accent" />
+                        </div>
+                        <span className="text-sm font-medium">{formData.icon}</span>
+                      </div>
+                      <Search className="h-4 w-4 text-slate-400" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-2" align="start">
                     <div className="grid grid-cols-4 gap-1 p-1">
-                      {filteredIcons.map(icon => (
-                        <Button key={icon} type="button" variant="ghost" size="icon" onClick={() => setFormData({...formData, icon})}>
+                      {TOOL_ICONS.map(icon => (
+                        <Button 
+                          key={icon} 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => setFormData({...formData, icon})}
+                          className={`h-10 w-10 ${formData.icon === icon ? 'bg-accent/10 text-accent' : ''}`}
+                        >
                           <DynamicIcon name={icon} className="h-4 w-4" />
                         </Button>
                       ))}
@@ -127,65 +171,80 @@ export default function AlatPetaPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Posisi</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Panel</Label>
                 <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="left">Sisi Kiri (Alat Peta)</SelectItem>
-                    <SelectItem value="header">Header Atas (Informasi)</SelectItem>
+                    <SelectItem value="left">Sisi Kiri (Toolbox)</SelectItem>
+                    <SelectItem value="header">Header Atas (Info)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>Urutan</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan</Label>
                 <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} required />
               </div>
 
-              <Button type="submit" className="w-full">
-                {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-                Simpan
-              </Button>
+              <div className="pt-2 flex flex-col gap-2">
+                <Button type="submit" className="w-full h-11 bg-slate-900 hover:bg-slate-800 shadow-md" disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
+                  {isEditing ? 'Simpan Alat' : 'Tambahkan Alat'}
+                </Button>
+                {isEditing && (
+                  <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>
+                    Batal
+                  </Button>
+                )}
+              </div>
             </form>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 shadow-sm border-slate-200">
+        <Card className="lg:col-span-8 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle>Daftar Alat Peta Aktif</CardTitle>
+            <CardTitle className="text-lg">Konfigurasi Visual Peta</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead>Label</TableHead>
                   <TableHead>Posisi</TableHead>
                   <TableHead className="text-center">Ikon</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead className="text-right pr-6">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-10">Memuat data...</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-16">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" />
+                  </TableCell></TableRow>
+                ) : tools.length === 0 ? (
+                  <TableRow><TableCell colSpan={4} className="text-center py-16 text-slate-400">Belum ada alat peta dikonfigurasi.</TableCell></TableRow>
                 ) : tools.map((tool: any) => (
-                  <TableRow key={tool.id}>
-                    <TableCell className="font-medium">{tool.label}</TableCell>
+                  <TableRow key={tool.id} className="hover:bg-slate-50/50 transition-colors">
+                    <TableCell className="font-semibold text-slate-700">{tool.label}</TableCell>
                     <TableCell>
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${tool.position === 'left' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                      <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                        tool.position === 'left' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
                         {tool.position === 'left' ? 'Kiri' : 'Header'}
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                      <DynamicIcon name={tool.icon} className="h-5 w-5 mx-auto text-slate-500" />
+                      <div className="inline-flex h-9 w-9 bg-slate-100 rounded-lg items-center justify-center text-slate-600">
+                        <DynamicIcon name={tool.icon} className="h-5 w-5" />
+                      </div>
                     </TableCell>
-                    <TableCell className="text-right space-x-1">
-                      <Button size="icon" variant="ghost" onClick={() => { setIsEditing(tool.id); setFormData(tool); }}>
+                    <TableCell className="text-right space-x-1 pr-6">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-slate-100" onClick={() => { setIsEditing(tool.id); setFormData(tool); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(tool.id)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-red-500 hover:bg-red-50" onClick={() => handleDelete(tool.id)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
