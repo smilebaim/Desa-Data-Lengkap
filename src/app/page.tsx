@@ -27,9 +27,9 @@ export default function HomePage() {
   const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
   const { data: menus } = useCollection(menuQuery);
 
-  const leftMenus = menus.filter((m: any) => m.position === 'left');
-  const bottomMenus = menus.filter((m: any) => m.position === 'bottom');
-  const headerMenus = menus.filter((m: any) => m.position === 'header');
+  const leftMenus = (menus || []).filter((m: any) => m.position === 'left');
+  const bottomMenus = (menus || []).filter((m: any) => m.position === 'bottom');
+  const headerMenus = (menus || []).filter((m: any) => m.position === 'header');
 
   return (
     <TooltipProvider>
@@ -104,6 +104,11 @@ export default function HomePage() {
 
         {/* Navigasi Utama (Bawah) */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-xl px-6">
+            <div className="mb-4 flex flex-col items-center gap-2">
+                <p className="text-[10px] text-white/30 font-bold tracking-[0.3em] uppercase drop-shadow-md text-center">
+                    Indonesian Village Network • 2024
+                </p>
+            </div>
             <nav className="flex items-center justify-center gap-2 rounded-3xl bg-slate-900/90 p-2 backdrop-blur-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden">
                 {bottomMenus.map((menu: any) => (
                     <NavButton key={menu.id} label={menu.label}>
@@ -116,11 +121,6 @@ export default function HomePage() {
                     </div>
                 )}
             </nav>
-            <div className="mt-6 flex flex-col items-center gap-2">
-                <p className="text-[10px] text-white/30 font-bold tracking-[0.3em] uppercase drop-shadow-md">
-                    Indonesian Village Network • 2024
-                </p>
-            </div>
         </div>
       </div>
     </TooltipProvider>
