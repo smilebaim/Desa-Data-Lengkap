@@ -1,11 +1,10 @@
-
 'use client';
 
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, LayoutDashboard, Menu as MenuIcon, Settings2, Shield, MousePointer2, Loader2 } from 'lucide-react';
+import { LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, Loader2, Settings2 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 import Link from 'next/link';
@@ -40,8 +39,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { href: '/dashboard', label: 'Dasbor', icon: LayoutDashboard },
-    { href: '/dashboard/menus', label: 'Navigasi Bawah', icon: MenuIcon },
-    { href: '/dashboard/map-tools', label: 'Alat & Header Peta', icon: Settings2 },
+    { href: '/dashboard/menus', label: 'Pengaturan Menu', icon: MenuIcon },
   ];
 
   return (
@@ -101,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       <main className="flex-1 overflow-auto bg-slate-50 p-6 md:p-10">
-        <div className="max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
           {children}
         </div>
       </main>
