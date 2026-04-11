@@ -9,10 +9,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Edit2, Save, X, LayoutDashboard } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { 
+  Plus, Trash2, Edit2, Save, X, LayoutDashboard, Search,
+  Map, Layers, Database, Users, FileText, Settings, Home, 
+  Info, BarChart, PieChart, Activity, Shield, MapPin, 
+  Navigation, Layout, Menu, Filter, GraduationCap, 
+  Briefcase, HeartPulse, Wheat, Droplets, Zap, 
+  Car, Bike, Bus, ShoppingCart, Camera, Image,
+  HelpCircle
+} from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+
+// Daftar ikon yang direkomendasikan untuk aplikasi Desa
+const RECOMMENDED_ICONS = [
+  'Map', 'Layers', 'Database', 'Users', 'FileText', 'Settings', 'Home', 
+  'Info', 'BarChart', 'PieChart', 'Activity', 'Shield', 'MapPin', 
+  'Navigation', 'Layout', 'Menu', 'Filter', 'GraduationCap', 
+  'Briefcase', 'HeartPulse', 'Wheat', 'Droplets', 'Zap', 
+  'Car', 'Bike', 'Bus', 'ShoppingCart', 'Camera', 'Image'
+];
+
+// Komponen Pembantu Ikon Dinamis
+const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
+  const IconComponent = (LucideIcons as any)[name];
+  if (!IconComponent) return <HelpCircle className={className} />;
+  return <IconComponent className={className} />;
+};
 
 export default function MenusPage() {
   const db = useFirestore();
@@ -28,6 +54,11 @@ export default function MenusPage() {
     order: 0,
     position: 'bottom'
   });
+  const [iconSearch, setIconSearch] = useState('');
+
+  const filteredIcons = RECOMMENDED_ICONS.filter(icon => 
+    icon.toLowerCase().includes(iconSearch.toLowerCase())
+  );
 
   const handleAddMenu = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +110,7 @@ export default function MenusPage() {
         errorEmitter.emit('permission-error', permissionError);
       });
     setIsEditing(null);
+    setFormData({ label: '', icon: 'Layers', href: '#', order: (menus?.length || 0) + 1, position: 'bottom' });
     toast({ title: "Berhasil", description: "Perubahan menu telah disimpan." });
   };
 
@@ -115,14 +147,60 @@ export default function MenusPage() {
                 <Label>Label Menu</Label>
                 <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Statistik" required />
               </div>
+              
               <div className="space-y-2">
-                <Label>Ikon Lucide</Label>
-                <Input value={formData.icon} onChange={e => setFormData({...formData, icon: e.target.value})} placeholder="User, Map, Layers, dsb." required />
+                <Label>Pilih Ikon</Label>
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start gap-2 h-10 px-3">
+                        <DynamicIcon name={formData.icon} className="h-5 w-5 text-primary" />
+                        <span>{formData.icon}</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-72 p-0" align="start">
+                      <div className="p-2 border-b">
+                        <div className="relative">
+                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            placeholder="Cari ikon..." 
+                            className="pl-8 h-9 text-xs" 
+                            value={iconSearch}
+                            onChange={(e) => setIconSearch(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-5 gap-1 p-2 max-h-60 overflow-y-auto">
+                        {filteredIcons.map((iconName) => (
+                          <Button
+                            key={iconName}
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className={`h-10 w-10 ${formData.icon === iconName ? 'bg-primary/10 text-primary' : ''}`}
+                            onClick={() => setFormData({...formData, icon: iconName})}
+                            title={iconName}
+                          >
+                            <DynamicIcon name={iconName} className="h-5 w-5" />
+                          </Button>
+                        ))}
+                        {filteredIcons.length === 0 && (
+                          <div className="col-span-5 py-4 text-center text-xs text-muted-foreground">
+                            Ikon tidak ditemukan
+                          </div>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Klik tombol di atas untuk memilih ikon secara visual.</p>
               </div>
+
               <div className="space-y-2">
                 <Label>Urutan Tampilan</Label>
                 <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} required />
               </div>
+
               <div className="space-y-2">
                 <Label>Posisi di Peta</Label>
                 <Select value={formData.position} onValueChange={v => setFormData({...formData, position: v})}>
@@ -136,13 +214,16 @@ export default function MenusPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                  <Button type="submit" className="flex-1">
                   {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
                   {isEditing ? 'Simpan' : 'Tambah'}
                 </Button>
                 {isEditing && (
-                  <Button type="button" variant="outline" onClick={() => setIsEditing(null)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsEditing(null);
+                    setFormData({ label: '', icon: 'Layers', href: '#', order: (menus?.length || 0) + 1, position: 'bottom' });
+                  }}>
                     Batal
                   </Button>
                 )}
@@ -164,7 +245,7 @@ export default function MenusPage() {
                   <TableRow className="bg-slate-50">
                     <TableHead className="w-[150px]">Label</TableHead>
                     <TableHead>Posisi</TableHead>
-                    <TableHead>Ikon</TableHead>
+                    <TableHead className="text-center">Ikon</TableHead>
                     <TableHead className="text-center">Urutan</TableHead>
                     <TableHead className="text-right">Aksi</TableHead>
                   </TableRow>
@@ -182,7 +263,11 @@ export default function MenusPage() {
                           {menu.position}
                         </span>
                       </TableCell>
-                      <TableCell className="text-slate-500 font-mono text-xs">{menu.icon}</TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center">
+                           <DynamicIcon name={menu.icon} className="h-5 w-5 text-slate-500" />
+                        </div>
+                      </TableCell>
                       <TableCell className="text-center font-semibold">{menu.order}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
