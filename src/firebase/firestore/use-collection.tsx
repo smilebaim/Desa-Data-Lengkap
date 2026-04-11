@@ -8,7 +8,7 @@ import {
   DocumentData 
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
-import { FirestorePermissionError } from '../errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '../errors';
 
 export function useCollection<T = DocumentData>(query: Query<T> | null) {
   const [data, setData] = useState<T[]>([]);
@@ -33,10 +33,13 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
         setIsLoading(false);
       },
       async (serverError: any) => {
+        // Ekstraksi path dari query untuk konteks galat
+        const path = (query as any)._query?.path?.segments?.join('/') || 'unknown';
+        
         const permissionError = new FirestorePermissionError({
-          path: (query as any)._query?.path?.segments?.join('/') || 'unknown',
+          path: path,
           operation: 'list',
-        });
+        } satisfies SecurityRuleContext);
 
         errorEmitter.emit('permission-error', permissionError);
         setError(permissionError);

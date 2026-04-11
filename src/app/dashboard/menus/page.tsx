@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -10,8 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Edit2, Save, X, Settings2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
 export default function MenusPage() {
   const db = useFirestore();
@@ -30,32 +31,49 @@ export default function MenusPage() {
 
   const handleAddMenu = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      addDoc(collection(db, 'menus'), formData);
-      setFormData({ label: '', icon: 'Layers', href: '#', order: menus.length, position: 'bottom' });
-      toast({ title: "Berhasil", description: "Menu baru ditambahkan." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Terjadi kesalahan." });
-    }
+    const collRef = collection(db, 'menus');
+    
+    // Pola Mutasi Non-Blocking dengan penanganan galat kontekstual
+    addDoc(collRef, formData)
+      .catch(async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: collRef.path,
+          operation: 'create',
+          requestResourceData: formData,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
+
+    setFormData({ label: '', icon: 'Layers', href: '#', order: menus.length, position: 'bottom' });
+    toast({ title: "Permintaan dikirim", description: "Menambahkan menu baru..." });
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      deleteDoc(doc(db, 'menus', id));
-      toast({ title: "Berhasil", description: "Menu dihapus." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal menghapus menu." });
-    }
+    const docRef = doc(db, 'menus', id);
+    deleteDoc(docRef)
+      .catch(async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
+    toast({ title: "Permintaan dikirim", description: "Menghapus menu..." });
   };
 
   const handleUpdate = async (id: string) => {
-    try {
-      updateDoc(doc(db, 'menus', id), formData);
-      setIsEditing(null);
-      toast({ title: "Berhasil", description: "Menu diperbarui." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal memperbarui menu." });
-    }
+    const docRef = doc(db, 'menus', id);
+    updateDoc(docRef, formData)
+      .catch(async (error) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'update',
+          requestResourceData: formData,
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
+    setIsEditing(null);
+    toast({ title: "Permintaan dikirim", description: "Memperbarui menu..." });
   };
 
   const startEdit = (menu: any) => {
@@ -79,7 +97,6 @@ export default function MenusPage() {
       </header>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Form Tambah Menu */}
         <Card className="lg:col-span-1 h-fit">
           <CardHeader>
             <CardTitle className="text-lg">Tambah Menu Baru</CardTitle>
@@ -118,7 +135,6 @@ export default function MenusPage() {
           </CardContent>
         </Card>
 
-        {/* Tabel Daftar Menu */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="text-lg">Daftar Navigasi Aktif</CardTitle>

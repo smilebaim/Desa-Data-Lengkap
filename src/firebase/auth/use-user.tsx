@@ -27,31 +27,41 @@ export function useUser() {
   }, [auth]);
 
   useEffect(() => {
+    let unsubscribeProfile: (() => void) | undefined;
+
     if (user) {
       const userDocRef = doc(db, 'users', user.uid);
       
-      const unsubscribeProfile = onSnapshot(userDocRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
-        } else {
-          setProfile(null);
+      unsubscribeProfile = onSnapshot(
+        userDocRef, 
+        (docSnap) => {
+          if (docSnap.exists()) {
+            setProfile(docSnap.data());
+          } else {
+            setProfile(null);
+          }
+          setIsLoading(false);
+        }, 
+        async (serverError: any) => {
+          // Implementasi arsitektur penanganan galat kontekstual
+          const permissionError = new FirestorePermissionError({
+            path: userDocRef.path,
+            operation: 'get',
+          } satisfies SecurityRuleContext);
+
+          // Emit galat ke pendengar pusat (FirebaseErrorListener)
+          errorEmitter.emit('permission-error', permissionError);
+          
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      }, async (serverError: any) => {
-        // Implementasi arsitektur penanganan galat kontekstual
-        const permissionError = new FirestorePermissionError({
-          path: userDocRef.path,
-          operation: 'get',
-        } satisfies SecurityRuleContext);
-
-        // Emit galat ke pendengar pusat
-        errorEmitter.emit('permission-error', permissionError);
-        
-        setIsLoading(false);
-      });
-
-      return () => unsubscribeProfile();
+      );
     }
+
+    return () => {
+      if (unsubscribeProfile) {
+        unsubscribeProfile();
+      }
+    };
   }, [user, db]);
 
   return { user, profile, isLoading };
