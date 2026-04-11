@@ -3,11 +3,10 @@
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
@@ -39,7 +38,7 @@ export default function PengaturanAlatPetaPage() {
   const { toast } = useToast();
 
   const tools = useMemo(() => 
-    (allMenus || []).filter((m: any) => ['left', 'header'].includes(m.position)), 
+    (allMenus || []).filter((m: any) => m.position === 'left'), 
     [allMenus]
   );
 
@@ -50,7 +49,7 @@ export default function PengaturanAlatPetaPage() {
     icon: 'Layers',
     href: '#',
     order: 0,
-    position: 'left' as 'left' | 'header'
+    position: 'left' as const
   });
 
   const resetForm = () => {
@@ -119,8 +118,8 @@ export default function PengaturanAlatPetaPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat & Header Peta</h1>
-        <p className="text-muted-foreground">Konfigurasi panel alat di sisi kiri dan tombol informasi di bagian atas peta.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat Samping Peta</h1>
+        <p className="text-muted-foreground">Konfigurasi panel alat geospasial yang muncul di sisi kiri peta.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -172,20 +171,7 @@ export default function PengaturanAlatPetaPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Tampilan</Label>
-                <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="left">Sisi Kiri (Toolbox)</SelectItem>
-                    <SelectItem value="header">Header Atas (Info)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan Tampil</Label>
                 <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} required />
               </div>
 
@@ -206,38 +192,33 @@ export default function PengaturanAlatPetaPage() {
 
         <Card className="lg:col-span-8 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle className="text-lg">Alat Peta Terdaftar</CardTitle>
+            <CardTitle className="text-lg">Daftar Alat Peta</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
-                  <TableHead>Label</TableHead>
-                  <TableHead>Posisi</TableHead>
-                  <TableHead className="text-center">Ikon</TableHead>
+                  <TableHead>Label & Ikon</TableHead>
+                  <TableHead className="text-center">Urutan</TableHead>
                   <TableHead className="text-right pr-6">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-16"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
+                  <TableRow><TableCell colSpan={3} className="text-center py-16"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
                 ) : tools.length === 0 ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-16 text-slate-400">Belum ada alat peta dikonfigurasi.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={3} className="text-center py-16 text-slate-400">Belum ada alat peta dikonfigurasi.</TableCell></TableRow>
                 ) : tools.map((tool: any) => (
                   <TableRow key={tool.id} className="hover:bg-slate-50/50">
-                    <TableCell className="font-semibold text-slate-700">{tool.label}</TableCell>
                     <TableCell>
-                      <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
-                        tool.position === 'left' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {tool.position === 'left' ? 'Kiri' : 'Header'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="inline-flex h-9 w-9 bg-slate-100 rounded-lg items-center justify-center text-slate-600">
-                        <DynamicIcon name={tool.icon} className="h-5 w-5" />
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-accent">
+                          <DynamicIcon name={tool.icon} className="h-5 w-5" />
+                        </div>
+                        <span className="font-semibold text-slate-700">{tool.label}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="text-center font-mono text-xs">{tool.order}</TableCell>
                     <TableCell className="text-right space-x-1 pr-6">
                       <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-accent" onClick={() => { setIsEditing(tool.id); setFormData(tool); }}>
                         <Edit2 className="h-4 w-4" />

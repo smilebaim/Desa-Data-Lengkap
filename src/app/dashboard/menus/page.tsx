@@ -3,18 +3,17 @@
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Trash2, Edit2, Save, Search, HelpCircle, 
   Home, BarChart, Users, Database, Map, Navigation, Info, FileText,
-  PieChart, Activity, Shield, MapPin, Filter, GraduationCap, 
-  Briefcase, HeartPulse, Wheat, Droplets, Zap, 
-  Car, Bike, Bus, ShoppingCart, Camera, Image, Loader2, Layers, Settings, Compass, MousePointer2
+  PieChart, Activity, Shield, MapPin, Filter, ShoppingCart, Camera, Image, Loader2, Car, Bus
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -32,14 +31,14 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
   return <IconComponent className={className} />;
 };
 
-export default function PengaturanMenuUtamaPage() {
+export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
   const { data: allMenus, isLoading } = useCollection(menuQuery);
   const { toast } = useToast();
 
   const menus = useMemo(() => 
-    (allMenus || []).filter((m: any) => m.position === 'bottom'), 
+    (allMenus || []).filter((m: any) => ['bottom', 'header'].includes(m.position)), 
     [allMenus]
   );
 
@@ -50,7 +49,7 @@ export default function PengaturanMenuUtamaPage() {
     icon: 'Home',
     href: '#',
     order: 0,
-    position: 'bottom' as const
+    position: 'bottom' as 'bottom' | 'header'
   });
   const [iconSearch, setIconSearch] = useState('');
 
@@ -80,7 +79,7 @@ export default function PengaturanMenuUtamaPage() {
       const docRef = doc(db, 'menus', isEditing);
       updateDoc(docRef, data)
         .then(() => {
-          toast({ title: "Berhasil", description: "Menu navigasi telah diperbarui." });
+          toast({ title: "Berhasil", description: "Navigasi telah diperbarui." });
           resetForm();
         })
         .catch(async () => {
@@ -94,7 +93,7 @@ export default function PengaturanMenuUtamaPage() {
     } else {
       addDoc(collRef, data)
         .then(() => {
-          toast({ title: "Berhasil", description: "Menu navigasi baru telah ditambahkan." });
+          toast({ title: "Berhasil", description: "Navigasi baru telah ditambahkan." });
           resetForm();
         })
         .catch(async () => {
@@ -125,8 +124,8 @@ export default function PengaturanMenuUtamaPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Navigasi Utama</h1>
-        <p className="text-muted-foreground">Kelola item menu yang muncul pada bar navigasi di bagian bawah peta.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Navigasi Utama & Header</h1>
+        <p className="text-muted-foreground">Kelola item menu bar bawah dan tombol informasi di header atas peta.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -186,6 +185,19 @@ export default function PengaturanMenuUtamaPage() {
               </div>
 
               <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Tampilan</Label>
+                <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bottom">Bawah (Bar Utama)</SelectItem>
+                    <SelectItem value="header">Atas (Header Info)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan Tampil</Label>
                 <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} required />
               </div>
@@ -207,22 +219,23 @@ export default function PengaturanMenuUtamaPage() {
 
         <Card className="lg:col-span-8 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle className="text-lg">Item Navigasi Aktif</CardTitle>
+            <CardTitle className="text-lg">Item Navigasi Terdaftar</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead>Label & Ikon</TableHead>
+                  <TableHead>Posisi</TableHead>
                   <TableHead className="text-center">Urutan</TableHead>
                   <TableHead className="text-right pr-6">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={3} className="text-center py-16"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-16"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
                 ) : menus.length === 0 ? (
-                  <TableRow><TableCell colSpan={3} className="text-center py-16 text-slate-400">Belum ada navigasi ditambahkan.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-16 text-slate-400">Belum ada navigasi ditambahkan.</TableCell></TableRow>
                 ) : menus.map((menu: any) => (
                   <TableRow key={menu.id} className="hover:bg-slate-50/50">
                     <TableCell>
@@ -232,6 +245,13 @@ export default function PengaturanMenuUtamaPage() {
                         </div>
                         <span className="font-semibold text-slate-700">{menu.label}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                        menu.position === 'bottom' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
+                        {menu.position === 'bottom' ? 'Bawah' : 'Header'}
+                      </span>
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">{menu.order}</TableCell>
                     <TableCell className="text-right space-x-1 pr-6">
