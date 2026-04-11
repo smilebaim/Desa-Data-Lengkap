@@ -8,25 +8,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Trash2, Edit2, Save, Search, HelpCircle,
-  Map, Layers, Database, Users, FileText, Settings, Home, 
-  Info, BarChart, PieChart, Activity, Shield, MapPin, 
-  Navigation, Layout, Menu, Filter, GraduationCap, 
-  Briefcase, HeartPulse, Wheat, Droplets, Zap, 
-  Car, Bike, Bus, ShoppingCart, Camera, Image
+  Settings, Layers, Filter, Search as SearchIcon, 
+  MapPin, Navigation, Layout, Camera, Image,
+  Shield, Database, Globe, Compass
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import { FirestorePermissionError } from '@/firebase/errors';
 
-const RECOMMENDED_ICONS = [
-  'Home', 'BarChart', 'Users', 'Database', 'Map', 'Navigation', 'Info', 'FileText',
-  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'GraduationCap', 'Briefcase',
-  'HeartPulse', 'Wheat', 'Droplets', 'Zap', 'ShoppingCart'
+const TOOL_ICONS = [
+  'Layers', 'Filter', 'Search', 'Settings', 'Shield', 'MapPin', 
+  'Navigation', 'Layout', 'Camera', 'Image', 'Database', 'Globe', 'Compass'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -35,27 +33,27 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
   return <IconComponent className={className} />;
 };
 
-export default function NavigasiUtamaPage() {
+export default function AlatPetaPage() {
   const db = useFirestore();
   const menuQuery = query(
     collection(db, 'menus'), 
-    where('position', '==', 'bottom'),
+    where('position', 'in', ['left', 'header']),
     orderBy('order', 'asc')
   );
-  const { data: menus, isLoading } = useCollection(menuQuery);
+  const { data: tools, isLoading } = useCollection(menuQuery);
   const { toast } = useToast();
 
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     label: '',
-    icon: 'Home',
+    icon: 'Layers',
     href: '#',
     order: 0,
-    position: 'bottom' as const
+    position: 'left' as 'left' | 'header'
   });
   const [iconSearch, setIconSearch] = useState('');
 
-  const filteredIcons = RECOMMENDED_ICONS.filter(icon => 
+  const filteredIcons = TOOL_ICONS.filter(icon => 
     icon.toLowerCase().includes(iconSearch.toLowerCase())
   );
 
@@ -76,8 +74,8 @@ export default function NavigasiUtamaPage() {
       });
     }
 
-    setFormData({ label: '', icon: 'Home', href: '#', order: (menus?.length || 0) + 1, position: 'bottom' });
-    toast({ title: "Berhasil", description: "Perubahan navigasi telah disimpan." });
+    setFormData({ label: '', icon: 'Layers', href: '#', order: (tools?.length || 0) + 1, position: 'left' });
+    toast({ title: "Berhasil", description: "Alat peta telah diperbarui." });
   };
 
   const handleDelete = async (id: string) => {
@@ -85,31 +83,30 @@ export default function NavigasiUtamaPage() {
     deleteDoc(docRef).catch(async () => {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' }));
     });
-    toast({ title: "Berhasil", description: "Item navigasi dihapus." });
+    toast({ title: "Berhasil", description: "Alat peta dihapus." });
   };
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Navigasi Utama</h1>
-        <p className="text-muted-foreground">Kelola tombol-tombol navigasi yang muncul di bagian bawah peta.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Alat & Header Peta</h1>
+        <p className="text-muted-foreground">Kelola alat bantu di sisi kiri dan tombol informasi di header peta.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
         <Card className="shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle>{isEditing ? 'Edit Item' : 'Tambah Item'}</CardTitle>
-            <CardDescription>Item ini akan muncul di bilah navigasi bawah.</CardDescription>
+            <CardTitle>{isEditing ? 'Edit Alat' : 'Tambah Alat'}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAction} className="space-y-4">
               <div className="space-y-2">
-                <Label>Label</Label>
-                <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Beranda" required />
+                <Label>Nama Alat / Label</Label>
+                <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Lapisan" required />
               </div>
               
               <div className="space-y-2">
-                <Label>Ikon</Label>
+                <Label>Ikon Alat</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start gap-2 h-10">
@@ -118,19 +115,28 @@ export default function NavigasiUtamaPage() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-2" align="start">
-                    <div className="relative mb-2">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input placeholder="Cari..." className="pl-8 h-9" value={iconSearch} onChange={e => setIconSearch(e.target.value)} />
-                    </div>
-                    <div className="grid grid-cols-4 gap-1 max-h-48 overflow-y-auto p-1">
+                    <div className="grid grid-cols-4 gap-1 p-1">
                       {filteredIcons.map(icon => (
-                        <Button key={icon} type="button" variant="ghost" size="icon" onClick={() => setFormData({...formData, icon})} className={formData.icon === icon ? 'bg-primary/10' : ''}>
+                        <Button key={icon} type="button" variant="ghost" size="icon" onClick={() => setFormData({...formData, icon})}>
                           <DynamicIcon name={icon} className="h-4 w-4" />
                         </Button>
                       ))}
                     </div>
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Posisi</Label>
+                <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="left">Sisi Kiri (Alat Peta)</SelectItem>
+                    <SelectItem value="header">Header Atas (Informasi)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -142,42 +148,43 @@ export default function NavigasiUtamaPage() {
                 {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
                 Simpan
               </Button>
-              {isEditing && (
-                <Button type="button" variant="ghost" className="w-full" onClick={() => setIsEditing(null)}>Batal</Button>
-              )}
             </form>
           </CardContent>
         </Card>
 
         <Card className="lg:col-span-2 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle>Struktur Navigasi Bawah</CardTitle>
+            <CardTitle>Daftar Alat Peta Aktif</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Label</TableHead>
+                  <TableHead>Posisi</TableHead>
                   <TableHead className="text-center">Ikon</TableHead>
-                  <TableHead className="text-center">Urutan</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow><TableCell colSpan={4} className="text-center py-10">Memuat data...</TableCell></TableRow>
-                ) : menus.map((menu: any) => (
-                  <TableRow key={menu.id}>
-                    <TableCell className="font-medium">{menu.label}</TableCell>
-                    <TableCell className="text-center">
-                      <DynamicIcon name={menu.icon} className="h-5 w-5 mx-auto text-slate-500" />
+                ) : tools.map((tool: any) => (
+                  <TableRow key={tool.id}>
+                    <TableCell className="font-medium">{tool.label}</TableCell>
+                    <TableCell>
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${tool.position === 'left' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                        {tool.position === 'left' ? 'Kiri' : 'Header'}
+                      </span>
                     </TableCell>
-                    <TableCell className="text-center">{menu.order}</TableCell>
+                    <TableCell className="text-center">
+                      <DynamicIcon name={tool.icon} className="h-5 w-5 mx-auto text-slate-500" />
+                    </TableCell>
                     <TableCell className="text-right space-x-1">
-                      <Button size="icon" variant="ghost" onClick={() => { setIsEditing(menu.id); setFormData(menu); }}>
+                      <Button size="icon" variant="ghost" onClick={() => { setIsEditing(tool.id); setFormData(tool); }}>
                         <Edit2 className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => handleDelete(menu.id)}>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(tool.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
                     </TableCell>
