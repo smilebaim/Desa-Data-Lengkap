@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
-import "leaflet/dist/leaflet.css"
+import "leaflet/dist/leaflet.css";
 
 // Center of Indonesia
 const indonesiaCenter: LatLngExpression = [-2.5489, 118.0149];
@@ -15,6 +15,7 @@ const indonesiaBounds: LatLngBoundsExpression = [
 const LeafletMap = () => {
   return (
     <MapContainer 
+        key="main-map"
         className="h-full w-full z-10"
         center={indonesiaCenter} 
         zoom={5}
@@ -25,7 +26,7 @@ const LeafletMap = () => {
         zoomControl={false}
     >
       <TileLayer
-        attribution='Leaflet | &copy; Google Satellite'
+        attribution='&copy; Google Satellite'
         url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
         subdomains={['mt0','mt1','mt2','mt3']}
         maxZoom={20}
