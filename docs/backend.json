@@ -24,6 +24,35 @@
         "position": { "type": "string", "enum": ["bottom", "left", "header"] }
       },
       "required": ["label", "icon", "position", "order"]
+    },
+    "Village": {
+      "title": "Village",
+      "description": "Data administratif dan spasial desa",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "province": { "type": "string" },
+        "population": { "type": "number" },
+        "area": { "type": "number" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "boundary": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "lat": { "type": "number" },
+              "lng": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["name", "location"]
     }
   },
   "auth": {
@@ -37,6 +66,10 @@
     "/menus/{menuId}": {
       "schema": { "$ref": "#/entities/MenuItem" },
       "description": "Koleksi item menu dinamis untuk navigasi utama"
+    },
+    "/villages/{villageId}": {
+      "schema": { "$ref": "#/entities/Village" },
+      "description": "Data spasial dan demografi desa"
     }
   }
 }
