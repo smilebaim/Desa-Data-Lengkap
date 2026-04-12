@@ -57,7 +57,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Search Bar - Sekarang Terlihat di Mobile */}
+            {/* Search Bar */}
             <div className="flex-1 flex items-center bg-white/5 border border-white/5 rounded-full px-3 h-8 sm:h-9 group transition-all focus-within:bg-white/10 focus-within:border-primary/30 mx-1 max-w-[120px] xs:max-w-[180px] sm:max-w-xs md:max-w-sm">
               <Search className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-500 group-focus-within:text-primary transition-colors shrink-0" />
               <input 
@@ -86,6 +86,7 @@ export default function HomePage() {
 
         {/* Toolbar Samping Kiri */}
         <aside className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3">
+          {/* Main Tools Container */}
           <div className="flex flex-col gap-1 p-1 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10">
             {leftMenus.map((menu: any) => (
               <ToolbarButton key={menu.id} tooltip={menu.label}>
@@ -99,15 +100,26 @@ export default function HomePage() {
             )}
           </div>
           
+          {/* Filter Container */}
           <div className="flex flex-col gap-1 p-1 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
             <ToolbarButton tooltip="Filter Cepat">
               <Filter className="h-4 w-4 text-primary" />
             </ToolbarButton>
           </div>
+
+          {/* Zoom Controls Container - MOVED HERE */}
+          <div className="flex flex-col gap-1 p-1 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10">
+            <ToolbarButton tooltip="Perbesar">
+              <Plus className="h-4 w-4 text-white/70" />
+            </ToolbarButton>
+            <ToolbarButton tooltip="Perkecil">
+              <Minus className="h-4 w-4 text-white/70" />
+            </ToolbarButton>
+          </div>
         </aside>
 
         {/* Area Navigasi Bawah */}
-        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-[95vw] sm:max-w-3xl px-4 flex flex-col items-center gap-2 sm:gap-3">
+        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-[95vw] sm:max-w-3xl px-4 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
             <div className="h-[1px] w-4 sm:w-8 bg-white/20" />
             <span className="text-[7px] sm:text-[9px] text-white/50 font-bold uppercase tracking-[0.4em] whitespace-nowrap drop-shadow-sm">Indonesian Village Network</span>
@@ -126,16 +138,6 @@ export default function HomePage() {
               </div>
             )}
           </nav>
-        </div>
-
-        {/* Zoom Controls */}
-        <div className="absolute bottom-6 sm:bottom-8 right-3 sm:right-6 z-[5000] flex flex-col gap-2">
-          <button className="h-8 w-8 sm:h-10 sm:w-10 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center hover:bg-primary transition-all group shadow-2xl ring-1 ring-white/10">
-            <Plus className="h-4 w-4 text-white/70 group-hover:text-white" />
-          </button>
-          <button className="h-8 w-8 sm:h-10 sm:w-10 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center hover:bg-primary transition-all group shadow-2xl ring-1 ring-white/10">
-            <Minus className="h-4 w-4 text-white/70 group-hover:text-white" />
-          </button>
         </div>
       </div>
     </TooltipProvider>
