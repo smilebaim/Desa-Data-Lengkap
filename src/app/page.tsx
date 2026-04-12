@@ -103,18 +103,18 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* Floating Dock (Bottom) - Proportional Scale */}
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-[95vw] sm:max-w-xl px-4 flex flex-col items-center gap-1.5 sm:gap-3">
+        {/* Floating Dock (Bottom) */}
+        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-[95vw] sm:max-w-xl px-4 flex flex-col items-center gap-1.5 sm:gap-2">
           <div className="flex items-center gap-2">
             <div className="h-[1px] w-3 sm:w-6 bg-white/10" />
-            <span className="text-[5px] sm:text-[8px] text-white/30 font-bold uppercase tracking-[0.4em] whitespace-nowrap">Indonesian Village Network</span>
+            <span className="text-[6px] sm:text-[8px] text-white/30 font-bold uppercase tracking-[0.4em] whitespace-nowrap">Indonesian Village Network</span>
             <div className="h-[1px] w-3 sm:w-6 bg-white/10" />
           </div>
           
           <nav className="flex items-center justify-start sm:justify-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5 max-w-full overflow-x-auto no-scrollbar">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label}>
-                <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </NavButton>
             ))}
             {bottomMenus.length === 0 && (
@@ -126,7 +126,7 @@ export default function HomePage() {
         </div>
 
         {/* Zoom Controls */}
-        <div className="absolute bottom-4 sm:bottom-6 right-3 sm:right-6 z-20 flex flex-col gap-1.5">
+        <div className="absolute bottom-6 sm:bottom-8 right-3 sm:right-6 z-20 flex flex-col gap-1.5">
           <button className="h-7 w-7 sm:h-9 sm:w-9 bg-slate-950/40 backdrop-blur-md border border-white/5 rounded-full flex items-center justify-center hover:bg-primary transition-all group shadow-xl ring-1 ring-white/5">
             <Plus className="h-3.5 w-3.5 text-white/60 group-hover:text-white" />
           </button>
@@ -143,7 +143,7 @@ function ToolbarButton({ children, tooltip }: { children: React.ReactNode, toolt
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 text-slate-400 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
+        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 text-slate-400 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
           {children}
         </Button>
       </TooltipTrigger>
@@ -158,7 +158,7 @@ function NavButton({ children, label }: { children: React.ReactNode, label: stri
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 w-16 sm:h-14 sm:w-20 gap-0.5 sm:gap-1 rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0">
+        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 w-16 sm:h-12 sm:w-20 gap-0.5 sm:gap-1 rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0">
           <div className="transition-transform group-hover:scale-110">
             {children}
           </div>
