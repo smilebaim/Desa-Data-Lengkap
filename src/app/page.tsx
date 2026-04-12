@@ -1,4 +1,3 @@
-
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -45,7 +44,7 @@ export default function HomePage() {
           <LeafletMap />
         </div>
 
-        {/* Header Atas - Z-index ditingkatkan agar selalu di atas peta */}
+        {/* Header Atas */}
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/60 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
             <div className="flex items-center gap-2 sm:gap-3 pl-2">
@@ -107,7 +106,7 @@ export default function HomePage() {
         </aside>
 
         {/* Area Navigasi Bawah */}
-        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-[95vw] sm:max-w-xl px-4 flex flex-col items-center gap-2 sm:gap-3">
+        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-[95vw] sm:max-w-3xl px-4 flex flex-col items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
             <div className="h-[1px] w-4 sm:w-8 bg-white/20" />
             <span className="text-[7px] sm:text-[9px] text-white/50 font-bold uppercase tracking-[0.4em] whitespace-nowrap drop-shadow-sm">Indonesian Village Network</span>
@@ -121,8 +120,8 @@ export default function HomePage() {
               </NavButton>
             ))}
             {bottomMenus.length === 0 && (
-              <div className="py-2.5 px-10 sm:px-14">
-                <p className="text-[9px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-widest italic whitespace-nowrap opacity-60">Menu Kosong</p>
+              <div className="py-2.5 px-10 sm:px-14 text-center">
+                <p className="text-[9px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-widest italic whitespace-nowrap opacity-60">Konfigurasi Kosong</p>
               </div>
             )}
           </nav>
@@ -161,11 +160,11 @@ function NavButton({ children, label }: { children: React.ReactNode, label: stri
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 w-16 sm:h-12 sm:w-20 gap-0.5 sm:gap-1 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0">
+        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 min-w-[4.5rem] sm:h-12 sm:min-w-[6rem] gap-0.5 sm:gap-1 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0 px-2 sm:px-4">
           <div className="transition-transform group-hover:scale-110">
             {children}
           </div>
-          <span className="text-[7px] sm:text-[10px] font-bold uppercase tracking-tight opacity-50 group-hover:opacity-100 truncate w-full px-2 text-center">
+          <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-tight opacity-50 group-hover:opacity-100 whitespace-nowrap text-center">
             {label}
           </span>
         </Button>
