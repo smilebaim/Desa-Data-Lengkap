@@ -104,17 +104,17 @@ export default function HomePage() {
         </aside>
 
         {/* Floating Dock (Bottom) - Proportional Scale */}
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-[95vw] sm:max-w-xl px-4 flex flex-col items-center gap-3">
+        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-[95vw] sm:max-w-xl px-4 flex flex-col items-center gap-1.5 sm:gap-3">
           <div className="flex items-center gap-2">
-            <div className="h-[1px] w-4 sm:w-6 bg-white/10" />
-            <span className="text-[6px] sm:text-[8px] text-white/30 font-bold uppercase tracking-[0.4em] whitespace-nowrap">Indonesian Village Network</span>
-            <div className="h-[1px] w-4 sm:w-6 bg-white/10" />
+            <div className="h-[1px] w-3 sm:w-6 bg-white/10" />
+            <span className="text-[5px] sm:text-[8px] text-white/30 font-bold uppercase tracking-[0.4em] whitespace-nowrap">Indonesian Village Network</span>
+            <div className="h-[1px] w-3 sm:w-6 bg-white/10" />
           </div>
           
-          <nav className="flex items-center justify-start sm:justify-center gap-1 sm:gap-1.5 p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5 max-w-full overflow-x-auto no-scrollbar">
+          <nav className="flex items-center justify-start sm:justify-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/5 max-w-full overflow-x-auto no-scrollbar">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label}>
-                <DynamicIcon name={menu.icon} className="h-4 w-4 sm:h-5 sm:w-5" />
+                <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
               </NavButton>
             ))}
             {bottomMenus.length === 0 && (
@@ -158,11 +158,11 @@ function NavButton({ children, label }: { children: React.ReactNode, label: stri
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" className="flex flex-col items-center justify-center h-11 w-14 sm:h-14 sm:w-20 gap-1 rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0">
+        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 w-16 sm:h-14 sm:w-20 gap-0.5 sm:gap-1 rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0">
           <div className="transition-transform group-hover:scale-110">
             {children}
           </div>
-          <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-tight opacity-40 group-hover:opacity-100 truncate w-full px-1 text-center">
+          <span className="text-[6px] sm:text-[9px] font-bold uppercase tracking-tight opacity-40 group-hover:opacity-100 truncate w-full px-1 text-center">
             {label}
           </span>
         </Button>
