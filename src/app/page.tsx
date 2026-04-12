@@ -46,31 +46,32 @@ export default function HomePage() {
 
         {/* Header Atas */}
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
-          <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/60 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
-            <div className="flex items-center gap-2 sm:gap-3 pl-2">
+          <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/60 backdrop-blur-xl border border-white/10 p-1 rounded-full shadow-2xl ring-1 ring-white/10">
+            <div className="flex items-center gap-2 pl-2">
               <div className="h-7 w-7 sm:h-8 sm:w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
                 <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
               </div>
-              <div className="hidden xs:block">
+              <div className="hidden lg:block">
                 <h1 className="text-[10px] sm:text-xs font-bold tracking-tight text-white leading-none">Desa Lengkap</h1>
                 <p className="text-[7px] sm:text-[8px] text-primary/80 font-bold uppercase tracking-widest mt-0.5">Geospatial</p>
               </div>
             </div>
 
-            <div className="flex-1 max-w-sm hidden md:flex items-center bg-white/5 border border-white/5 rounded-full px-4 h-9 group transition-all focus-within:bg-white/10 focus-within:border-primary/30">
-              <Search className="h-3.5 w-3.5 text-slate-500 group-focus-within:text-primary transition-colors" />
+            {/* Search Bar - Sekarang Terlihat di Mobile */}
+            <div className="flex-1 flex items-center bg-white/5 border border-white/5 rounded-full px-3 h-8 sm:h-9 group transition-all focus-within:bg-white/10 focus-within:border-primary/30 mx-1 max-w-[120px] xs:max-w-[180px] sm:max-w-xs md:max-w-sm">
+              <Search className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-500 group-focus-within:text-primary transition-colors shrink-0" />
               <input 
                 type="text" 
-                placeholder="Cari desa atau wilayah..." 
-                className="bg-transparent text-[11px] font-medium outline-none placeholder:text-slate-600 w-full ml-3"
+                placeholder="Cari wilayah..." 
+                className="bg-transparent text-[9px] sm:text-[11px] font-medium outline-none placeholder:text-slate-600 w-full ml-1.5 sm:ml-3"
               />
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-1.5 pr-1">
+            <div className="flex items-center gap-1 pr-1">
               {headerMenus.map((menu: any) => (
-                <Button key={menu.id} variant="ghost" className="h-7 sm:h-8 rounded-full px-2 sm:px-3 text-[9px] sm:text-[10px] font-bold gap-1.5 sm:gap-2 text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+                <Button key={menu.id} variant="ghost" className="h-7 sm:h-8 rounded-full px-1.5 sm:px-3 text-[9px] sm:text-[10px] font-bold gap-1 sm:gap-2 text-slate-300 hover:bg-white/10 hover:text-white transition-all">
                   <DynamicIcon name={menu.icon} className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
-                  <span className="hidden lg:inline">{menu.label}</span>
+                  <span className="hidden md:inline">{menu.label}</span>
                 </Button>
               ))}
               <Link href="/login">
@@ -113,7 +114,7 @@ export default function HomePage() {
             <div className="h-[1px] w-4 sm:w-8 bg-white/20" />
           </div>
           
-          <nav className="flex items-center justify-start sm:justify-center gap-1.5 p-1.5 bg-slate-950/60 backdrop-blur-2xl border border-white/15 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/10 max-w-full overflow-x-auto no-scrollbar">
+          <nav className="flex items-center justify-start sm:justify-center gap-1.5 p-1 bg-slate-950/60 backdrop-blur-2xl border border-white/15 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/10 max-w-full overflow-x-auto no-scrollbar">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label}>
                 <DynamicIcon name={menu.icon} className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -160,7 +161,7 @@ function NavButton({ children, label }: { children: React.ReactNode, label: stri
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 min-w-[4.5rem] sm:h-12 sm:min-w-[6rem] gap-0.5 sm:gap-1 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0 px-2 sm:px-4">
+        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 min-w-[4rem] sm:h-12 sm:min-w-[6rem] gap-0.5 sm:gap-1 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0 px-2 sm:px-4">
           <div className="transition-transform group-hover:scale-110">
             {children}
           </div>
