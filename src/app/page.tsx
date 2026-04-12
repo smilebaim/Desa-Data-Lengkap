@@ -8,6 +8,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import * as LucideIcons from 'lucide-react';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 // Inisialisasi Peta secara dinamis untuk performa
 const LeafletMap = dynamic(() => import('@/components/leaflet-map'), {
@@ -30,12 +31,14 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
 
 export default function HomePage() {
   const db = useFirestore();
-  const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
+  
+  // Memoarisasi kueri untuk mencegah render ulang yang tidak perlu
+  const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: menus } = useCollection(menuQuery);
 
-  const leftMenus = (menus || []).filter((m: any) => m.position === 'left');
-  const bottomMenus = (menus || []).filter((m: any) => m.position === 'bottom');
-  const headerMenus = (menus || []).filter((m: any) => m.position === 'header');
+  const leftMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'left'), [menus]);
+  const bottomMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'bottom'), [menus]);
+  const headerMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'header'), [menus]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -44,7 +47,7 @@ export default function HomePage() {
           <LeafletMap />
         </div>
 
-        {/* Header Atas */}
+        {/* Header Atas - Standar Emas Estetika */}
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/60 backdrop-blur-xl border border-white/10 p-1 rounded-full shadow-2xl ring-1 ring-white/10">
             <div className="flex items-center gap-2 pl-2">
@@ -57,8 +60,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="flex-1 flex items-center bg-white/5 border border-white/5 rounded-full px-3 h-8 sm:h-9 group transition-all focus-within:bg-white/10 focus-within:border-primary/30 mx-1 max-w-[120px] xs:max-w-[180px] sm:max-w-xs md:max-w-sm">
+            {/* Search Bar Adaptif */}
+            <div className="flex-1 flex items-center bg-white/5 border border-white/5 rounded-full px-3 h-8 sm:h-9 group transition-all focus-within:bg-white/10 focus-within:border-primary/30 mx-1 max-w-[140px] xs:max-w-[180px] sm:max-w-xs md:max-w-sm lg:max-w-md">
               <Search className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-500 group-focus-within:text-primary transition-colors shrink-0" />
               <input 
                 type="text" 
@@ -84,9 +87,8 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Toolbar Samping Kiri */}
+        {/* Toolbar Samping Kiri Terintegrasi */}
         <aside className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3">
-          {/* Main Tools Container */}
           <div className="flex flex-col gap-1 p-1 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10">
             {leftMenus.map((menu: any) => (
               <ToolbarButton key={menu.id} tooltip={menu.label}>
@@ -100,14 +102,13 @@ export default function HomePage() {
             )}
           </div>
           
-          {/* Filter Container */}
           <div className="flex flex-col gap-1 p-1 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
             <ToolbarButton tooltip="Filter Cepat">
               <Filter className="h-4 w-4 text-primary" />
             </ToolbarButton>
           </div>
 
-          {/* Zoom Controls Container - MOVED HERE */}
+          {/* Zoom Controls Terintegrasi di Samping */}
           <div className="flex flex-col gap-1 p-1 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10">
             <ToolbarButton tooltip="Perbesar">
               <Plus className="h-4 w-4 text-white/70" />
@@ -118,23 +119,23 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* Area Navigasi Bawah */}
+        {/* Dock Navigasi Bawah - Skala Diselaraskan dengan Header */}
         <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-[95vw] sm:max-w-3xl px-4 flex flex-col items-center gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mb-1">
             <div className="h-[1px] w-4 sm:w-8 bg-white/20" />
-            <span className="text-[7px] sm:text-[9px] text-white/50 font-bold uppercase tracking-[0.4em] whitespace-nowrap drop-shadow-sm">Indonesian Village Network</span>
+            <span className="text-[7px] sm:text-[8px] text-white/40 font-bold uppercase tracking-[0.4em] whitespace-nowrap drop-shadow-sm">Indonesian Village Network</span>
             <div className="h-[1px] w-4 sm:w-8 bg-white/20" />
           </div>
           
           <nav className="flex items-center justify-start sm:justify-center gap-1.5 p-1 bg-slate-950/60 backdrop-blur-2xl border border-white/15 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/10 max-w-full overflow-x-auto no-scrollbar">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label}>
-                <DynamicIcon name={menu.icon} className="h-4 w-4 sm:h-5 sm:w-5" />
+                <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </NavButton>
             ))}
             {bottomMenus.length === 0 && (
               <div className="py-2.5 px-10 sm:px-14 text-center">
-                <p className="text-[9px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-widest italic whitespace-nowrap opacity-60">Konfigurasi Kosong</p>
+                <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest italic whitespace-nowrap opacity-60">Konfigurasi Kosong</p>
               </div>
             )}
           </nav>
@@ -163,11 +164,11 @@ function NavButton({ children, label }: { children: React.ReactNode, label: stri
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" className="flex flex-col items-center justify-center h-10 min-w-[4rem] sm:h-12 sm:min-w-[6rem] gap-0.5 sm:gap-1 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0 px-2 sm:px-4">
+        <Button variant="ghost" className="flex items-center justify-center h-8 px-3 sm:h-9 sm:px-5 gap-2 rounded-full text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group shrink-0">
           <div className="transition-transform group-hover:scale-110">
             {children}
           </div>
-          <span className="text-[7px] sm:text-[9px] font-bold uppercase tracking-tight opacity-50 group-hover:opacity-100 whitespace-nowrap text-center">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-tight opacity-80 group-hover:opacity-100 whitespace-nowrap">
             {label}
           </span>
         </Button>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -14,20 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Plus, Trash2, Edit2, Save, Search, HelpCircle, Loader2,
-  Layers, Filter, Settings, Shield, MapPin, 
-  Navigation, Layout, Camera, Image,
-  Database, Globe, Compass, Info, MousePointer2,
-  Maximize, Minimize, ZoomIn, ZoomOut, Target,
-  Eye, EyeOff, Ruler, Grid, Map as MapIcon,
-  Wind, Thermometer, Cloud, Droplets,
-  Zap, Flame, AlertTriangle, Radio, Hexagon
+  Layers, Filter, Settings, MapPin, 
+  Map as MapIcon, Info, Hexagon
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
 
 // Dynamic imports for Map components to avoid SSR issues
 const MapEditor = dynamic(() => import('./map-editor'), { 
@@ -54,13 +46,12 @@ export default function PengaturanAlatPetaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Data for Sidebar Tools
-  const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
+  // Memoized Queries
+  const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading: isMenusLoading } = useCollection(menuQuery);
   const leftTools = useMemo(() => (allMenus || []).filter((m: any) => m.position === 'left'), [allMenus]);
 
-  // Data for Villages
-  const villageQuery = query(collection(db, 'villages'), orderBy('name', 'asc'));
+  const villageQuery = useMemo(() => query(collection(db, 'villages'), orderBy('name', 'asc')), [db]);
   const { data: villages, isLoading: isVillagesLoading } = useCollection(villageQuery);
 
   const [activeTab, setActiveTab] = useState('config');
@@ -146,19 +137,19 @@ export default function PengaturanAlatPetaPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pusat Manajemen Peta</h1>
-        <p className="text-muted-foreground">Kelola alat navigasi dan data wilayah poligon desa secara terintegrasi.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pusat Manajemen Spasial</h1>
+        <p className="text-muted-foreground">Kelola alat navigasi publik dan basis data poligon wilayah desa.</p>
       </div>
 
       <Tabs defaultValue="config" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-100 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-100 p-1 rounded-xl shadow-inner">
           <TabsTrigger value="config" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Settings className="h-4 w-4 mr-2" />
-            Konfigurasi Alat
+            Konfigurasi Toolbar
           </TabsTrigger>
           <TabsTrigger value="villages" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
             <Hexagon className="h-4 w-4 mr-2" />
-            Input Poligon Desa
+            Database Wilayah
           </TabsTrigger>
         </TabsList>
 
@@ -166,29 +157,29 @@ export default function PengaturanAlatPetaPage() {
           <div className="grid gap-8 lg:grid-cols-12 items-start">
             <Card className="lg:col-span-4 shadow-sm border-slate-200">
               <CardHeader>
-                <CardTitle className="text-lg">Tambah/Edit Alat Samping</CardTitle>
-                <CardDescription>Ikon yang muncul di panel kiri peta publik.</CardDescription>
+                <CardTitle className="text-lg">Editor Alat Samping</CardTitle>
+                <CardDescription>Sesuaikan ikon yang muncul pada panel kendali kiri peta.</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleToolAction} className="space-y-5">
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase text-slate-500">Label Alat</Label>
+                    <Label className="text-xs font-bold uppercase text-slate-500">Nama Alat</Label>
                     <Input value={toolFormData.label} onChange={e => setToolFormData({...toolFormData, label: e.target.value})} required />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase text-slate-500">Ikon</Label>
+                    <Label className="text-xs font-bold uppercase text-slate-500">Ikon Lucide</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-between h-11">
                           <div className="flex items-center gap-3">
-                            <DynamicIcon name={toolFormData.icon} className="h-4 w-4 text-accent" />
+                            <DynamicIcon name={toolFormData.icon} className="h-4 w-4 text-primary" />
                             <span>{toolFormData.icon}</span>
                           </div>
                           <Search className="h-4 w-4 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-72 p-0">
-                        <div className="p-2 border-b"><Input placeholder="Cari..." value={iconSearch} onChange={e => setIconSearch(e.target.value)} /></div>
+                        <div className="p-2 border-b"><Input placeholder="Cari ikon..." value={iconSearch} onChange={e => setIconSearch(e.target.value)} /></div>
                         <div className="p-1 grid grid-cols-5 gap-1 max-h-60 overflow-y-auto">
                           {filteredIcons.map(icon => (
                             <Button key={icon} variant="ghost" size="icon" onClick={() => setToolFormData({...toolFormData, icon})}><DynamicIcon name={icon} className="h-4 w-4" /></Button>
@@ -198,30 +189,30 @@ export default function PengaturanAlatPetaPage() {
                     </Popover>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase text-slate-500">Urutan</Label>
+                    <Label className="text-xs font-bold uppercase text-slate-500">Prioritas Urutan</Label>
                     <Input type="number" value={toolFormData.order} onChange={e => setToolFormData({...toolFormData, order: parseInt(e.target.value)})} />
                   </div>
                   <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" />}
-                    {isEditingTool ? 'Simpan Perubahan' : 'Tambah Alat'}
+                    {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+                    {isEditingTool ? 'Simpan Perubahan' : 'Tambah ke Toolbar'}
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
             <Card className="lg:col-span-8 shadow-sm border-slate-200">
-              <CardHeader><CardTitle className="text-lg">Daftar Alat Samping Aktif</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg">Alat Samping Terkonfigurasi</CardTitle></CardHeader>
               <CardContent className="p-0">
                 <Table>
-                  <TableHeader><TableRow><TableHead>Label</TableHead><TableHead className="text-center">Urutan</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
+                  <TableHeader><TableRow><TableHead>Pratinjau</TableHead><TableHead className="text-center">Urutan</TableHead><TableHead className="text-right">Kontrol</TableHead></TableRow></TableHeader>
                   <TableBody>
-                    {isMenusLoading ? <TableRow><TableCell colSpan={3} className="text-center py-10">Memuat...</TableCell></TableRow> : leftTools.map((tool: any) => (
+                    {isMenusLoading ? <TableRow><TableCell colSpan={3} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow> : leftTools.length === 0 ? <TableRow><TableCell colSpan={3} className="text-center py-10 text-slate-400">Belum ada alat samping.</TableCell></TableRow> : leftTools.map((tool: any) => (
                       <TableRow key={tool.id}>
-                        <TableCell><div className="flex items-center gap-3"><DynamicIcon name={tool.icon} className="h-5 w-5 text-accent" /><b>{tool.label}</b></div></TableCell>
+                        <TableCell><div className="flex items-center gap-3"><DynamicIcon name={tool.icon} className="h-5 w-5 text-primary" /><b>{tool.label}</b></div></TableCell>
                         <TableCell className="text-center">{tool.order}</TableCell>
                         <TableCell className="text-right">
                           <Button size="icon" variant="ghost" onClick={() => { setIsEditingTool(tool.id); setToolFormData(tool); }}><Edit2 className="h-4 w-4" /></Button>
-                          <Button size="icon" variant="ghost" onClick={() => handleDelete('menus', tool.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <Button size="icon" variant="ghost" className="text-red-500" onClick={() => handleDelete('menus', tool.id)}><Trash2 className="h-4 w-4" /></Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -239,9 +230,9 @@ export default function PengaturanAlatPetaPage() {
                 <CardHeader className="bg-slate-50/50 border-b">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <MapIcon className="h-5 w-5 text-primary" />
-                    Editor Spasial Desa
+                    Editor Geospasial Wilayah
                   </CardTitle>
-                  <CardDescription>Gunakan alat poligon di sebelah kiri peta untuk menggambar batas wilayah desa.</CardDescription>
+                  <CardDescription>Gunakan alat poligon di toolbar peta untuk menandai batas fisik desa.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0 relative">
                    <MapEditor 
@@ -251,23 +242,23 @@ export default function PengaturanAlatPetaPage() {
                         boundary: data.boundary,
                         location: data.center
                       });
-                      toast({ title: "Poligon Terdeteksi", description: "Batas wilayah desa telah terekam." });
+                      toast({ title: "Wilayah Terekam", description: "Geometri poligon telah berhasil divalidasi." });
                     }}
                    />
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm">
-                <CardHeader><CardTitle className="text-lg">Desa Terdaftar</CardTitle></CardHeader>
+              <Card className="shadow-sm border-slate-200">
+                <CardHeader><CardTitle className="text-lg">Katalog Desa & Poligon</CardTitle></CardHeader>
                 <CardContent className="p-0">
                   <Table>
-                    <TableHeader><TableRow><TableHead>Nama Desa</TableHead><TableHead>Provinsi</TableHead><TableHead className="text-right">Populasi</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Desa</TableHead><TableHead>Provinsi</TableHead><TableHead className="text-center">Titik Batas</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
                     <TableBody>
-                      {isVillagesLoading ? <TableRow><TableCell colSpan={4} className="text-center py-10">Memuat...</TableCell></TableRow> : villages?.map((v: any) => (
+                      {isVillagesLoading ? <TableRow><TableCell colSpan={4} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow> : villages?.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center py-10 text-slate-400">Database desa kosong.</TableCell></TableRow> : villages?.map((v: any) => (
                         <TableRow key={v.id}>
                           <TableCell className="font-bold">{v.name}</TableCell>
                           <TableCell>{v.province || '-'}</TableCell>
-                          <TableCell className="text-right">{v.population?.toLocaleString() || 0}</TableCell>
+                          <TableCell className="text-center"><span className="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-mono">{v.boundary?.length || 0} pts</span></TableCell>
                           <TableCell className="text-right">
                             <Button size="icon" variant="ghost" className="text-red-500" onClick={() => handleDelete('villages', v.id)}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>
@@ -282,60 +273,62 @@ export default function PengaturanAlatPetaPage() {
             <div className="lg:col-span-4 space-y-6">
               <Card className="shadow-xl border-primary/20 bg-primary/5">
                 <CardHeader>
-                  <CardTitle className="text-lg">Data Atribut Desa</CardTitle>
-                  <CardDescription>Lengkapi informasi administratif setelah menggambar poligon.</CardDescription>
+                  <CardTitle className="text-lg">Informasi Atribut Desa</CardTitle>
+                  <CardDescription>Lengkapi data administratif desa terpilih.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase">Nama Desa</Label>
+                    <Label className="text-xs font-bold uppercase tracking-wider text-slate-600">Nama Resmi Desa</Label>
                     <Input 
-                      className="bg-white" 
-                      placeholder="Contoh: Desa Sukamaju" 
+                      className="bg-white border-slate-300" 
+                      placeholder="Contoh: Desa Mandiri" 
                       value={villageFormData.name} 
                       onChange={e => setVillageFormData({...villageFormData, name: e.target.value})} 
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase">Provinsi</Label>
+                    <Label className="text-xs font-bold uppercase tracking-wider text-slate-600">Provinsi</Label>
                     <Input 
-                      className="bg-white" 
+                      className="bg-white border-slate-300" 
                       value={villageFormData.province} 
                       onChange={e => setVillageFormData({...villageFormData, province: e.target.value})} 
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase">Estimasi Populasi</Label>
+                    <Label className="text-xs font-bold uppercase tracking-wider text-slate-600">Populasi (Jiwa)</Label>
                     <Input 
                       type="number" 
-                      className="bg-white" 
+                      className="bg-white border-slate-300" 
                       value={villageFormData.population} 
                       onChange={e => setVillageFormData({...villageFormData, population: parseInt(e.target.value)})} 
                     />
                   </div>
-                  <div className="p-4 bg-white rounded-lg border border-slate-200 text-[10px] space-y-1">
-                    <p className="font-bold text-slate-500 uppercase tracking-widest">Status Spasial</p>
-                    <div className="flex justify-between items-center">
-                      <span>Titik Pusat:</span>
-                      <span className="font-mono">{villageFormData.location.lat.toFixed(4)}, {villageFormData.location.lng.toFixed(4)}</span>
+                  
+                  <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-inner text-[10px] space-y-2">
+                    <p className="font-bold text-slate-400 uppercase tracking-widest">Metadata Spasial</p>
+                    <div className="flex justify-between items-center border-b pb-1">
+                      <span>Pusat (Lat, Lng):</span>
+                      <span className="font-mono text-primary">{villageFormData.location.lat.toFixed(4)}, {villageFormData.location.lng.toFixed(4)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span>Titik Poligon:</span>
+                      <span>Status Poligon:</span>
                       <span className={`font-mono font-bold ${villageFormData.boundary.length > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {villageFormData.boundary.length} Titik
+                        {villageFormData.boundary.length > 0 ? `${villageFormData.boundary.length} Titik Siap` : 'Belum Digambar'}
                       </span>
                     </div>
                   </div>
-                  <Button className="w-full h-12 shadow-lg" onClick={handleVillageSave} disabled={isSubmitting || villageFormData.boundary.length === 0}>
-                    {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
-                    Simpan Data Desa
+
+                  <Button className="w-full h-12 shadow-lg hover:translate-y-[-1px] transition-transform" onClick={handleVillageSave} disabled={isSubmitting || villageFormData.boundary.length === 0}>
+                    {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
+                    Simpan ke Database
                   </Button>
                 </CardContent>
               </Card>
 
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 text-amber-800">
                 <Info className="h-5 w-5 shrink-0" />
-                <p className="text-xs leading-relaxed">
-                  <b>Tips:</b> Klik ikon poligon pada toolbar peta, kemudian klik pada peta untuk membuat titik-titik batas desa. Klik titik pertama kembali untuk menutup poligon.
+                <p className="text-[11px] leading-relaxed">
+                  <b>Instruksi Spasial:</b> Aktifkan alat poligon pada toolbar peta (kiri atas), klik pada peta untuk membuat rute batas desa, dan klik kembali pada titik awal untuk menutup poligon.
                 </p>
               </div>
             </div>

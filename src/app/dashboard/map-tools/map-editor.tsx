@@ -1,4 +1,3 @@
-
 'use client';
 
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
@@ -26,6 +25,7 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
 
   const _onCreated = (e: any) => {
     const { layerType, layer } = e;
+    
     if (layerType === 'polygon') {
       const latlngs = layer.getLatLngs()[0];
       const boundary = latlngs.map((ll: L.LatLng) => ({ lat: ll.lat, lng: ll.lng }));
@@ -35,11 +35,17 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
         boundary,
         center: { lat: center.lat, lng: center.lng }
       });
+    } else if (layerType === 'marker') {
+      const latlng = layer.getLatLng();
+      onDrawCreated({
+        boundary: [], // Marker doesn't have a polygon boundary
+        center: { lat: latlng.lat, lng: latlng.lng }
+      });
     }
   };
 
   return (
-    <div className="h-[500px] w-full rounded-b-xl overflow-hidden z-10">
+    <div className="h-[500px] w-full rounded-b-xl overflow-hidden z-10 border-t border-slate-200">
       <MapContainer 
         center={indonesiaCenter} 
         zoom={5} 
@@ -60,19 +66,26 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
               rectangle: false,
               circle: false,
               circlemarker: false,
-              marker: true,
+              marker: {
+                icon: new L.Icon.Default()
+              },
               polyline: false,
               polygon: {
                 allowIntersection: false,
                 drawError: {
-                  color: '#e1e100',
-                  message: '<strong>Galat:</strong> Batas tidak boleh berpotongan!'
+                  color: '#ef4444',
+                  message: '<strong>Galat:</strong> Batas wilayah tidak boleh berpotongan!'
                 },
                 shapeOptions: {
                   color: '#22c55e',
-                  fillOpacity: 0.3
+                  fillOpacity: 0.3,
+                  weight: 2
                 }
               }
+            }}
+            edit={{
+              remove: true,
+              edit: true
             }}
           />
         </FeatureGroup>
