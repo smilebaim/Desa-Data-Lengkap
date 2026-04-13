@@ -1,7 +1,6 @@
-
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Marker, Popup, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, Popup, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
@@ -42,7 +41,6 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
   const featureQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features } = useCollection(featureQuery);
 
-  // Grouping features by category for Layers Control
   const categories = useMemo(() => {
     const groups: Record<string, any[]> = {};
     features?.forEach(f => {
@@ -57,8 +55,13 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
       return (
         <Marker key={f.id} position={[f.geometry.lat, f.geometry.lng]}>
           <Popup>
-            <div className="font-bold">{f.name}</div>
-            <div className="text-[10px] text-slate-500">{f.category}</div>
+            <div className="p-1">
+              <div className="flex items-center gap-2 font-bold text-slate-900">
+                <DynamicIcon name={f.icon || 'MapPin'} />
+                {f.name}
+              </div>
+              <div className="text-[10px] text-slate-500 uppercase font-black mt-1">{f.category.replace('_', ' ')}</div>
+            </div>
           </Popup>
         </Marker>
       );
@@ -70,7 +73,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
           positions={f.geometry.map((p: any) => [p.lat, p.lng])}
           pathOptions={{ color: '#3b82f6', weight: 4 }}
         >
-          <Popup>{f.name}</Popup>
+          <Popup className="font-bold">{f.name}</Popup>
         </Polyline>
       );
     }
@@ -82,8 +85,25 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
           radius={f.properties.radius}
           pathOptions={{ color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.2 }}
         >
-          <Popup>{f.name}</Popup>
+          <Popup>
+            <div className="font-bold">{f.name}</div>
+            <div className="text-xs">Radius: {Math.round(f.properties.radius)}m</div>
+          </Popup>
         </Circle>
+      );
+    }
+    if (f.type === 'polygon' || f.type === 'rectangle') {
+       return (
+        <Polygon 
+          key={f.id} 
+          positions={f.geometry.map((p: any) => [p.lat, p.lng])}
+          pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }}
+        >
+          <Popup>
+            <div className="font-bold">{f.name}</div>
+            <div className="text-xs">Luas: {f.properties.area} km²</div>
+          </Popup>
+        </Polygon>
       );
     }
     return null;
@@ -109,7 +129,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
       <LayersControl position="topright">
         {showVillages && (
           <LayersControl.Overlay checked name="Batas Desa">
-            <FeatureGroupWrapper>
+            <FeatureGroup>
               {villages.map((village) => {
                 if (!village.location) return null;
                 const center: LatLngExpression = [village.location.lat, village.location.lng];
@@ -142,25 +162,20 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                   </div>
                 );
               })}
-            </FeatureGroupWrapper>
+            </FeatureGroup>
           </LayersControl.Overlay>
         )}
 
         {Object.entries(categories).map(([catKey, catFeatures]) => (
           <LayersControl.Overlay checked key={catKey} name={catKey.replace('_', ' ').toUpperCase()}>
-            <FeatureGroupWrapper>
+            <FeatureGroup>
               {catFeatures.map(f => renderFeature(f))}
-            </FeatureGroupWrapper>
+            </FeatureGroup>
           </LayersControl.Overlay>
         ))}
       </LayersControl>
     </MapContainer>
   );
 };
-
-// Helper component for grouping
-function FeatureGroupWrapper({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
 
 export default LeafletMap;

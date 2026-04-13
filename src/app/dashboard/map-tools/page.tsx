@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -17,7 +16,9 @@ import {
   Plus, Trash2, Edit2, Save, Search, HelpCircle, Loader2,
   Layers, MapPin, Map as MapIcon, Info, Hexagon, FileJson, 
   Ruler, Waypoints, Circle as CircleIcon, Square, Landmark, 
-  Construction, TreePine, Droplets, Zap, ShieldAlert, Navigation
+  Construction, TreePine, Droplets, Zap, ShieldAlert, Navigation,
+  Home, Users, School, Hospital, Warehouse, Factory, ShoppingBag,
+  Wind, Activity, Camera, Car, Bus, Bike, Waves, Flame
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -37,11 +38,11 @@ const FEATURE_ICONS = [
 ];
 
 const CATEGORIES = [
-  { value: 'village_boundary', label: 'Batas Desa' },
   { value: 'infrastructure', label: 'Infrastruktur' },
   { value: 'natural_resource', label: 'Sumber Daya Alam' },
   { value: 'public_facility', label: 'Fasilitas Umum' },
-  { value: 'danger_zone', label: 'Area Rawan' }
+  { value: 'danger_zone', label: 'Area Rawan' },
+  { value: 'village_boundary', label: 'Batas Wilayah' }
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -60,7 +61,6 @@ export default function SpasialManagementPage() {
   const featureQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features, isLoading: isFeaturesLoading } = useCollection(featureQuery);
 
-  const [activeTab, setActiveTab] = useState('editor');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [iconSearch, setIconSearch] = useState('');
   
@@ -79,14 +79,14 @@ export default function SpasialManagementPage() {
     }
     
     setIsSubmitting(true);
-    const collName = currentFeature.category === 'village_boundary' ? 'villages' : 'features';
+    const isBoundary = currentFeature.category === 'village_boundary';
+    const collName = isBoundary ? 'villages' : 'features';
     const collRef = collection(db, collName);
     
-    // Mapping format data agar sesuai entitas Village jika kategori adalah batas desa
-    const dataToSave = currentFeature.category === 'village_boundary' 
+    const dataToSave = isBoundary 
       ? {
           name: currentFeature.name,
-          province: 'Jawa Barat', // Default or from form
+          province: 'Jawa Barat',
           population: 0,
           area: currentFeature.properties.area || 0,
           location: Array.isArray(currentFeature.geometry) ? currentFeature.geometry[0] : currentFeature.geometry,
@@ -120,20 +120,19 @@ export default function SpasialManagementPage() {
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Manajemen Spasial Lanjutan</h1>
-        <p className="text-muted-foreground">Editor multi-alat untuk mendefinisikan aset, infrastruktur, dan batas wilayah desa.</p>
+        <p className="text-muted-foreground">Gunakan alat gambar di peta untuk mendefinisikan aset, jalan, dan batas wilayah desa.</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* Kontrol Utama & Form */}
         <div className="lg:col-span-4 space-y-6">
           <Card className="shadow-lg border-primary/10">
             <CardHeader>
-              <CardTitle className="text-lg">Atribut Objek Spasial</CardTitle>
-              <CardDescription>Definisikan detail untuk objek yang digambar.</CardDescription>
+              <CardTitle className="text-lg">Atribut Objek</CardTitle>
+              <CardDescription>Detail teknis untuk objek yang akan disimpan.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500">Nama Objek / Aset</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500">Nama Objek</Label>
                 <Input 
                   placeholder="Misal: Jembatan Ciujung" 
                   value={currentFeature.name}
@@ -192,13 +191,19 @@ export default function SpasialManagementPage() {
               <div className="p-4 bg-slate-50 rounded-xl border space-y-2">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Metadata Geometris</p>
                 <div className="flex justify-between items-center text-xs">
-                  <span>Tipe Geometri:</span>
+                  <span>Tipe:</span>
                   <span className="font-bold text-primary uppercase">{currentFeature.type || 'Belum Digambar'}</span>
                 </div>
                 {currentFeature.properties.area && (
                   <div className="flex justify-between items-center text-xs">
-                    <span>Luas Estimasi:</span>
+                    <span>Luas:</span>
                     <span className="font-bold text-primary">{currentFeature.properties.area} km²</span>
+                  </div>
+                )}
+                {currentFeature.properties.radius && (
+                  <div className="flex justify-between items-center text-xs">
+                    <span>Radius:</span>
+                    <span className="font-bold text-primary">{Math.round(currentFeature.properties.radius)} m</span>
                   </div>
                 )}
               </div>
@@ -209,37 +214,19 @@ export default function SpasialManagementPage() {
                 onClick={handleSaveFeature}
               >
                 {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
-                Simpan & Sinkronkan
+                Simpan ke Database
               </Button>
             </CardContent>
           </Card>
-
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 text-amber-800">
-            <Info className="h-5 w-5 shrink-0" />
-            <div className="space-y-1">
-              <p className="text-[11px] font-bold">Panduan Editor:</p>
-              <ul className="text-[10px] list-disc pl-4 space-y-1">
-                <li>Gunakan <b>Polygon</b> untuk batas wilayah.</li>
-                <li>Gunakan <b>Polyline</b> untuk jalan/sungai.</li>
-                <li>Gunakan <b>Marker</b> untuk titik fasilitas.</li>
-                <li>Objek akan muncul di peta publik sesuai layer kategorinya.</li>
-              </ul>
-            </div>
-          </div>
         </div>
 
-        {/* Editor & List */}
         <div className="lg:col-span-8 space-y-6">
           <Card className="overflow-hidden shadow-xl border-none">
-            <CardHeader className="bg-white border-b flex flex-row items-center justify-between py-4">
+            <CardHeader className="bg-white border-b flex flex-row items-center justify-between py-4 px-6">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Navigation className="h-5 w-5 text-primary" />
-                Interaktif Canvas GIS
+                Interaktif GIS Canvas
               </CardTitle>
-              <div className="flex gap-2">
-                 <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Live Editor Ready</span>
-              </div>
             </CardHeader>
             <CardContent className="p-0">
                <MapEditor onDrawCreated={(data) => {
@@ -249,34 +236,33 @@ export default function SpasialManagementPage() {
                    geometry: data.geometry,
                    properties: data.properties
                  });
-                 toast({ title: "Geometri Berhasil Ditangkap", description: `Tipe: ${data.type} terdeteksi.` });
+                 toast({ title: "Geometri Berhasil Ditangkap", description: `Tipe ${data.type} terdeteksi.` });
                }} />
             </CardContent>
           </Card>
 
           <Card className="shadow-sm border-slate-200">
             <CardHeader>
-              <CardTitle className="text-lg">Katalog Aset & Layer Spasial</CardTitle>
+              <CardTitle className="text-lg">Katalog Data Spasial</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Tabs defaultValue="all_features">
                 <TabsList className="mx-6 mb-4">
-                  <TabsTrigger value="all_features">Seluruh Objek</TabsTrigger>
-                  <TabsTrigger value="villages">Batas Desa</TabsTrigger>
+                  <TabsTrigger value="all_features">Objek Tambahan</TabsTrigger>
+                  <TabsTrigger value="villages">Batas Wilayah</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="all_features">
                   <Table>
-                    <TableHeader><TableRow><TableHead>Nama Objek</TableHead><TableHead>Tipe</TableHead><TableHead>Kategori</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Kategori</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
                     <TableBody>
-                      {isFeaturesLoading ? <TableRow><TableCell colSpan={4} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow> : features?.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center py-10 text-slate-400">Tidak ada objek tambahan.</TableCell></TableRow> : features?.map((f: any) => (
+                      {isFeaturesLoading ? <TableRow><TableCell colSpan={3} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow> : features?.length === 0 ? <TableRow><TableCell colSpan={3} className="text-center py-10 text-slate-400">Tidak ada objek tambahan.</TableCell></TableRow> : features?.map((f: any) => (
                         <TableRow key={f.id}>
                           <TableCell className="font-bold flex items-center gap-2">
                             <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4 text-primary" />
                             {f.name}
                           </TableCell>
-                          <TableCell className="text-xs uppercase font-mono">{f.type}</TableCell>
-                          <TableCell><span className="text-[10px] bg-slate-100 px-2 py-1 rounded-full font-bold">{f.category}</span></TableCell>
+                          <TableCell><span className="text-[10px] bg-slate-100 px-2 py-1 rounded-full font-bold uppercase">{f.category}</span></TableCell>
                           <TableCell className="text-right">
                             <Button size="icon" variant="ghost" className="text-red-500" onClick={() => handleDelete('features', f.id)}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>

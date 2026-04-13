@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useUser } from '@/firebase';
@@ -7,7 +6,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, 
-  Loader2, Settings2, Map as MapIcon, BarChart3, Layers, Database
+  Loader2, Map as MapIcon, BarChart3, Settings2
 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/firebase';
