@@ -1,10 +1,14 @@
+
 'use client';
 
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, Loader2, Settings2, Map as MapIcon } from 'lucide-react';
+import { 
+  LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, 
+  Loader2, Settings2, Map as MapIcon, BarChart3, Layers, Database
+} from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 import Link from 'next/link';
@@ -40,20 +44,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { href: '/dashboard', label: 'Ringkasan', icon: LayoutDashboard },
     { href: '/dashboard/menus', label: 'Navigasi Utama', icon: MenuIcon },
-    { href: '/dashboard/map-tools', label: 'Alat Peta', icon: MapIcon },
+    { href: '/dashboard/map-tools', label: 'Manajemen Spasial', icon: MapIcon },
+    { href: '/dashboard/visualizations', label: 'Visualisasi Data', icon: BarChart3 },
   ];
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar Modern */}
       <aside className="w-64 bg-slate-900 text-slate-100 flex flex-col border-r border-slate-800 shadow-xl">
         <div className="p-6 border-b border-slate-800 flex items-center gap-3 bg-slate-950/50">
           <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
             <Shield className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="font-bold text-sm tracking-tight text-white">Admin Panel</h2>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Desa Lengkap</p>
+            <h2 className="font-bold text-sm tracking-tight text-white">Sistem Informasi Desa</h2>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Admin Panel</p>
           </div>
         </div>
         
@@ -90,11 +94,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           <Link href="/" className="flex items-center gap-3 px-4 py-2 text-xs text-slate-400 hover:text-white transition-colors">
             <MousePointer2 className="h-4 w-4" />
-            Ke Peta Publik
+            Buka Peta Publik
           </Link>
           <Button variant="ghost" className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-950/30 rounded-xl h-10" onClick={handleLogout}>
             <LogOut className="mr-3 h-4 w-4" />
-            Keluar Sesi
+            Keluar
           </Button>
         </div>
       </aside>

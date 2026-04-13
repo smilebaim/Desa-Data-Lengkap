@@ -1,11 +1,16 @@
+
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Marker, Popup, Tooltip as LeafletTooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, Popup, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { useMemo } from 'react';
+import * as LucideIcons from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
-// Fix for default Leaflet icons
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -15,12 +20,16 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// Center of Indonesia
+const DynamicIcon = ({ name }: { name: string }) => {
+  const IconComponent = (LucideIcons as any)[name];
+  if (!IconComponent) return <HelpCircle className="h-4 w-4" />;
+  return <IconComponent className="h-4 w-4" />;
+};
+
 const indonesiaCenter: LatLngExpression = [-2.5489, 118.0149];
-// Bounding box for Indonesia
 const indonesiaBounds: LatLngBoundsExpression = [
-    [6.0769, 95.0108], // North-West
-    [-11.0058, 141.0194] // South-East
+    [6.0769, 95.0108],
+    [-11.0058, 141.0194]
 ];
 
 interface LeafletMapProps {
@@ -29,6 +38,57 @@ interface LeafletMapProps {
 }
 
 const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
+  const db = useFirestore();
+  const featureQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
+  const { data: features } = useCollection(featureQuery);
+
+  // Grouping features by category for Layers Control
+  const categories = useMemo(() => {
+    const groups: Record<string, any[]> = {};
+    features?.forEach(f => {
+      if (!groups[f.category]) groups[f.category] = [];
+      groups[f.category].push(f);
+    });
+    return groups;
+  }, [features]);
+
+  const renderFeature = (f: any) => {
+    if (f.type === 'marker') {
+      return (
+        <Marker key={f.id} position={[f.geometry.lat, f.geometry.lng]}>
+          <Popup>
+            <div className="font-bold">{f.name}</div>
+            <div className="text-[10px] text-slate-500">{f.category}</div>
+          </Popup>
+        </Marker>
+      );
+    }
+    if (f.type === 'polyline') {
+      return (
+        <Polyline 
+          key={f.id} 
+          positions={f.geometry.map((p: any) => [p.lat, p.lng])}
+          pathOptions={{ color: '#3b82f6', weight: 4 }}
+        >
+          <Popup>{f.name}</Popup>
+        </Polyline>
+      );
+    }
+    if (f.type === 'circle') {
+      return (
+        <Circle 
+          key={f.id} 
+          center={[f.geometry.lat, f.geometry.lng]}
+          radius={f.properties.radius}
+          pathOptions={{ color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.2 }}
+        >
+          <Popup>{f.name}</Popup>
+        </Circle>
+      );
+    }
+    return null;
+  };
+
   return (
     <MapContainer 
         key="main-map"
@@ -38,57 +98,69 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
         minZoom={5}
         maxBounds={indonesiaBounds}
         maxBoundsViscosity={1.0}
-        scrollWheelZoom={true} 
         zoomControl={false}
     >
       <TileLayer
         attribution='&copy; Google Satellite'
         url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
         subdomains={['mt0','mt1','mt2','mt3']}
-        maxZoom={20}
       />
 
-      {showVillages && villages.map((village) => {
-        if (!village.location) return null;
-        
-        const center: LatLngExpression = [village.location.lat, village.location.lng];
-        const hasBoundary = village.boundary && village.boundary.length > 0;
-        const polygonPath = hasBoundary ? village.boundary.map((p: any) => [p.lat, p.lng]) : [];
+      <LayersControl position="topright">
+        {showVillages && (
+          <LayersControl.Overlay checked name="Batas Desa">
+            <FeatureGroupWrapper>
+              {villages.map((village) => {
+                if (!village.location) return null;
+                const center: LatLngExpression = [village.location.lat, village.location.lng];
+                const hasBoundary = village.boundary && village.boundary.length > 0;
+                const polygonPath = hasBoundary ? village.boundary.map((p: any) => [p.lat, p.lng]) : [];
 
-        return (
-          <div key={village.id}>
-            {hasBoundary && (
-              <Polygon 
-                positions={polygonPath}
-                pathOptions={{ 
-                  color: '#22c55e', 
-                  fillColor: '#22c55e', 
-                  fillOpacity: 0.3,
-                  weight: 2 
-                }}
-              >
-                <Popup>
-                  <div className="p-1">
-                    <h3 className="font-bold text-slate-900">{village.name}</h3>
-                    <p className="text-[10px] text-slate-500 uppercase font-bold">{village.province}</p>
-                    <div className="mt-2 text-xs border-t pt-2">
-                      <p>Populasi: <b>{village.population?.toLocaleString()}</b> jiwa</p>
-                    </div>
+                return (
+                  <div key={village.id}>
+                    {hasBoundary && (
+                      <Polygon 
+                        positions={polygonPath}
+                        pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }}
+                      >
+                        <Popup>
+                          <div className="p-1">
+                            <h3 className="font-bold text-slate-900">{village.name}</h3>
+                            <p className="text-[10px] text-slate-500 uppercase font-bold">{village.province}</p>
+                            <div className="mt-2 text-xs border-t pt-2">
+                              <p>Populasi: <b>{village.population?.toLocaleString()}</b> jiwa</p>
+                            </div>
+                          </div>
+                        </Popup>
+                      </Polygon>
+                    )}
+                    <Marker position={center}>
+                      <LeafletTooltip direction="top" offset={[0, -10]} opacity={1}>
+                        <span className="font-bold text-[10px]">{village.name}</span>
+                      </LeafletTooltip>
+                    </Marker>
                   </div>
-                </Popup>
-              </Polygon>
-            )}
-            
-            <Marker position={center}>
-              <LeafletTooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-                <span className="font-bold text-[10px]">{village.name}</span>
-              </LeafletTooltip>
-            </Marker>
-          </div>
-        );
-      })}
+                );
+              })}
+            </FeatureGroupWrapper>
+          </LayersControl.Overlay>
+        )}
+
+        {Object.entries(categories).map(([catKey, catFeatures]) => (
+          <LayersControl.Overlay checked key={catKey} name={catKey.replace('_', ' ').toUpperCase()}>
+            <FeatureGroupWrapper>
+              {catFeatures.map(f => renderFeature(f))}
+            </FeatureGroupWrapper>
+          </LayersControl.Overlay>
+        ))}
+      </LayersControl>
     </MapContainer>
   );
 };
+
+// Helper component for grouping
+function FeatureGroupWrapper({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
 
 export default LeafletMap;

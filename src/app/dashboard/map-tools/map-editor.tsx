@@ -1,3 +1,4 @@
+
 'use client';
 
 import { MapContainer, TileLayer, FeatureGroup, LayersControl } from 'react-leaflet';
@@ -6,7 +7,6 @@ import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 
-// Fix for default Leaflet icons in Next.js
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -17,39 +17,41 @@ if (typeof window !== 'undefined') {
 }
 
 interface MapEditorProps {
-  onDrawCreated: (data: { boundary: { lat: number, lng: number }[], center: { lat: number, lng: number }, area: number }) => void;
+  onDrawCreated: (payload: { 
+    type: string, 
+    geometry: any, 
+    properties: { area?: number, length?: number, radius?: number } 
+  }) => void;
 }
 
 const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
   const indonesiaCenter: [number, number] = [-2.5489, 118.0149];
 
-  const calculateArea = (latlngs: L.LatLng[]) => {
-    // Formula dasar untuk menghitung luas poligon di permukaan bola (dalam meter persegi)
-    return L.GeometryUtil.geodesicArea(latlngs) / 1000000; // Konversi ke km2
-  };
-
   const _onCreated = (e: any) => {
     const { layerType, layer } = e;
     
+    let payload: any = { type: layerType, properties: {} };
+
     if (layerType === 'polygon') {
       const latlngs = layer.getLatLngs()[0];
-      const boundary = latlngs.map((ll: L.LatLng) => ({ lat: ll.lat, lng: ll.lng }));
-      const center = layer.getBounds().getCenter();
-      const area = calculateArea(latlngs);
-      
-      onDrawCreated({
-        boundary,
-        center: { lat: center.lat, lng: center.lng },
-        area: parseFloat(area.toFixed(2))
-      });
+      payload.geometry = latlngs.map((ll: L.LatLng) => ({ lat: ll.lat, lng: ll.lng }));
+      payload.properties.area = parseFloat((L.GeometryUtil.geodesicArea(latlngs) / 1000000).toFixed(2));
     } else if (layerType === 'marker') {
-      const latlng = layer.getLatLng();
-      onDrawCreated({
-        boundary: [], 
-        center: { lat: latlng.lat, lng: latlng.lng },
-        area: 0
-      });
+      const ll = layer.getLatLng();
+      payload.geometry = { lat: ll.lat, lng: ll.lng };
+    } else if (layerType === 'polyline') {
+      const latlngs = layer.getLatLngs();
+      payload.geometry = latlngs.map((ll: L.LatLng) => ({ lat: ll.lat, lng: ll.lng }));
+    } else if (layerType === 'circle') {
+      const ll = layer.getLatLng();
+      payload.geometry = { lat: ll.lat, lng: ll.lng };
+      payload.properties.radius = layer.getRadius();
+    } else if (layerType === 'rectangle') {
+      const latlngs = layer.getLatLngs()[0];
+      payload.geometry = latlngs.map((ll: L.LatLng) => ({ lat: ll.lat, lng: ll.lng }));
     }
+
+    onDrawCreated(payload);
   };
 
   return (
@@ -58,7 +60,6 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
         center={indonesiaCenter} 
         zoom={5} 
         style={{ height: '100%', width: '100%' }}
-        zoomControl={true}
       >
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name="Satelit (Google)">
@@ -66,20 +67,12 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
               attribution='&copy; Google Satellite'
               url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
               subdomains={['mt0','mt1','mt2','mt3']}
-              maxZoom={20}
             />
           </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Jalan (OpenStreetMap)">
+          <LayersControl.BaseLayer name="Street Map">
             <TileLayer
               attribution='&copy; OpenStreetMap'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Terrain (Google)">
-            <TileLayer
-              attribution='&copy; Google Terrain'
-              url="https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}"
-              subdomains={['mt0','mt1','mt2','mt3']}
             />
           </LayersControl.BaseLayer>
         </LayersControl>
@@ -89,30 +82,21 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
             position="topleft"
             onCreated={_onCreated}
             draw={{
-              rectangle: false,
-              circle: false,
-              circlemarker: false,
-              marker: {
-                icon: new L.Icon.Default()
+              polyline: {
+                shapeOptions: { color: '#3b82f6', weight: 4 }
               },
-              polyline: false,
               polygon: {
                 allowIntersection: false,
-                drawError: {
-                  color: '#ef4444',
-                  message: '<strong>Galat:</strong> Batas wilayah tidak boleh berpotongan!'
-                },
-                shapeOptions: {
-                  color: '#22c55e',
-                  fillOpacity: 0.3,
-                  weight: 2
-                },
-                showArea: true
-              }
-            }}
-            edit={{
-              remove: true,
-              edit: true
+                shapeOptions: { color: '#22c55e', fillOpacity: 0.3 }
+              },
+              circle: {
+                shapeOptions: { color: '#f59e0b' }
+              },
+              rectangle: {
+                shapeOptions: { color: '#8b5cf6' }
+              },
+              marker: true,
+              circlemarker: false
             }}
           />
         </FeatureGroup>

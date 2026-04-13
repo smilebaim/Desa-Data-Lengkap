@@ -18,7 +18,7 @@
       "type": "object",
       "properties": {
         "label": { "type": "string" },
-        "icon": { "type": "string", "description": "Nama ikon Lucide (misal: User, Map, Layers)" },
+        "icon": { "type": "string", "description": "Nama ikon Lucide" },
         "href": { "type": "string" },
         "order": { "type": "number" },
         "position": { "type": "string", "enum": ["bottom", "left", "header"] }
@@ -53,6 +53,20 @@
         }
       },
       "required": ["name", "location"]
+    },
+    "MapFeature": {
+      "title": "Map Feature",
+      "description": "Objek spasial tambahan (Marker, Line, POI)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["marker", "polyline", "circle"] },
+        "category": { "type": "string" },
+        "icon": { "type": "string" },
+        "geometry": { "type": "object" },
+        "properties": { "type": "object" }
+      },
+      "required": ["name", "type", "geometry"]
     }
   },
   "auth": {
@@ -65,11 +79,15 @@
     },
     "/menus/{menuId}": {
       "schema": { "$ref": "#/entities/MenuItem" },
-      "description": "Koleksi item menu dinamis untuk navigasi utama"
+      "description": "Koleksi item menu dinamis"
     },
     "/villages/{villageId}": {
       "schema": { "$ref": "#/entities/Village" },
-      "description": "Data spasial dan demografi desa"
+      "description": "Data spasial desa"
+    },
+    "/features/{featureId}": {
+      "schema": { "$ref": "#/entities/MapFeature" },
+      "description": "Data overlay peta (POI, Jalan, Aset)"
     }
   }
 }
