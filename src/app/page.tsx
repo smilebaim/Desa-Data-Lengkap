@@ -8,7 +8,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import * as LucideIcons from 'lucide-react';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 // Inisialisasi Peta secara dinamis untuk performa
 const LeafletMap = dynamic(() => import('@/components/leaflet-map'), {
@@ -31,10 +31,14 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
 
 export default function HomePage() {
   const db = useFirestore();
+  const [showVillages, setShowVillages] = useState(true);
   
   // Memoarisasi kueri untuk mencegah render ulang yang tidak perlu
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: menus } = useCollection(menuQuery);
+
+  const villageQuery = useMemo(() => query(collection(db, 'villages'), orderBy('name', 'asc')), [db]);
+  const { data: villages } = useCollection(villageQuery);
 
   const leftMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'left'), [menus]);
   const bottomMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'bottom'), [menus]);
@@ -44,10 +48,10 @@ export default function HomePage() {
     <TooltipProvider delayDuration={0}>
       <div className="relative h-[100dvh] w-screen overflow-hidden bg-slate-950 text-white font-body">
         <div className="absolute inset-0 z-0">
-          <LeafletMap />
+          <LeafletMap villages={villages} showVillages={showVillages} />
         </div>
 
-        {/* Header Atas - Standar Emas Estetika */}
+        {/* Header Atas */}
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/60 backdrop-blur-xl border border-white/10 p-1 rounded-full shadow-2xl ring-1 ring-white/10">
             <div className="flex items-center gap-2 pl-2">
@@ -60,7 +64,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Search Bar Adaptif */}
             <div className="flex-1 flex items-center bg-white/5 border border-white/5 rounded-full px-3 h-8 sm:h-9 group transition-all focus-within:bg-white/10 focus-within:border-primary/30 mx-1 max-w-[140px] xs:max-w-[180px] sm:max-w-xs md:max-w-sm lg:max-w-md">
               <Search className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-500 group-focus-within:text-primary transition-colors shrink-0" />
               <input 
@@ -87,19 +90,23 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Toolbar Samping Kiri Terintegrasi */}
+        {/* Toolbar Samping Kiri */}
         <aside className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3">
           <div className="flex flex-col gap-1 p-1 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10">
+            {/* Tombol Layer khusus untuk Kontrol Wilayah Desa */}
+            <ToolbarButton 
+              tooltip={showVillages ? "Sembunyikan Wilayah" : "Tampilkan Wilayah"}
+              onClick={() => setShowVillages(!showVillages)}
+              className={showVillages ? "bg-primary text-white" : ""}
+            >
+              <Layers className="h-4 w-4" />
+            </ToolbarButton>
+            
             {leftMenus.map((menu: any) => (
               <ToolbarButton key={menu.id} tooltip={menu.label}>
                 <DynamicIcon name={menu.icon} className="h-4 w-4" />
               </ToolbarButton>
             ))}
-            {leftMenus.length === 0 && (
-              <ToolbarButton tooltip="Lapisan Peta">
-                <Layers className="h-4 w-4 opacity-40" />
-              </ToolbarButton>
-            )}
           </div>
           
           <div className="flex flex-col gap-1 p-1 bg-white/10 backdrop-blur-xl border border-white/10 rounded-full">
@@ -108,7 +115,6 @@ export default function HomePage() {
             </ToolbarButton>
           </div>
 
-          {/* Zoom Controls Terintegrasi di Samping */}
           <div className="flex flex-col gap-1 p-1 bg-slate-950/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10">
             <ToolbarButton tooltip="Perbesar">
               <Plus className="h-4 w-4 text-white/70" />
@@ -119,7 +125,7 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* Dock Navigasi Bawah - Skala Diselaraskan dengan Header */}
+        {/* Dock Navigasi Bawah */}
         <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-[95vw] sm:max-w-3xl px-4 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2 mb-1">
             <div className="h-[1px] w-4 sm:w-8 bg-white/20" />
@@ -133,11 +139,6 @@ export default function HomePage() {
                 <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </NavButton>
             ))}
-            {bottomMenus.length === 0 && (
-              <div className="py-2.5 px-10 sm:px-14 text-center">
-                <p className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest italic whitespace-nowrap opacity-60">Konfigurasi Kosong</p>
-              </div>
-            )}
           </nav>
         </div>
       </div>
@@ -145,11 +146,16 @@ export default function HomePage() {
   );
 }
 
-function ToolbarButton({ children, tooltip }: { children: React.ReactNode, tooltip: string }) {
+function ToolbarButton({ children, tooltip, onClick, className }: { children: React.ReactNode, tooltip: string, onClick?: () => void, className?: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 text-slate-400 hover:bg-primary hover:text-white rounded-full transition-all duration-300">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onClick}
+          className={`h-8 w-8 sm:h-9 sm:w-9 text-slate-400 hover:bg-primary hover:text-white rounded-full transition-all duration-300 ${className}`}
+        >
           {children}
         </Button>
       </TooltipTrigger>
