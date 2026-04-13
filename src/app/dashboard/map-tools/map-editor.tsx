@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup, LayersControl } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
@@ -17,11 +17,16 @@ if (typeof window !== 'undefined') {
 }
 
 interface MapEditorProps {
-  onDrawCreated: (data: { boundary: { lat: number, lng: number }[], center: { lat: number, lng: number } }) => void;
+  onDrawCreated: (data: { boundary: { lat: number, lng: number }[], center: { lat: number, lng: number }, area: number }) => void;
 }
 
 const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
   const indonesiaCenter: [number, number] = [-2.5489, 118.0149];
+
+  const calculateArea = (latlngs: L.LatLng[]) => {
+    // Formula dasar untuk menghitung luas poligon di permukaan bola (dalam meter persegi)
+    return L.GeometryUtil.geodesicArea(latlngs) / 1000000; // Konversi ke km2
+  };
 
   const _onCreated = (e: any) => {
     const { layerType, layer } = e;
@@ -30,16 +35,19 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
       const latlngs = layer.getLatLngs()[0];
       const boundary = latlngs.map((ll: L.LatLng) => ({ lat: ll.lat, lng: ll.lng }));
       const center = layer.getBounds().getCenter();
+      const area = calculateArea(latlngs);
       
       onDrawCreated({
         boundary,
-        center: { lat: center.lat, lng: center.lng }
+        center: { lat: center.lat, lng: center.lng },
+        area: parseFloat(area.toFixed(2))
       });
     } else if (layerType === 'marker') {
       const latlng = layer.getLatLng();
       onDrawCreated({
-        boundary: [], // Marker doesn't have a polygon boundary
-        center: { lat: latlng.lat, lng: latlng.lng }
+        boundary: [], 
+        center: { lat: latlng.lat, lng: latlng.lng },
+        area: 0
       });
     }
   };
@@ -52,12 +60,30 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
         style={{ height: '100%', width: '100%' }}
         zoomControl={true}
       >
-        <TileLayer
-          attribution='&copy; Google Satellite'
-          url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
-          subdomains={['mt0','mt1','mt2','mt3']}
-          maxZoom={20}
-        />
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer checked name="Satelit (Google)">
+            <TileLayer
+              attribution='&copy; Google Satellite'
+              url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
+              subdomains={['mt0','mt1','mt2','mt3']}
+              maxZoom={20}
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Jalan (OpenStreetMap)">
+            <TileLayer
+              attribution='&copy; OpenStreetMap'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Terrain (Google)">
+            <TileLayer
+              attribution='&copy; Google Terrain'
+              url="https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}"
+              subdomains={['mt0','mt1','mt2','mt3']}
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
+
         <FeatureGroup>
           <EditControl
             position="topleft"
@@ -80,7 +106,8 @@ const MapEditor = ({ onDrawCreated }: MapEditorProps) => {
                   color: '#22c55e',
                   fillOpacity: 0.3,
                   weight: 2
-                }
+                },
+                showArea: true
               }
             }}
             edit={{
