@@ -58,7 +58,10 @@ export default function VisualizationsPage() {
   if (isLoading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Menghimpun Data Strategis...</p>
+        </div>
       </div>
     );
   }
@@ -97,12 +100,12 @@ export default function VisualizationsPage() {
         </div>
       </div>
 
-      {/* Visualizer Builder Tool - High Contrast Design */}
+      {/* Visualizer Builder Tool - Premium Canvas */}
       <Card className="border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white overflow-hidden ring-1 ring-white/10">
         <CardHeader className="border-b border-white/5 pb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/20 rounded-2xl">
+              <div className="p-3 bg-primary/20 rounded-2xl shadow-lg shadow-primary/10">
                 <Settings2 className="h-6 w-6 text-primary" />
               </div>
               <div>
@@ -111,7 +114,7 @@ export default function VisualizationsPage() {
               </div>
             </div>
             <div className="hidden md:flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-              <Zap className="h-3 w-3 text-amber-400 fill-amber-400" />
+              <Zap className="h-3 w-3 text-amber-400 fill-amber-400 animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Live Engine Active</span>
             </div>
           </div>
@@ -119,13 +122,13 @@ export default function VisualizationsPage() {
         <CardContent className="pt-8 px-6 md:px-10 pb-10">
           <div className="grid gap-10 lg:grid-cols-12 items-start">
             {/* Configuration Controls */}
-            <div className="lg:col-span-4 space-y-8">
+            <div className="lg:col-span-4 space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
                   <LayoutPanelLeft className="h-3 w-3" /> Pilihan Metrik Utama
                 </label>
                 <Select value={builderMetric} onValueChange={setBuilderMetric}>
-                  <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl text-white focus:ring-primary/50 transition-all">
+                  <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl text-white focus:ring-primary/50 transition-all hover:bg-white/10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 text-white border-white/10">
@@ -141,7 +144,7 @@ export default function VisualizationsPage() {
                   <BarChart3 className="h-3 w-3" /> Format Tampilan Grafik
                 </label>
                 <Select value={builderType} onValueChange={setBuilderType}>
-                  <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl text-white focus:ring-primary/50 transition-all">
+                  <SelectTrigger className="bg-white/5 border-white/10 h-14 rounded-2xl text-white focus:ring-primary/50 transition-all hover:bg-white/10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 text-white border-white/10">
@@ -154,40 +157,44 @@ export default function VisualizationsPage() {
               </div>
 
               <div className="pt-6 space-y-4">
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2">
-                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">ID Referensi Sematan</p>
-                  <code className="text-primary font-mono text-sm block bg-black/30 p-2 rounded-lg truncate">
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2 group transition-all hover:bg-white/10">
+                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center justify-between">
+                    ID Referensi Sematan
+                    <Sparkles className="h-2.5 w-2.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </p>
+                  <code className="text-primary font-mono text-sm block bg-black/30 p-2 rounded-lg truncate border border-primary/10">
                     {getEmbedId()}
                   </code>
                 </div>
                 <Button 
-                  className="w-full h-14 rounded-2xl shadow-2xl shadow-primary/30 text-xs font-bold uppercase tracking-widest bg-primary hover:bg-primary/90 transition-all active:scale-95"
+                  className="w-full h-14 rounded-2xl shadow-2xl shadow-primary/30 text-xs font-bold uppercase tracking-widest bg-primary hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-3"
                   onClick={() => handleCopy(getEmbedId(), 'copy-embed')}
                 >
-                  {copiedId === 'copy-embed' ? <CheckCheck className="mr-3 h-5 w-5" /> : <Copy className="mr-3 h-5 w-5" />}
-                  Salin ID Referensi
+                  {copiedId === 'copy-embed' ? <CheckCheck className="h-5 w-5 animate-in zoom-in" /> : <Copy className="h-5 w-5" />}
+                  {copiedId === 'copy-embed' ? 'Tersalin!' : 'Salin ID Referensi'}
                 </Button>
-                <p className="text-[9px] text-center text-slate-500 italic px-4">
-                  Salin ID ini dan tempelkan pada kolom "Keterangan" di Map Tools untuk menampilkan grafik spesifik ini.
+                <p className="text-[9px] text-center text-slate-500 italic px-4 leading-relaxed">
+                  Salin ID ini dan tempelkan pada kolom "Keterangan" di Map Tools untuk menampilkan grafik spesifik ini secara otomatis.
                 </p>
               </div>
             </div>
 
             {/* Live Preview - Premium Canvas */}
-            <div className="lg:col-span-8 space-y-4">
+            <div className="lg:col-span-8 space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Interactive Preview Mode</span>
                 </div>
-                <div className="flex items-center gap-2">
-                   <MousePointerClick className="h-3 w-3 text-slate-600" />
-                   <span className="text-[9px] text-slate-600 font-medium">Hover untuk detail data</span>
+                <div className="flex items-center gap-2 text-slate-600">
+                   <MousePointerClick className="h-3 w-3" />
+                   <span className="text-[9px] font-medium uppercase tracking-wider">Hover untuk detail data</span>
                 </div>
               </div>
               
-              <div className="bg-white/5 rounded-[2.5rem] p-8 md:p-12 border border-white/10 relative min-h-[400px] flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+              <div className="bg-white/5 rounded-[2.5rem] p-8 md:p-12 border border-white/10 relative min-h-[450px] flex items-center justify-center overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute -top-24 -right-24 h-64 w-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
                 
                 <div className="h-[350px] w-full z-10">
                   <ResponsiveContainer width="100%" height="100%">
@@ -198,9 +205,9 @@ export default function VisualizationsPage() {
                         <YAxis fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
                         <ChartTooltip 
                           cursor={{fill: 'rgba(255,255,255,0.03)'}}
-                          contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} 
+                          contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '11px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} 
                         />
-                        <Bar dataKey={builderMetric} fill="#22c55e" radius={[6, 6, 0, 0]} barSize={38} />
+                        <Bar dataKey={builderMetric} fill="#22c55e" radius={[8, 8, 0, 0]} barSize={40} animationDuration={1500} />
                       </BarChart>
                     ) : builderType === 'pie' ? (
                       <PieChart>
@@ -210,38 +217,40 @@ export default function VisualizationsPage() {
                           nameKey="name" 
                           cx="50%" 
                           cy="50%" 
-                          innerRadius={60} 
-                          outerRadius={110} 
-                          paddingAngle={8}
+                          innerRadius={70} 
+                          outerRadius={120} 
+                          paddingAngle={10}
+                          animationBegin={0}
+                          animationDuration={1500}
                         >
-                          {statsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="rgba(0,0,0,0.2)" strokeWidth={2} />)}
+                          {statsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="rgba(0,0,0,0.4)" strokeWidth={2} />)}
                         </Pie>
                         <ChartTooltip 
-                           contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)' }}
+                           contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', fontSize: '11px' }}
                         />
-                        <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '10px' }} />
+                        <Legend iconType="circle" wrapperStyle={{ paddingTop: '30px', fontSize: '10px', color: '#64748b' }} />
                       </PieChart>
                     ) : builderType === 'line' ? (
                       <LineChart data={statsData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                         <XAxis dataKey="name" fontSize={10} tick={{fill: '#64748b'}} axisLine={false} />
                         <YAxis fontSize={10} tick={{fill: '#64748b'}} axisLine={false} />
-                        <ChartTooltip contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)' }} />
-                        <Line type="monotone" dataKey={builderMetric} stroke="#22c55e" strokeWidth={4} dot={{r: 6, fill: '#22c55e', strokeWidth: 3, stroke: '#0f172a'}} activeDot={{r: 8}} />
+                        <ChartTooltip contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', fontSize: '11px' }} />
+                        <Line type="monotone" dataKey={builderMetric} stroke="#22c55e" strokeWidth={5} dot={{r: 7, fill: '#22c55e', strokeWidth: 4, stroke: '#0f172a'}} activeDot={{r: 10, strokeWidth: 0}} animationDuration={1500} />
                       </LineChart>
                     ) : (
                       <AreaChart data={statsData}>
                         <defs>
                           <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4}/>
                             <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                         <XAxis dataKey="name" fontSize={10} tick={{fill: '#64748b'}} axisLine={false} />
                         <YAxis fontSize={10} tick={{fill: '#64748b'}} axisLine={false} />
-                        <ChartTooltip contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)' }} />
-                        <Area type="monotone" dataKey={builderMetric} stroke="#22c55e" strokeWidth={4} fillOpacity={1} fill="url(#colorMetric)" />
+                        <ChartTooltip contentStyle={{ borderRadius: '16px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', fontSize: '11px' }} />
+                        <Area type="monotone" dataKey={builderMetric} stroke="#22c55e" strokeWidth={5} fillOpacity={1} fill="url(#colorMetric)" animationDuration={1500} />
                       </AreaChart>
                     )}
                   </ResponsiveContainer>
@@ -252,95 +261,95 @@ export default function VisualizationsPage() {
         </CardContent>
       </Card>
 
-      {/* Quick Insights Cards */}
+      {/* Quick Insights Cards with Enhanced Interaction */}
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="bg-white shadow-xl shadow-slate-200/50 border-none rounded-[2rem] overflow-hidden group hover:translate-y-[-4px] transition-all">
-          <CardContent className="pt-8">
-            <div className="flex items-center gap-5">
-              <div className="p-4 bg-green-50 text-green-600 rounded-2xl group-hover:scale-110 transition-transform"><Users className="h-7 w-7" /></div>
-              <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Populasi Jaringan</p>
-                <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{totalPopulasi.toLocaleString()} <span className="text-sm font-normal text-slate-400 ml-1">Jiwa</span></h3>
+        {[
+          { label: 'Total Populasi Jaringan', value: totalPopulasi, unit: 'Jiwa', icon: Users, color: 'bg-green-50', iconColor: 'text-green-600' },
+          { label: 'Cakupan Luas Terdata', value: parseFloat(totalLuas), unit: 'km²', icon: MapIcon, color: 'bg-blue-50', iconColor: 'text-blue-600' },
+          { label: 'Kepadatan Rata-rata', value: statsData.length > 0 ? (totalPopulasi / parseFloat(totalLuas)).toFixed(0) : 0, unit: 'Jiwa/km²', icon: TrendingUp, color: 'bg-amber-50', iconColor: 'text-amber-600' }
+        ].map((item, idx) => (
+          <Card key={idx} className="bg-white shadow-xl shadow-slate-200/40 border-none rounded-[2rem] overflow-hidden group hover:translate-y-[-6px] transition-all duration-300">
+            <CardContent className="pt-8">
+              <div className="flex items-center gap-6">
+                <div className={`p-4 ${item.color} ${item.iconColor} rounded-2xl group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                  <item.icon className="h-7 w-7" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
+                  <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
+                    {Number(item.value).toLocaleString()} 
+                    <span className="text-sm font-normal text-slate-400 ml-1.5">{item.unit}</span>
+                  </h3>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white shadow-xl shadow-slate-200/50 border-none rounded-[2rem] overflow-hidden group hover:translate-y-[-4px] transition-all">
-          <CardContent className="pt-8">
-            <div className="flex items-center gap-5">
-              <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl group-hover:scale-110 transition-transform"><MapIcon className="h-7 w-7" /></div>
-              <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Cakupan Luas Terdata</p>
-                <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{totalLuas} <span className="text-sm font-normal text-slate-400 ml-1">km²</span></h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white shadow-xl shadow-slate-200/50 border-none rounded-[2rem] overflow-hidden group hover:translate-y-[-4px] transition-all">
-          <CardContent className="pt-8">
-            <div className="flex items-center gap-5">
-              <div className="p-4 bg-amber-50 text-amber-600 rounded-2xl group-hover:scale-110 transition-transform"><TrendingUp className="h-7 w-7" /></div>
-              <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kepadatan Rata-rata</p>
-                <h3 className="text-3xl font-bold text-slate-900 tracking-tight">
-                  {statsData.length > 0 ? (totalPopulasi / parseFloat(totalLuas)).toFixed(0) : 0} 
-                  <span className="text-sm font-normal text-slate-400 ml-1">Jiwa/km²</span>
-                </h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Global Data Comparison */}
-      <Card className="shadow-sm border-slate-200 rounded-[2.5rem] bg-white">
-        <CardHeader className="border-b px-8 py-6">
-          <div className="flex items-center gap-3">
-             <BarChart3 className="h-5 w-5 text-primary" />
+      {/* Global Data Comparison - Professional Analytics */}
+      <Card className="shadow-sm border-slate-200 rounded-[2.5rem] bg-white overflow-hidden group">
+        <CardHeader className="border-b px-8 py-8 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-4">
+             <div className="h-10 w-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-primary transition-colors">
+               <BarChart3 className="h-6 w-6" />
+             </div>
              <div>
-               <CardTitle className="text-lg">Analisis Komparatif Desa</CardTitle>
-               <CardDescription>Perbandingan populasi antar wilayah administratif secara real-time.</CardDescription>
+               <CardTitle className="text-xl">Analisis Komparatif Antar Desa</CardTitle>
+               <CardDescription>Perbandingan populasi real-time di seluruh wilayah administratif.</CardDescription>
+             </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-3">
+             <div className="text-right">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Update Terakhir</p>
+                <p className="text-xs font-bold text-slate-700">Otomatis (Sesuai Firestore)</p>
              </div>
           </div>
         </CardHeader>
-        <CardContent className="p-8">
-          <div className="h-[400px] w-full mt-4">
+        <CardContent className="p-8 md:p-12">
+          <div className="h-[450px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={statsData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
-                <YAxis fontSize={10} axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
+                <XAxis dataKey="name" fontSize={11} axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} dy={10} />
+                <YAxis fontSize={11} axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} dx={-10} />
                 <ChartTooltip 
                   cursor={{fill: '#f8fafc'}}
-                  contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '16px' }} 
+                  contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.15)', padding: '20px' }} 
                 />
-                <Bar dataKey="populasi" fill="hsl(var(--primary))" radius={[12, 12, 0, 0]} barSize={45} />
+                <Bar dataKey="populasi" fill="hsl(var(--primary))" radius={[14, 14, 0, 0]} barSize={50} animationDuration={2000}>
+                   {statsData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fillOpacity={0.8 + (index % 5) * 0.05} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
 
-      {/* Instruction Footer */}
-      <div className="bg-slate-900 text-white rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center justify-between gap-8 border border-white/5">
-         <div className="space-y-4 text-center md:text-left">
-            <h3 className="text-xl font-bold flex items-center justify-center md:justify-start gap-3">
-              <Sparkles className="h-6 w-6 text-primary" />
-              Sematkan ke Seluruh Antarmuka
+      {/* Interactive CTA Footer */}
+      <div className="bg-slate-900 text-white rounded-[2.5rem] p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-10 border border-white/5 relative overflow-hidden group">
+         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] group-hover:scale-150 transition-transform duration-700" />
+         
+         <div className="space-y-5 text-center md:text-left relative z-10">
+            <h3 className="text-2xl font-bold flex items-center justify-center md:justify-start gap-4">
+              <Sparkles className="h-7 w-7 text-primary animate-pulse" />
+              Sematkan Data Ke Seluruh Antarmuka
             </h3>
-            <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
-              Gunakan ID Referensi dari <strong>Visualizer Builder</strong> di atas untuk menampilkan grafik tertentu pada peta interaktif atau halaman narasi Anda. Setiap perubahan data di modul Manajemen Desa akan secara otomatis memperbarui grafik tersebut.
+            <p className="text-slate-400 text-base max-w-xl leading-relaxed">
+              ID yang dihasilkan dari <strong>Visualizer Builder</strong> dapat ditempelkan di kolom deskripsi pada modul Map Tools atau Manajemen Halaman. Gunakan kekuatan data untuk memperkaya narasi geospasial Anda.
             </p>
          </div>
-         <div className="flex gap-4 shrink-0">
-            <Button variant="outline" className="h-12 border-white/10 text-white hover:bg-white/5 rounded-2xl px-6" onClick={() => handleCopy('/visualizations', 'footer-link')}>
-              <Copy className="h-4 w-4 mr-3" /> Salin URL Publik
+         <div className="flex flex-col sm:flex-row gap-4 shrink-0 relative z-10">
+            <Button variant="outline" className="h-14 border-white/10 text-white hover:bg-white/10 rounded-2xl px-8 transition-all group/btn" onClick={() => handleCopy('/visualizations', 'footer-link')}>
+              <Copy className="h-5 w-5 mr-3 group-hover/btn:scale-110 transition-transform" /> 
+              {copiedId === 'footer-link' ? 'Tersalin' : 'Salin URL Publik'}
             </Button>
             <Link href="/visualizations" target="_blank">
-               <Button className="h-12 bg-primary hover:bg-primary/90 rounded-2xl px-8 shadow-xl shadow-primary/20">
-                 <ExternalLink className="h-4 w-4 mr-3" /> Buka Dashboard
+               <Button className="h-14 bg-primary hover:bg-primary/90 rounded-2xl px-10 shadow-2xl shadow-primary/20 group/btn">
+                 <ExternalLink className="h-5 w-5 mr-3 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                 Buka Dashboard
                </Button>
             </Link>
          </div>
