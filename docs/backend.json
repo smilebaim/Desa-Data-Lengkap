@@ -50,7 +50,10 @@
               "lng": { "type": "number" }
             }
           }
-        }
+        },
+        "description": { "type": "string" },
+        "tagline": { "type": "string" },
+        "potentials": { "type": "array", "items": { "type": "string" } }
       },
       "required": ["name", "location"]
     },
@@ -60,7 +63,9 @@
       "type": "object",
       "properties": {
         "name": { "type": "string" },
-        "type": { "type": "string", "enum": ["marker", "polyline", "circle"] },
+        "description": { "type": "string" },
+        "showStats": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["marker", "polyline", "circle", "polygon", "rectangle"] },
         "category": { "type": "string" },
         "icon": { "type": "string" },
         "geometry": { "type": "object" },
@@ -75,7 +80,6 @@
       "properties": {
         "title": { "type": "string" },
         "content": { "type": "string" },
-        "slug": { "type": "string" },
         "showStats": { "type": "boolean" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },

@@ -13,19 +13,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { 
   Plus, Trash2, Edit2, Save, Search, HelpCircle, Loader2,
   Layers, MapPin, Map as MapIcon, Info, Hexagon, FileJson, 
   Ruler, Waypoints, Circle as CircleIcon, Square, Landmark, 
   Construction, TreePine, Droplets, Zap, ShieldAlert, Navigation,
-  Home, Users, School, Hospital, Warehouse, Factory, ShoppingBag,
-  Wind, Activity, Camera, Car, Bus, Bike, Waves, Flame,
-  Coffee, Wifi, ParkingCircle, TrainFront, Ship, Plane, Fish, 
-  Wheat, Sprout, Mountain, Cloud, Sun, Moon, Battery, Recycle,
-  Store, Utensils, Bed, Heart, Stethoscope, Briefcase, GraduationCap,
-  Music, Film, Baby, Banknote, BookOpen, Building2, ClipboardList,
-  FlameKindling, Globe, HardHat, Library, Mail, Microscope, Radio,
-  Satellite, Smartphone, Telescope, Tractor, Truck, Umbrella, Wallet
+  BarChart3, Sparkles
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -41,15 +36,7 @@ const FEATURE_ICONS = [
   'MapPin', 'Landmark', 'Construction', 'TreePine', 'Droplets', 'Zap', 
   'ShieldAlert', 'Navigation', 'Info', 'Home', 'Users', 'School', 
   'Hospital', 'Warehouse', 'Factory', 'ShoppingBag', 'Trash2', 'Wind',
-  'Activity', 'Camera', 'Car', 'Bus', 'Bike', 'Waves', 'Flame',
-  'Coffee', 'Wifi', 'ParkingCircle', 'TrainFront', 'Ship', 'Plane',
-  'Fish', 'Wheat', 'Sprout', 'Mountain', 'Cloud', 'Sun', 'Moon',
-  'Battery', 'Recycle', 'Store', 'Utensils', 'Bed', 'Heart',
-  'Stethoscope', 'Briefcase', 'GraduationCap', 'Music', 'Film',
-  'Baby', 'Banknote', 'BookOpen', 'Building2', 'ClipboardList',
-  'FlameKindling', 'Globe', 'HardHat', 'Library', 'Mail', 'Microscope',
-  'Radio', 'Satellite', 'Smartphone', 'Telescope', 'Tractor', 'Truck',
-  'Umbrella', 'Wallet'
+  'Activity', 'Camera', 'Car', 'Bus', 'Bike', 'Waves', 'Flame'
 ];
 
 const CATEGORIES = [
@@ -81,6 +68,8 @@ export default function SpasialManagementPage() {
   
   const [currentFeature, setCurrentFeature] = useState<any>({
     name: '',
+    description: '',
+    showStats: false,
     type: '',
     category: 'infrastructure',
     icon: 'MapPin',
@@ -101,6 +90,7 @@ export default function SpasialManagementPage() {
     const dataToSave = isBoundary 
       ? {
           name: currentFeature.name,
+          description: currentFeature.description,
           province: 'Jawa Barat',
           population: 0,
           area: currentFeature.properties.area || 0,
@@ -112,7 +102,7 @@ export default function SpasialManagementPage() {
     addDoc(collRef, dataToSave)
       .then(() => {
         toast({ title: "Berhasil", description: "Data spasial telah disinkronkan ke peta utama." });
-        setCurrentFeature({ name: '', type: '', category: 'infrastructure', icon: 'MapPin', geometry: null, properties: {} });
+        setCurrentFeature({ name: '', description: '', showStats: false, type: '', category: 'infrastructure', icon: 'MapPin', geometry: null, properties: {} });
       })
       .catch(async () => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: dataToSave }));
@@ -156,6 +146,16 @@ export default function SpasialManagementPage() {
               </div>
 
               <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase text-slate-500">Keterangan / Deskripsi</Label>
+                <Textarea 
+                  placeholder="Berikan penjelasan detail tentang objek ini..." 
+                  className="min-h-[100px] text-sm"
+                  value={currentFeature.description}
+                  onChange={e => setCurrentFeature({...currentFeature, description: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-xs font-bold uppercase text-slate-500">Kategori Layer</Label>
                 <Select 
                   value={currentFeature.category} 
@@ -170,6 +170,28 @@ export default function SpasialManagementPage() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-bold flex items-center gap-2 text-primary">
+                      <BarChart3 className="h-3.5 w-3.5" />
+                      Sematkan Statistik
+                    </Label>
+                    <p className="text-[10px] text-slate-500">Tampilkan data populasi jaringan di popup objek.</p>
+                  </div>
+                  <Switch 
+                    checked={currentFeature.showStats} 
+                    onCheckedChange={(checked) => setCurrentFeature({...currentFeature, showStats: checked})} 
+                  />
+                </div>
+                {currentFeature.showStats && (
+                  <div className="flex items-start gap-2 text-[9px] text-primary/70 bg-white/50 p-2 rounded-xl border border-primary/5">
+                    <Sparkles className="h-2.5 w-2.5 shrink-0 mt-0.5" />
+                    <span>Popup pada peta akan menyertakan ringkasan data statistik desa secara real-time.</span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">

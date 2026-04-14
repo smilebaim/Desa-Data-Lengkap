@@ -9,7 +9,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { HelpCircle, ArrowRight } from 'lucide-react';
+import { HelpCircle, ArrowRight, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -22,10 +22,10 @@ if (typeof window !== 'undefined') {
   });
 }
 
-const DynamicIcon = ({ name }: { name: string }) => {
+const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
   const IconComponent = (LucideIcons as any)[name];
-  if (!IconComponent) return <HelpCircle className="h-4 w-4" />;
-  return <IconComponent className="h-4 w-4" />;
+  if (!IconComponent) return <HelpCircle className={className || "h-4 w-4"} />;
+  return <IconComponent className={className || "h-4 w-4"} />;
 };
 
 const indonesiaCenter: LatLngExpression = [-2.5489, 118.0149];
@@ -58,22 +58,51 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
     return groups;
   }, [features]);
 
+  const statsSummary = useMemo(() => {
+    if (!villages || villages.length === 0) return null;
+    const totalPop = villages.reduce((acc, curr) => acc + (curr.population || 0), 0);
+    const totalArea = villages.reduce((acc, curr) => acc + (curr.area || 0), 0);
+    return { totalPop, totalArea };
+  }, [villages]);
+
   const renderFeature = (f: any) => {
+    const popupContent = (
+      <div className="p-1 min-w-[180px]">
+        <div className="flex items-center gap-2 font-bold text-slate-900">
+          <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4 text-primary" />
+          {f.name}
+        </div>
+        <div className="text-[10px] text-slate-400 uppercase font-black mt-1 mb-2 tracking-wider">
+          {f.category?.replace('_', ' ') || 'ASET SPASIAL'}
+        </div>
+        {f.description && (
+          <p className="text-[11px] text-slate-600 mb-3 leading-relaxed whitespace-pre-line border-t pt-2 border-slate-50 italic">
+            "{f.description}"
+          </p>
+        )}
+        
+        {f.showStats && statsSummary && (
+          <div className="mt-2 pt-2 border-t border-slate-100 bg-primary/5 p-2.5 rounded-xl space-y-1.5">
+            <p className="text-[8px] font-black text-primary uppercase tracking-[0.2em] mb-1 flex items-center gap-1.5">
+              <BarChart3 className="h-2.5 w-2.5" /> Data Jaringan Desa
+            </p>
+            <div className="flex justify-between items-center text-[9px]">
+              <span className="text-slate-500 font-medium">Total Populasi:</span>
+              <span className="font-bold text-slate-900">{statsSummary.totalPop.toLocaleString()} Jiwa</span>
+            </div>
+            <div className="flex justify-between items-center text-[9px]">
+              <span className="text-slate-500 font-medium">Cakupan Luas:</span>
+              <span className="font-bold text-slate-900">{statsSummary.totalArea.toFixed(2)} km²</span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+
     if (f.type === 'marker') {
       return (
         <Marker key={f.id} position={[f.geometry.lat, f.geometry.lng]}>
-          <Popup>
-            <div className="p-1 min-w-[150px]">
-              <div className="flex items-center gap-2 font-bold text-slate-900">
-                <DynamicIcon name={f.icon || 'MapPin'} />
-                {f.name}
-              </div>
-              <div className="text-[10px] text-slate-500 uppercase font-black mt-1 mb-2">
-                {f.category?.replace('_', ' ') || 'ASET'}
-              </div>
-              {f.description && <p className="text-[11px] text-slate-600 mb-2">{f.description}</p>}
-            </div>
-          </Popup>
+          <Popup>{popupContent}</Popup>
         </Marker>
       );
     }
@@ -84,7 +113,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
           positions={f.geometry.map((p: any) => [p.lat, p.lng])}
           pathOptions={{ color: '#3b82f6', weight: 4 }}
         >
-          <Popup className="font-bold">{f.name}</Popup>
+          <Popup>{popupContent}</Popup>
         </Polyline>
       );
     }
@@ -96,10 +125,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
           radius={f.properties?.radius || 100}
           pathOptions={{ color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.2 }}
         >
-          <Popup>
-            <div className="font-bold">{f.name}</div>
-            <div className="text-xs">Radius: {Math.round(f.properties?.radius || 0)}m</div>
-          </Popup>
+          <Popup>{popupContent}</Popup>
         </Circle>
       );
     }
@@ -110,10 +136,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
           positions={f.geometry.map((p: any) => [p.lat, p.lng])}
           pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }}
         >
-          <Popup>
-            <div className="font-bold">{f.name}</div>
-            <div className="text-xs">Luas: {f.properties?.area || 0} km²</div>
-          </Popup>
+          <Popup>{popupContent}</Popup>
         </Polygon>
       );
     }
