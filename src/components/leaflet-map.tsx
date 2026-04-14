@@ -40,7 +40,8 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
   const type = config.chartType || 'bar';
 
   return (
-    <div className="h-32 w-full mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+    <div className="h-40 w-full mt-3 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-inner">
+      <p className="text-[8px] font-black uppercase text-slate-400 mb-2 tracking-widest">{config.title}</p>
       <ResponsiveContainer width="100%" height="100%">
         {type === 'bar' ? (
           <BarChart data={data}>
@@ -50,10 +51,14 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
           </BarChart>
         ) : type === 'pie' ? (
           <PieChart>
-            <Pie data={data} dataKey={metric} nameKey="name" cx="50%" cy="50%" outerRadius={25}>
+            <Pie data={data} dataKey={metric} nameKey="name" cx="50%" cy="50%" outerRadius={30}>
               {data.map((_, index) => <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
             </Pie>
           </PieChart>
+        ) : type === 'area' ? (
+          <AreaChart data={data}>
+            <Area type="monotone" dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} />
+          </AreaChart>
         ) : (
           <LineChart data={data}>
             <Line type="monotone" dataKey={metric} stroke="#22c55e" strokeWidth={2} dot={false} />
@@ -63,6 +68,11 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
     </div>
   );
 };
+
+interface LeafletMapProps {
+  villages?: any[];
+  showVillages?: boolean;
+}
 
 const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
   const db = useFirestore();
@@ -82,15 +92,19 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
   const categories = useMemo(() => {
     const groups: Record<string, any[]> = {};
     features?.forEach(f => {
-      if (!groups[f.category]) groups[f.category] = [];
-      groups[f.category].push(f);
+      const cat = f.category || 'LAINNYA';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(f);
     });
     return groups;
   }, [features]);
 
-  const renderContentWithCharts = (content: string) => {
+  // Pendeteksi dan perender konten dengan dukungan [CHART:ID]
+  const renderTextWithCharts = (content: string) => {
     if (!content) return null;
-    const parts = content.split(/(\[CHART:[a-zA-Z0-9_-]+\])/g);
+    const regex = /(\[CHART:[a-zA-Z0-9_-]+\])/g;
+    const parts = content.split(regex);
+    
     return parts.map((part, index) => {
       const match = part.match(/\[CHART:([a-zA-Z0-9_-]+)\]/);
       if (match) {
@@ -104,17 +118,36 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
 
   const renderFeature = (f: any) => {
     const popupContent = (
-      <div className="p-1 min-w-[200px] max-w-[250px]">
-        <div className="flex items-center gap-2 font-bold text-slate-900">
-          <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4 text-primary" />
-          {f.name}
+      <div className="p-1 min-w-[220px] max-w-[280px]">
+        <div className="flex items-center gap-2 font-bold text-slate-900 border-b pb-2 mb-2">
+          <div className="h-7 w-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+            <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-xs leading-none">{f.name}</p>
+            <p className="text-[8px] text-slate-400 font-black uppercase mt-1 tracking-widest">{f.category?.replace('_', ' ')}</p>
+          </div>
         </div>
-        <div className="text-[9px] text-slate-400 uppercase font-black mt-1 mb-2 tracking-wider">
-          {f.category?.replace('_', ' ') || 'ASET SPASIAL'}
+        <div className="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line">
+          {renderTextWithCharts(f.description)}
         </div>
-        <div className="text-[11px] text-slate-600 leading-relaxed">
-          {renderContentWithCharts(f.description)}
-        </div>
+        {f.showStats && (
+           <div className="mt-4 pt-3 border-t border-dashed border-slate-200">
+             <div className="flex items-center gap-2 mb-2 text-[9px] font-bold text-primary">
+               <BarChart3 className="h-3 w-3" /> RINGKASAN DATA JARINGAN
+             </div>
+             <div className="grid grid-cols-2 gap-2">
+                <div className="bg-slate-50 p-2 rounded-lg border">
+                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Populasi</p>
+                  <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.population, 0).toLocaleString()} Jiwa</p>
+                </div>
+                <div className="bg-slate-50 p-2 rounded-lg border">
+                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Wilayah</p>
+                  <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.area, 0).toFixed(1)} km²</p>
+                </div>
+             </div>
+           </div>
+        )}
       </div>
     );
 

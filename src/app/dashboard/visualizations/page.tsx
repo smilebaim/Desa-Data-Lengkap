@@ -12,7 +12,7 @@ import {
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles,
-  Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info
+  Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info, Database
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,7 +88,7 @@ export default function VisualizationsPage() {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
-    toast({ title: "Berhasil Disalin", description: `Gunakan kode ini di editor konten.` });
+    toast({ title: "Berhasil Disalin", description: `Tempel kode ini di Editor Halaman atau Map Tools.` });
   };
 
   if (isVillagesLoading) {
@@ -107,7 +107,7 @@ export default function VisualizationsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
           <h1 className="text-4xl font-black tracking-tight text-slate-900">Pusat Analisis & Visualisasi</h1>
-          <p className="text-slate-500 font-medium">Buat grafik kustom dan sematkan ke dalam konten naratif Anda.</p>
+          <p className="text-slate-500 font-medium">Data di bawah diambil secara otomatis dari modul <strong>Manajemen Desa</strong>.</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -117,11 +117,16 @@ export default function VisualizationsPage() {
                Dashboard Publik
              </Button>
            </Link>
+           <Link href="/dashboard/villages">
+             <Button className="h-11 px-6 rounded-2xl text-xs font-bold gap-2 shadow-lg shadow-primary/20">
+               <Database className="h-3.5 w-3.5" />
+               Input Data Desa
+             </Button>
+           </Link>
         </div>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12">
-        {/* Metric Highlights */}
         <div className="lg:col-span-12 grid gap-6 md:grid-cols-3">
           {[
             { label: 'Populasi Jaringan', value: totalPopulasi.toLocaleString(), unit: 'Jiwa', icon: Users, color: 'text-green-600', bg: 'bg-green-50' },
@@ -144,20 +149,19 @@ export default function VisualizationsPage() {
           ))}
         </div>
 
-        {/* Chart Builder Form */}
         <Card className="lg:col-span-5 border-none shadow-2xl rounded-[3rem] bg-slate-900 text-white overflow-hidden sticky top-6">
           <CardHeader className="p-8 border-b border-white/5">
             <CardTitle className="text-xl flex items-center gap-3">
               <Plus className="h-5 w-5 text-primary" />
-              Buat Grafik Baru
+              Buat Grafik Kustom
             </CardTitle>
-            <CardDescription className="text-slate-400">Rancang visualisasi data kustom untuk disematkan.</CardDescription>
+            <CardDescription className="text-slate-400">Pilih metrik dan tipe grafik, lalu simpan untuk disematkan.</CardDescription>
           </CardHeader>
           <CardContent className="p-8 space-y-6">
             <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase text-slate-400">Judul Grafik</Label>
+              <Label className="text-xs font-bold uppercase text-slate-400">Judul Visualisasi</Label>
               <Input 
-                placeholder="Misal: Perbandingan Populasi 2024" 
+                placeholder="Misal: Grafik Populasi 2024" 
                 value={newChart.title}
                 onChange={e => setNewChart({...newChart, title: e.target.value})}
                 className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:ring-primary/30"
@@ -166,11 +170,9 @@ export default function VisualizationsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-400">Metrik Data</Label>
+                <Label className="text-xs font-bold uppercase text-slate-400">Metrik</Label>
                 <Select value={newChart.metric} onValueChange={v => setNewChart({...newChart, metric: v})}>
-                  <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-xl">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="population">Populasi</SelectItem>
                     <SelectItem value="area">Luas Wilayah</SelectItem>
@@ -179,11 +181,9 @@ export default function VisualizationsPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-400">Tipe Grafik</Label>
+                <Label className="text-xs font-bold uppercase text-slate-400">Diagram</Label>
                 <Select value={newChart.chartType} onValueChange={v => setNewChart({...newChart, chartType: v})}>
-                  <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-xl">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bar">Bar Chart</SelectItem>
                     <SelectItem value="pie">Pie Chart</SelectItem>
@@ -194,28 +194,18 @@ export default function VisualizationsPage() {
               </div>
             </div>
 
-            <Button 
-              className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20" 
-              onClick={handleCreateChart}
-              disabled={isSubmitting}
-            >
+            <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold" onClick={handleCreateChart} disabled={isSubmitting}>
               {isSubmitting ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : <Sparkles className="mr-2 h-5 w-5" />}
-              Tambahkan ke Pustaka
+              Simpan ke Pustaka
             </Button>
           </CardContent>
         </Card>
 
-        {/* Saved Visualizers Library */}
         <div className="lg:col-span-7 space-y-6">
           <Card className="border-none shadow-xl rounded-[3rem] bg-white overflow-hidden min-h-[500px]">
-            <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-lg flex items-center gap-3">
-                  <LayoutGrid className="h-5 w-5 text-primary" />
-                  Pustaka Visualisasi
-                </CardTitle>
-                <CardDescription>Daftar grafik kustom yang siap disematkan.</CardDescription>
-              </div>
+            <CardHeader className="p-8 border-b border-slate-50">
+              <CardTitle className="text-lg flex items-center gap-3"><LayoutGrid className="h-5 w-5 text-primary" /> Pustaka Visualisasi</CardTitle>
+              <CardDescription>Daftar grafik kustom yang siap disematkan ke dalam konten.</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
                {isVisualizersLoading ? (
@@ -223,7 +213,7 @@ export default function VisualizationsPage() {
                ) : visualizers?.length === 0 ? (
                  <div className="text-center py-20 text-slate-400 flex flex-col items-center gap-4">
                    <BarChart3 className="h-12 w-12 opacity-10" />
-                   <p className="text-sm font-medium">Belum ada grafik kustom yang dibuat.</p>
+                   <p className="text-sm font-medium">Belum ada grafik kustom.</p>
                  </div>
                ) : (
                  <div className="divide-y divide-slate-50">
@@ -246,22 +236,16 @@ export default function VisualizationsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                            <Button 
-                             variant="outline" 
-                             size="sm" 
-                             className="rounded-xl h-9 text-[10px] font-bold gap-2 hover:bg-primary hover:text-white transition-all"
+                             variant="outline" size="sm" className="rounded-xl h-9 text-[10px] font-bold gap-2 hover:bg-primary hover:text-white"
                              onClick={() => handleCopy(`[CHART:${viz.id}]`, viz.id)}
                            >
                              {copiedId === viz.id ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                              SALIN KODE SEMATAN
                            </Button>
                            <Button 
-                             variant="ghost" 
-                             size="icon" 
-                             className="h-9 w-9 text-red-400 hover:text-red-500 hover:bg-red-50"
+                             variant="ghost" size="icon" className="h-9 w-9 text-red-400"
                              onClick={() => handleDeleteChart(viz.id)}
-                           >
-                             <Trash2 className="h-4 w-4" />
-                           </Button>
+                           ><Trash2 className="h-4 w-4" /></Button>
                         </div>
                       </div>
                     ))}
@@ -271,13 +255,11 @@ export default function VisualizationsPage() {
           </Card>
           
           <div className="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10 flex items-start gap-4">
-             <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
-               <Info className="h-5 w-5" />
-             </div>
+             <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0"><Info className="h-5 w-5" /></div>
              <div className="space-y-2">
-                <h4 className="font-bold text-slate-900">Cara Menggunakan Kode Sematan</h4>
+                <h4 className="font-bold text-slate-900">Petunjuk Penyematan Konten</h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Salin <strong>Kode Sematan</strong> dari pustaka di atas (contoh: <code>[CHART:abc-123]</code>) dan tempelkan ke dalam area teks pada modul <strong>Manajemen Halaman</strong> atau <strong>Map Tools</strong>. Grafik akan muncul secara otomatis menggantikan kode tersebut di halaman publik.
+                  Gunakan <strong>Kode Sematan</strong> (contoh: <code>[CHART:abc-123]</code>) di dalam deskripsi **Editor Spasial** atau konten **Manajemen Halaman**. Sistem akan secara otomatis mengganti kode tersebut dengan grafik yang sesuai saat dilihat oleh publik.
                 </p>
              </div>
           </div>
