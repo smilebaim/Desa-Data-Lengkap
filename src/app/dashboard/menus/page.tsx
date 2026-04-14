@@ -36,6 +36,7 @@ export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
+  // Memoisasi kueri untuk mencegah siklus render tak terbatas
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading } = useCollection(menuQuery);
 

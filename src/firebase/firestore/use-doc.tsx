@@ -16,6 +16,8 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    setIsLoading(true);
+
     if (!ref) {
       setData(null);
       setIsLoading(false);

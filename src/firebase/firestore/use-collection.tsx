@@ -16,6 +16,9 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    // Set loading ke true setiap kali kueri berubah
+    setIsLoading(true);
+
     if (!query) {
       setData([]);
       setIsLoading(false);

@@ -20,6 +20,7 @@ export default function PagesManagementPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
+  // Memoisasi kueri untuk stabilitas daftar
   const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('updatedAt', 'desc')), [db]);
   const { data: pages, isLoading } = useCollection(pagesQuery);
 
@@ -44,7 +45,7 @@ export default function PagesManagementPage() {
       content: page.content || '',
       showStats: !!page.showStats
     });
-    // Scroll to top or form
+    // Scroll ke atas untuk memudahkan pengeditan
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
