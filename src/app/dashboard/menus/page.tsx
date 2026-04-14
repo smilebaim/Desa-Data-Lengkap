@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -36,7 +37,6 @@ export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Memoisasi kueri untuk mencegah siklus render tak terbatas
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading } = useCollection(menuQuery);
 
@@ -60,11 +60,12 @@ export default function PengaturanNavigasiUtamaPage() {
   const [iconSearch, setIconSearch] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const filteredIcons = NAV_ICONS.filter(icon => 
-    icon.toLowerCase().includes(iconSearch.toLowerCase())
+  const filteredIcons = useMemo(() => 
+    NAV_ICONS.filter(icon => icon.toLowerCase().includes(iconSearch.toLowerCase())),
+    [iconSearch]
   );
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setIsEditing(null);
     setFormData({ 
         label: '', 
@@ -74,7 +75,7 @@ export default function PengaturanNavigasiUtamaPage() {
         position: 'bottom' 
     });
     setIconSearch('');
-  };
+  }, [menus?.length]);
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -85,6 +86,8 @@ export default function PengaturanNavigasiUtamaPage() {
 
   const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
     setIsSubmitting(true);
     const collRef = collection(db, 'menus');
     const data = { ...formData, order: Number(formData.order) };
@@ -122,11 +125,22 @@ export default function PengaturanNavigasiUtamaPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Hapus menu ini?')) return;
+    if (!id || !confirm('Hapus menu ini?')) return;
     const docRef = doc(db, 'menus', id);
     deleteDoc(docRef)
       .then(() => toast({ title: "Berhasil", description: "Menu telah dihapus." }))
       .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' })));
+  };
+
+  const startEdit = (menu: any) => {
+    setIsEditing(menu.id);
+    setFormData({
+      label: menu.label || '',
+      icon: menu.icon || 'Home',
+      href: menu.href || '#',
+      order: menu.order || 0,
+      position: menu.position || 'bottom'
+    });
   };
 
   return (
@@ -286,7 +300,7 @@ export default function PengaturanNavigasiUtamaPage() {
                     </TableCell>
                     <TableCell className="text-center font-mono text-xs">{menu.order}</TableCell>
                     <TableCell className="text-right space-x-1 pr-6">
-                      <Button size="icon" variant="ghost" className="h-9 w-9 text-slate-600 hover:bg-slate-100" onClick={() => { setIsEditing(menu.id); setFormData(menu); }}><Edit2 className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" className="h-9 w-9 text-slate-600 hover:bg-slate-100" onClick={() => startEdit(menu)}><Edit2 className="h-4 w-4" /></Button>
                       <Button size="icon" variant="ghost" className="h-9 w-9 text-red-500 hover:bg-red-50" onClick={() => handleDelete(menu.id)}><Trash2 className="h-4 w-4" /></Button>
                     </TableCell>
                   </TableRow>

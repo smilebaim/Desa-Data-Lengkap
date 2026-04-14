@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -20,7 +21,6 @@ export default function PagesManagementPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Memoisasi kueri untuk stabilitas daftar
   const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('updatedAt', 'desc')), [db]);
   const { data: pages, isLoading } = useCollection(pagesQuery);
 
@@ -33,10 +33,10 @@ export default function PagesManagementPage() {
     showStats: false
   });
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setIsEditing(null);
     setFormData({ title: '', content: '', showStats: false });
-  };
+  }, []);
 
   const handleEdit = (page: any) => {
     setIsEditing(page.id);
@@ -45,12 +45,13 @@ export default function PagesManagementPage() {
       content: page.content || '',
       showStats: !!page.showStats
     });
-    // Scroll ke atas untuk memudahkan pengeditan
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
     if (!formData.title || !formData.content) {
       return toast({ title: "Galat", description: "Judul dan konten harus diisi.", variant: "destructive" });
     }
@@ -95,7 +96,7 @@ export default function PagesManagementPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Hapus halaman ini secara permanen?')) return;
+    if (!id || !confirm('Hapus halaman ini secara permanen?')) return;
     const docRef = doc(db, 'pages', id);
     deleteDoc(docRef)
       .then(() => toast({ title: "Berhasil", description: "Halaman telah dihapus dari sistem." }))
