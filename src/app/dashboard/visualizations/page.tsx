@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -62,7 +62,6 @@ export default function VisualizationsPage() {
           <p className="text-muted-foreground">Analisis infografis populasi dan penggunaan lahan desa secara real-time.</p>
         </div>
         
-        {/* Share & Embed Actions */}
         <div className="flex items-center gap-2">
            <Card className="bg-primary/5 border-primary/20 p-1 flex items-center gap-1 rounded-2xl">
               <Button 
@@ -186,7 +185,6 @@ export default function VisualizationsPage() {
           </CardContent>
         </Card>
 
-        {/* Info Sematan Footer */}
         <Card className="lg:col-span-12 bg-slate-900 text-white border-none rounded-[2.5rem] p-6">
            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="space-y-2 text-center md:text-left">
