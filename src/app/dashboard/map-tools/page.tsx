@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -18,7 +19,13 @@ import {
   Ruler, Waypoints, Circle as CircleIcon, Square, Landmark, 
   Construction, TreePine, Droplets, Zap, ShieldAlert, Navigation,
   Home, Users, School, Hospital, Warehouse, Factory, ShoppingBag,
-  Wind, Activity, Camera, Car, Bus, Bike, Waves, Flame
+  Wind, Activity, Camera, Car, Bus, Bike, Waves, Flame,
+  Coffee, Wifi, ParkingCircle, TrainFront, Ship, Plane, Fish, 
+  Wheat, Sprout, Mountain, Cloud, Sun, Moon, Battery, Recycle,
+  Store, Utensils, Bed, Heart, Stethoscope, Briefcase, GraduationCap,
+  Music, Film, Baby, Banknote, BookOpen, Building2, ClipboardList,
+  FlameKindling, Globe, HardHat, Library, Mail, Microscope, Radio,
+  Satellite, Smartphone, Telescope, Tractor, Truck, Umbrella, Wallet
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -34,7 +41,15 @@ const FEATURE_ICONS = [
   'MapPin', 'Landmark', 'Construction', 'TreePine', 'Droplets', 'Zap', 
   'ShieldAlert', 'Navigation', 'Info', 'Home', 'Users', 'School', 
   'Hospital', 'Warehouse', 'Factory', 'ShoppingBag', 'Trash2', 'Wind',
-  'Activity', 'Camera', 'Car', 'Bus', 'Bike', 'Waves', 'Flame'
+  'Activity', 'Camera', 'Car', 'Bus', 'Bike', 'Waves', 'Flame',
+  'Coffee', 'Wifi', 'ParkingCircle', 'TrainFront', 'Ship', 'Plane',
+  'Fish', 'Wheat', 'Sprout', 'Mountain', 'Cloud', 'Sun', 'Moon',
+  'Battery', 'Recycle', 'Store', 'Utensils', 'Bed', 'Heart',
+  'Stethoscope', 'Briefcase', 'GraduationCap', 'Music', 'Film',
+  'Baby', 'Banknote', 'BookOpen', 'Building2', 'ClipboardList',
+  'FlameKindling', 'Globe', 'HardHat', 'Library', 'Mail', 'Microscope',
+  'Radio', 'Satellite', 'Smartphone', 'Telescope', 'Tractor', 'Truck',
+  'Umbrella', 'Wallet'
 ];
 
 const CATEGORIES = [

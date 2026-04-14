@@ -1,3 +1,4 @@
+
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Marker, Popup, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
@@ -40,7 +41,12 @@ interface LeafletMapProps {
 
 const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
   const db = useFirestore();
-  const featureQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
+  
+  const featureQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, 'features'), orderBy('name', 'asc'));
+  }, [db]);
+  
   const { data: features } = useCollection(featureQuery);
 
   const categories = useMemo(() => {
@@ -62,7 +68,9 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                 <DynamicIcon name={f.icon || 'MapPin'} />
                 {f.name}
               </div>
-              <div className="text-[10px] text-slate-500 uppercase font-black mt-1 mb-2">{f.category.replace('_', ' ')}</div>
+              <div className="text-[10px] text-slate-500 uppercase font-black mt-1 mb-2">
+                {f.category?.replace('_', ' ') || 'ASET'}
+              </div>
               {f.description && <p className="text-[11px] text-slate-600 mb-2">{f.description}</p>}
             </div>
           </Popup>
@@ -85,12 +93,12 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
         <Circle 
           key={f.id} 
           center={[f.geometry.lat, f.geometry.lng]}
-          radius={f.properties.radius}
+          radius={f.properties?.radius || 100}
           pathOptions={{ color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.2 }}
         >
           <Popup>
             <div className="font-bold">{f.name}</div>
-            <div className="text-xs">Radius: {Math.round(f.properties.radius)}m</div>
+            <div className="text-xs">Radius: {Math.round(f.properties?.radius || 0)}m</div>
           </Popup>
         </Circle>
       );
@@ -104,7 +112,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
         >
           <Popup>
             <div className="font-bold">{f.name}</div>
-            <div className="text-xs">Luas: {f.properties.area} km²</div>
+            <div className="text-xs">Luas: {f.properties?.area || 0} km²</div>
           </Popup>
         </Polygon>
       );

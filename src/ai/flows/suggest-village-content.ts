@@ -5,7 +5,7 @@
  * @fileOverview AI Flow untuk menghasilkan saran konten profil desa.
  */
 
-import { ai, z } from '@/ai/genkit-instance';
+import { ai, z } from '@/lib/ai-setup';
 
 const SuggestVillageContentInputSchema = z.object({
   name: z.string().describe('Nama desa'),

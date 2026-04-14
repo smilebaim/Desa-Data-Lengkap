@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -13,7 +14,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { 
   Plus, Trash2, Edit2, Save, Search, HelpCircle, 
   Home, BarChart, Users, Database, Map, Navigation, Info, FileText,
-  PieChart, Activity, Shield, MapPin, Filter, ShoppingCart, Camera, Image, Loader2, Car, Bus, Link as LinkIcon
+  PieChart, Activity, Shield, MapPin, Filter, ShoppingCart, Camera, Image, Loader2, Car, Bus, Link as LinkIcon,
+  Baby, Banknote, BookOpen, Building2, ClipboardList, FlameKindling, Globe, HardHat, Library, Mail, Microscope,
+  Radio, Satellite, Smartphone, Telescope, Tractor, Truck, Umbrella, Wallet
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -22,7 +25,10 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const NAV_ICONS = [
   'Home', 'BarChart', 'Users', 'Database', 'Map', 'Navigation', 'Info', 'FileText',
-  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'Car', 'Bus'
+  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'Car', 'Bus',
+  'Baby', 'Banknote', 'BookOpen', 'Building2', 'ClipboardList', 'FlameKindling', 'Globe', 'HardHat',
+  'Library', 'Mail', 'Microscope', 'Radio', 'Satellite', 'Smartphone', 'Telescope', 'Tractor', 'Truck',
+  'Umbrella', 'Wallet'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {

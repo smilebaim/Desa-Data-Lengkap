@@ -1,16 +1,10 @@
 
-import { genkit, z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+'use client';
 
 /**
- * Inisialisasi utama Genkit.
- * Gunakan file ini sebagai sumber tunggal instansi 'ai'.
+ * Barrel export untuk instansi AI.
+ * Mengambil dari src/lib/ai-setup untuk menghindari shadowing modul 'genkit'.
  */
-export const ai = genkit({
-  plugins: [
-    googleAI(),
-  ],
-  model: googleAI.model('gemini-2.5-flash'),
-});
+import { ai, z } from '@/lib/ai-setup';
 
-export { z };
+export { ai, z };
