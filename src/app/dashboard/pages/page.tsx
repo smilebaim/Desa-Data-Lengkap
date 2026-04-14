@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -41,16 +40,21 @@ export default function PagesManagementPage() {
   const handleEdit = (page: any) => {
     setIsEditing(page.id);
     setFormData({
-      title: page.title,
-      content: page.content,
+      title: page.title || '',
+      content: page.content || '',
       showStats: !!page.showStats
     });
+    // Scroll to top or form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!formData.title || !formData.content) {
+      return toast({ title: "Galat", description: "Judul dan konten harus diisi.", variant: "destructive" });
+    }
 
+    setIsSubmitting(true);
     const collRef = collection(db, 'pages');
     const data = {
       ...formData,
@@ -90,10 +94,10 @@ export default function PagesManagementPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Hapus halaman ini?')) return;
+    if (!confirm('Hapus halaman ini secara permanen?')) return;
     const docRef = doc(db, 'pages', id);
     deleteDoc(docRef)
-      .then(() => toast({ title: "Berhasil", description: "Halaman dihapus." }))
+      .then(() => toast({ title: "Berhasil", description: "Halaman telah dihapus dari sistem." }))
       .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' })));
   };
 

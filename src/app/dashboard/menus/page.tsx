@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -15,7 +14,7 @@ import {
   Plus, Trash2, Edit2, Save, Search, HelpCircle, 
   Home, BarChart, Users, Database, Map, Navigation, Info, FileText,
   PieChart, Activity, Shield, MapPin, Filter, ShoppingCart, Camera, Image, Loader2, Car, Bus, Link as LinkIcon,
-  Copy, CheckCheck, Sparkles, TrendingUp
+  Copy, CheckCheck, Sparkles, TrendingUp, X
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -37,10 +36,10 @@ export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
+  const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading } = useCollection(menuQuery);
 
-  const pagesQuery = query(collection(db, 'pages'), orderBy('title', 'asc'));
+  const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('title', 'asc')), [db]);
   const { data: pages } = useCollection(pagesQuery);
 
   const menus = useMemo(() => 
@@ -122,6 +121,7 @@ export default function PengaturanNavigasiUtamaPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm('Hapus menu ini?')) return;
     const docRef = doc(db, 'menus', id);
     deleteDoc(docRef)
       .then(() => toast({ title: "Berhasil", description: "Menu telah dihapus." }))
@@ -212,7 +212,6 @@ export default function PengaturanNavigasiUtamaPage() {
             </CardContent>
           </Card>
 
-          {/* Quick References Section */}
           <Card className="shadow-sm border-primary/20 bg-primary/5 rounded-[2rem]">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
