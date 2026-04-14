@@ -8,7 +8,9 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -55,12 +57,13 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
       return (
         <Marker key={f.id} position={[f.geometry.lat, f.geometry.lng]}>
           <Popup>
-            <div className="p-1">
+            <div className="p-1 min-w-[150px]">
               <div className="flex items-center gap-2 font-bold text-slate-900">
                 <DynamicIcon name={f.icon || 'MapPin'} />
                 {f.name}
               </div>
-              <div className="text-[10px] text-slate-500 uppercase font-black mt-1">{f.category.replace('_', ' ')}</div>
+              <div className="text-[10px] text-slate-500 uppercase font-black mt-1 mb-2">{f.category.replace('_', ' ')}</div>
+              {f.description && <p className="text-[11px] text-slate-600 mb-2">{f.description}</p>}
             </div>
           </Popup>
         </Marker>
@@ -144,11 +147,22 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                         pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }}
                       >
                         <Popup>
-                          <div className="p-1">
-                            <h3 className="font-bold text-slate-900">{village.name}</h3>
-                            <p className="text-[10px] text-slate-500 uppercase font-bold">{village.province}</p>
-                            <div className="mt-2 text-xs border-t pt-2">
-                              <p>Populasi: <b>{village.population?.toLocaleString()}</b> jiwa</p>
+                          <div className="p-1 min-w-[200px]">
+                            <h3 className="font-bold text-slate-900 text-lg">{village.name}</h3>
+                            <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{village.province}</p>
+                            <div className="mt-3 text-xs border-t pt-3 space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Populasi:</span>
+                                <b className="text-slate-900">{village.population?.toLocaleString() || 0} jiwa</b>
+                              </div>
+                              {village.tagline && (
+                                <p className="italic text-slate-500 text-[11px]">"{village.tagline}"</p>
+                              )}
+                              <Link href={`/village/${village.id}`} className="block mt-2">
+                                <Button size="sm" className="w-full h-8 text-[10px] font-bold bg-primary hover:bg-primary/90">
+                                  LIHAT PROFIL DESA <ArrowRight className="ml-2 h-3 w-3" />
+                                </Button>
+                              </Link>
                             </div>
                           </div>
                         </Popup>

@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, 
-  Loader2, Map as MapIcon, BarChart3, Settings2
+  Loader2, Map as MapIcon, BarChart3, Landmark, Settings2
 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/firebase';
@@ -42,9 +42,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { href: '/dashboard', label: 'Ringkasan', icon: LayoutDashboard },
-    { href: '/dashboard/menus', label: 'Navigasi Utama', icon: MenuIcon },
-    { href: '/dashboard/map-tools', label: 'Manajemen Spasial', icon: MapIcon },
-    { href: '/dashboard/visualizations', label: 'Visualisasi Data', icon: BarChart3 },
+    { href: '/dashboard/villages', label: 'Manajemen Desa', icon: Landmark },
+    { href: '/dashboard/map-tools', label: 'Editor Spasial', icon: MapIcon },
+    { href: '/dashboard/menus', label: 'Navigasi Publik', icon: MenuIcon },
+    { href: '/dashboard/visualizations', label: 'Statistik & Data', icon: BarChart3 },
   ];
 
   return (
