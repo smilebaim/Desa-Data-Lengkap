@@ -76,8 +76,19 @@ interface LeafletMapProps {
 
 const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
   const db = useFirestore();
-  const { data: features } = useCollection(query(collection(db, 'features'), orderBy('name', 'asc')));
-  const { data: visualizers } = useCollection(query(collection(db, 'visualizers')));
+  
+  // Memoize data requirements
+  const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
+  const { data: features } = useCollection(featuresQuery);
+
+  const visualizersQuery = useMemo(() => query(collection(db, 'visualizers')), [db]);
+  const { data: visualizers } = useCollection(visualizersQuery);
+
+  // Define Indonesia Bounds: [SouthWest, NorthEast]
+  const indonesiaBounds: LatLngBoundsExpression = [
+    [-11.0, 95.0], // Sabang/Rote area
+    [6.0, 141.0]   // Merauke/Natuna area
+  ];
 
   const statsData = useMemo(() => {
     if (!villages) return [];
@@ -99,7 +110,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
     return groups;
   }, [features]);
 
-  // Pendeteksi dan perender konten dengan dukungan [CHART:ID]
+  // Detector and renderer for content with [CHART:ID] support
   const renderTextWithCharts = (content: string) => {
     if (!content) return null;
     const regex = /(\[CHART:[a-zA-Z0-9_-]+\])/g;
@@ -160,8 +171,21 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
   };
 
   return (
-    <MapContainer className="h-full w-full z-10" center={[-2.5489, 118.0149]} zoom={5} minZoom={5} zoomControl={false}>
-      <TileLayer attribution='&copy; Google' url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" subdomains={['mt0','mt1','mt2','mt3']} />
+    <MapContainer 
+      className="h-full w-full z-10" 
+      center={[-2.5489, 118.0149]} 
+      zoom={5} 
+      minZoom={5} 
+      maxZoom={18}
+      maxBounds={indonesiaBounds}
+      maxBoundsViscosity={1.0}
+      zoomControl={false}
+    >
+      <TileLayer 
+        attribution='&copy; Google' 
+        url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
+        subdomains={['mt0','mt1','mt2','mt3']} 
+      />
       <LayersControl position="topright">
         {showVillages && (
           <LayersControl.Overlay checked name="Batas Desa">
