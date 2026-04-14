@@ -32,6 +32,7 @@ export default function VisualizationsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Memoize queries
   const villageQuery = useMemo(() => query(collection(db, 'villages'), orderBy('name', 'asc')), [db]);
   const { data: villages, isLoading: isVillagesLoading } = useCollection(villageQuery);
 
@@ -62,22 +63,21 @@ export default function VisualizationsPage() {
     if (!newChart.title) return toast({ title: "Galat", description: "Judul grafik harus diisi.", variant: "destructive" });
     
     setIsSubmitting(true);
-    const collRef = collection(db, 'visualizers');
     const data = { ...newChart, createdAt: serverTimestamp() };
 
-    addDoc(collRef, data)
+    addDoc(collection(db, 'visualizers'), data)
       .then(() => {
         toast({ title: "Berhasil", description: "Grafik baru ditambahkan ke pustaka." });
         setNewChart({ title: '', metric: 'population', chartType: 'bar' });
       })
       .catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: data }));
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: 'visualizers', operation: 'create', requestResourceData: data }));
       })
       .finally(() => setIsSubmitting(false));
   };
 
   const handleDeleteChart = async (id: string) => {
-    if (!confirm('Hapus grafik ini dari pustaka?')) return;
+    if (!id || !confirm('Hapus grafik ini dari pustaka?')) return;
     const docRef = doc(db, 'visualizers', id);
     deleteDoc(docRef)
       .then(() => toast({ title: "Berhasil", description: "Grafik dihapus." }))

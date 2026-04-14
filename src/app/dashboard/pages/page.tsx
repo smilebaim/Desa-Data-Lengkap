@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Edit2, Save, FileText, Loader2, Eye, BarChart3, Info, Globe, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, FileText, Loader2, Eye, BarChart3, Info, Globe, Sparkles, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -21,6 +21,7 @@ export default function PagesManagementPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
+  // Memoize query to prevent infinite reload loop
   const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('updatedAt', 'desc')), [db]);
   const { data: pages, isLoading } = useCollection(pagesQuery);
 
@@ -45,6 +46,7 @@ export default function PagesManagementPage() {
       content: page.content || '',
       showStats: !!page.showStats
     });
+    // Scroll smoothly to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -57,15 +59,14 @@ export default function PagesManagementPage() {
     }
 
     setIsSubmitting(true);
-    const collRef = collection(db, 'pages');
-    const data = {
+    const dataToSave = {
       ...formData,
       updatedAt: serverTimestamp()
     };
 
     if (isEditing) {
       const docRef = doc(db, 'pages', isEditing);
-      updateDoc(docRef, data)
+      updateDoc(docRef, dataToSave)
         .then(() => {
           toast({ title: "Berhasil", description: "Halaman diperbarui." });
           resetForm();
@@ -74,12 +75,13 @@ export default function PagesManagementPage() {
           errorEmitter.emit('permission-error', new FirestorePermissionError({ 
             path: docRef.path, 
             operation: 'update', 
-            requestResourceData: data 
+            requestResourceData: dataToSave 
           }));
         })
         .finally(() => setIsSubmitting(false));
     } else {
-      addDoc(collRef, data)
+      const collRef = collection(db, 'pages');
+      addDoc(collRef, dataToSave)
         .then(() => {
           toast({ title: "Berhasil", description: "Halaman baru dibuat." });
           resetForm();
@@ -88,7 +90,7 @@ export default function PagesManagementPage() {
           errorEmitter.emit('permission-error', new FirestorePermissionError({ 
             path: collRef.path, 
             operation: 'create', 
-            requestResourceData: data 
+            requestResourceData: dataToSave 
           }));
         })
         .finally(() => setIsSubmitting(false));
@@ -97,10 +99,18 @@ export default function PagesManagementPage() {
 
   const handleDelete = async (id: string) => {
     if (!id || !confirm('Hapus halaman ini secara permanen?')) return;
+    
     const docRef = doc(db, 'pages', id);
     deleteDoc(docRef)
-      .then(() => toast({ title: "Berhasil", description: "Halaman telah dihapus dari sistem." }))
-      .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' })));
+      .then(() => {
+        toast({ title: "Berhasil", description: "Halaman telah dihapus dari sistem." });
+      })
+      .catch(async () => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+          path: docRef.path, 
+          operation: 'delete' 
+        }));
+      });
   };
 
   return (
@@ -137,7 +147,7 @@ export default function PagesManagementPage() {
                 <Textarea 
                   value={formData.content} 
                   onChange={e => setFormData({...formData, content: e.target.value})} 
-                  placeholder="Tuliskan isi halaman di sini..." 
+                  placeholder="Tuliskan isi halaman di sini... Gunakan [CHART:ID] untuk menyematkan grafik." 
                   className="min-h-[250px] resize-none focus:ring-primary/20"
                   required 
                 />
@@ -157,12 +167,6 @@ export default function PagesManagementPage() {
                     onCheckedChange={(checked) => setFormData({...formData, showStats: checked})} 
                   />
                 </div>
-                {formData.showStats && (
-                  <div className="flex items-start gap-3 text-[10px] text-primary/80 bg-white p-3 rounded-2xl border border-primary/5 shadow-sm">
-                    <Sparkles className="h-3 w-3 shrink-0 mt-0.5" />
-                    <span>Halaman publik akan menyertakan visualisasi data real-time dari seluruh jaringan desa Anda.</span>
-                  </div>
-                )}
               </div>
 
               <div className="pt-2 flex flex-col gap-2">
@@ -172,7 +176,7 @@ export default function PagesManagementPage() {
                 </Button>
                 {isEditing && (
                   <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>
-                    Batalkan Edit
+                    <X className="mr-2 h-4 w-4" /> Batalkan Edit
                   </Button>
                 )}
               </div>

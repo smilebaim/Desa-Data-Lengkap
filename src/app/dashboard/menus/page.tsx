@@ -89,12 +89,11 @@ export default function PengaturanNavigasiUtamaPage() {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
-    const collRef = collection(db, 'menus');
-    const data = { ...formData, order: Number(formData.order) };
+    const dataToSave = { ...formData, order: Number(formData.order) };
 
     if (isEditing) {
       const docRef = doc(db, 'menus', isEditing);
-      updateDoc(docRef, data)
+      updateDoc(docRef, dataToSave)
         .then(() => {
           toast({ title: "Berhasil", description: "Navigasi telah diperbarui." });
           resetForm();
@@ -103,12 +102,13 @@ export default function PengaturanNavigasiUtamaPage() {
           errorEmitter.emit('permission-error', new FirestorePermissionError({ 
             path: docRef.path, 
             operation: 'update', 
-            requestResourceData: data 
+            requestResourceData: dataToSave 
           }));
         })
         .finally(() => setIsSubmitting(false));
     } else {
-      addDoc(collRef, data)
+      const collRef = collection(db, 'menus');
+      addDoc(collRef, dataToSave)
         .then(() => {
           toast({ title: "Berhasil", description: "Navigasi baru telah ditambahkan." });
           resetForm();
@@ -117,7 +117,7 @@ export default function PengaturanNavigasiUtamaPage() {
           errorEmitter.emit('permission-error', new FirestorePermissionError({ 
             path: collRef.path, 
             operation: 'create', 
-            requestResourceData: data 
+            requestResourceData: dataToSave 
           }));
         })
         .finally(() => setIsSubmitting(false));
@@ -141,6 +141,7 @@ export default function PengaturanNavigasiUtamaPage() {
       order: menu.order || 0,
       position: menu.position || 'bottom'
     });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -152,7 +153,7 @@ export default function PengaturanNavigasiUtamaPage() {
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
         <div className="lg:col-span-4 space-y-6">
-          <Card className="shadow-lg border-primary/10">
+          <Card className="shadow-lg border-primary/10 sticky top-6">
             <CardHeader className="bg-slate-50/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 {isEditing ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
@@ -221,41 +222,9 @@ export default function PengaturanNavigasiUtamaPage() {
                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
                     {isEditing ? 'Simpan Perubahan' : 'Tambahkan ke Peta'}
                   </Button>
-                  {isEditing && <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>Batalkan</Button>}
+                  {isEditing && <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}><X className="mr-2 h-4 w-4" /> Batalkan</Button>}
                 </div>
               </form>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border-primary/20 bg-primary/5 rounded-[2rem]">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
-                <Sparkles className="h-4 w-4" /> Referensi Tautan Publik
-              </CardTitle>
-              <CardDescription className="text-[10px]">Klik ikon untuk menyalin alamat tujuan.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pb-6">
-              <div className="flex items-center justify-between p-3 bg-white rounded-2xl border border-primary/10 group">
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="h-8 w-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><TrendingUp className="h-4 w-4" /></div>
-                  <span className="text-xs font-bold truncate">Dashboard Statistik</span>
-                </div>
-                <Button size="icon" variant="ghost" className="h-9 w-9 hover:bg-primary/5" onClick={() => handleCopy('/visualizations', 'viz')}>
-                  {copiedId === 'viz' ? <CheckCheck className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" />}
-                </Button>
-              </div>
-
-              {pages?.map((page: any) => (
-                <div key={page.id} className="flex items-center justify-between p-3 bg-white rounded-2xl border border-slate-100 group">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="h-8 w-8 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400"><FileText className="h-4 w-4" /></div>
-                    <span className="text-xs font-medium truncate">{page.title}</span>
-                  </div>
-                  <Button size="icon" variant="ghost" className="h-9 w-9 hover:bg-slate-100" onClick={() => handleCopy(`/p/${page.id}`, page.id)}>
-                    {copiedId === page.id ? <CheckCheck className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4 text-slate-300 group-hover:text-primary transition-colors" />}
-                  </Button>
-                </div>
-              ))}
             </CardContent>
           </Card>
         </div>
