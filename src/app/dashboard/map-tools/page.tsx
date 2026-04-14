@@ -20,7 +20,7 @@ import {
   Layers, MapPin, Map as MapIcon, Info, Hexagon, FileJson, 
   Ruler, Waypoints, Circle as CircleIcon, Square, Landmark, 
   Construction, TreePine, Droplets, Zap, ShieldAlert, Navigation,
-  BarChart3, Sparkles
+  BarChart3, Sparkles, PlusCircle, X
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -65,6 +65,7 @@ export default function SpasialManagementPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [iconSearch, setIconSearch] = useState('');
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   
   const [currentFeature, setCurrentFeature] = useState<any>({
     name: '',
@@ -103,6 +104,7 @@ export default function SpasialManagementPage() {
       .then(() => {
         toast({ title: "Berhasil", description: "Data spasial telah disinkronkan ke peta utama." });
         setCurrentFeature({ name: '', description: '', showStats: false, type: '', category: 'infrastructure', icon: 'MapPin', geometry: null, properties: {} });
+        setIsCustomCategory(false);
       })
       .catch(async () => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: dataToSave }));
@@ -111,6 +113,7 @@ export default function SpasialManagementPage() {
   };
 
   const handleDelete = async (coll: string, id: string) => {
+    if (!confirm('Hapus objek ini?')) return;
     const docRef = doc(db, coll, id);
     deleteDoc(docRef)
       .then(() => toast({ title: "Berhasil", description: "Objek dihapus dari database." }))
@@ -135,7 +138,7 @@ export default function SpasialManagementPage() {
               <CardTitle className="text-lg">Atribut Objek</CardTitle>
               <CardDescription>Detail teknis untuk objek yang akan disimpan.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="space-y-2">
                 <Label className="text-xs font-bold uppercase text-slate-500">Nama Objek</Label>
                 <Input 
@@ -146,51 +149,47 @@ export default function SpasialManagementPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500">Keterangan / Deskripsi</Label>
-                <Textarea 
-                  placeholder="Berikan penjelasan detail tentang objek ini..." 
-                  className="min-h-[100px] text-sm"
-                  value={currentFeature.description}
-                  onChange={e => setCurrentFeature({...currentFeature, description: e.target.value})}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500">Kategori Layer</Label>
-                <Select 
-                  value={currentFeature.category} 
-                  onValueChange={(v) => setCurrentFeature({...currentFeature, category: v})}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map(cat => (
-                      <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label className="text-xs font-bold flex items-center gap-2 text-primary">
-                      <BarChart3 className="h-3.5 w-3.5" />
-                      Sematkan Statistik
-                    </Label>
-                    <p className="text-[10px] text-slate-500">Tampilkan data populasi jaringan di popup objek.</p>
-                  </div>
-                  <Switch 
-                    checked={currentFeature.showStats} 
-                    onCheckedChange={(checked) => setCurrentFeature({...currentFeature, showStats: checked})} 
-                  />
+                <div className="flex items-center justify-between mb-1">
+                  <Label className="text-xs font-bold uppercase text-slate-500">Kategori Layer</Label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 text-[10px] font-bold text-primary hover:bg-primary/5 px-2"
+                    onClick={() => {
+                      setIsCustomCategory(!isCustomCategory);
+                      setCurrentFeature({...currentFeature, category: isCustomCategory ? 'infrastructure' : ''});
+                    }}
+                  >
+                    {isCustomCategory ? (
+                      <span className="flex items-center gap-1"><X className="h-3 w-3" /> Batal</span>
+                    ) : (
+                      <span className="flex items-center gap-1"><PlusCircle className="h-3 w-3" /> Kategori Baru</span>
+                    )}
+                  </Button>
                 </div>
-                {currentFeature.showStats && (
-                  <div className="flex items-start gap-2 text-[9px] text-primary/70 bg-white/50 p-2 rounded-xl border border-primary/5">
-                    <Sparkles className="h-2.5 w-2.5 shrink-0 mt-0.5" />
-                    <span>Popup pada peta akan menyertakan ringkasan data statistik desa secara real-time.</span>
+                {isCustomCategory ? (
+                  <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+                    <Input 
+                      placeholder="Ketik kategori baru..." 
+                      value={currentFeature.category}
+                      onChange={e => setCurrentFeature({...currentFeature, category: e.target.value})}
+                      className="border-primary/30 focus-visible:ring-primary/20"
+                    />
                   </div>
+                ) : (
+                  <Select 
+                    value={currentFeature.category} 
+                    onValueChange={(v) => setCurrentFeature({...currentFeature, category: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih kategori..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map(cat => (
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               </div>
 
@@ -223,6 +222,38 @@ export default function SpasialManagementPage() {
                     </div>
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase text-slate-500">Keterangan / Deskripsi</Label>
+                <Textarea 
+                  placeholder="Berikan penjelasan detail tentang objek ini..." 
+                  className="min-h-[100px] text-sm resize-none"
+                  value={currentFeature.description}
+                  onChange={e => setCurrentFeature({...currentFeature, description: e.target.value})}
+                />
+              </div>
+
+              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-bold flex items-center gap-2 text-primary">
+                      <BarChart3 className="h-3.5 w-3.5" />
+                      Sematkan Statistik
+                    </Label>
+                    <p className="text-[10px] text-slate-500">Tampilkan ringkasan data statistik desa di popup.</p>
+                  </div>
+                  <Switch 
+                    checked={currentFeature.showStats} 
+                    onCheckedChange={(checked) => setCurrentFeature({...currentFeature, showStats: checked})} 
+                  />
+                </div>
+                {currentFeature.showStats && (
+                  <div className="flex items-start gap-2 text-[9px] text-primary/70 bg-white/50 p-2 rounded-xl border border-primary/5">
+                    <Sparkles className="h-2.5 w-2.5 shrink-0 mt-0.5" />
+                    <span>Popup pada peta akan menyertakan data populasi dan luas wilayah secara real-time.</span>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 bg-slate-50 rounded-xl border space-y-2">
@@ -291,17 +322,17 @@ export default function SpasialManagementPage() {
                 
                 <TabsContent value="all_features">
                   <Table>
-                    <TableHeader><TableRow><TableHead>Nama</TableHead><TableHead>Kategori</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead className="pl-6">Nama</TableHead><TableHead>Kategori</TableHead><TableHead className="text-right pr-6">Aksi</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {isFeaturesLoading ? <TableRow><TableCell colSpan={3} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow> : features?.length === 0 ? <TableRow><TableCell colSpan={3} className="text-center py-10 text-slate-400">Tidak ada objek tambahan.</TableCell></TableRow> : features?.map((f: any) => (
-                        <TableRow key={f.id}>
-                          <TableCell className="font-bold flex items-center gap-2">
-                            <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4 text-primary" />
+                        <TableRow key={f.id} className="group hover:bg-slate-50/50">
+                          <TableCell className="pl-6 font-bold flex items-center gap-3">
+                            <div className="h-8 w-8 bg-white border rounded-lg flex items-center justify-center text-primary shadow-sm"><DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4" /></div>
                             {f.name}
                           </TableCell>
-                          <TableCell><span className="text-[10px] bg-slate-100 px-2 py-1 rounded-full font-bold uppercase">{f.category}</span></TableCell>
-                          <TableCell className="text-right">
-                            <Button size="icon" variant="ghost" className="text-red-500" onClick={() => handleDelete('features', f.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <TableCell><span className="text-[10px] bg-slate-100 px-2.5 py-1 rounded-full font-black uppercase tracking-wider text-slate-500 border border-slate-200">{f.category?.replace('_', ' ')}</span></TableCell>
+                          <TableCell className="text-right pr-6">
+                            <Button size="icon" variant="ghost" className="text-red-500 hover:bg-red-50" onClick={() => handleDelete('features', f.id)}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -311,15 +342,15 @@ export default function SpasialManagementPage() {
 
                 <TabsContent value="villages">
                    <Table>
-                    <TableHeader><TableRow><TableHead>Nama Desa</TableHead><TableHead>Provinsi</TableHead><TableHead className="text-center">Luas</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead className="pl-6">Nama Desa</TableHead><TableHead>Provinsi</TableHead><TableHead className="text-center">Luas</TableHead><TableHead className="text-right pr-6">Aksi</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {isVillagesLoading ? <TableRow><TableCell colSpan={4} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" /></TableCell></TableRow> : villages?.length === 0 ? <TableRow><TableCell colSpan={4} className="text-center py-10 text-slate-400">Tidak ada data desa.</TableCell></TableRow> : villages?.map((v: any) => (
-                        <TableRow key={v.id}>
-                          <TableCell className="font-bold">{v.name}</TableCell>
+                        <TableRow key={v.id} className="group hover:bg-slate-50/50">
+                          <TableCell className="pl-6 font-bold">{v.name}</TableCell>
                           <TableCell className="text-xs">{v.province}</TableCell>
                           <TableCell className="text-center text-xs font-mono">{v.area} km²</TableCell>
-                          <TableCell className="text-right">
-                            <Button size="icon" variant="ghost" className="text-red-500" onClick={() => handleDelete('villages', v.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <TableCell className="text-right pr-6">
+                            <Button size="icon" variant="ghost" className="text-red-500 hover:bg-red-50" onClick={() => handleDelete('villages', v.id)}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>
                         </TableRow>
                       ))}
