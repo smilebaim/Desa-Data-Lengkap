@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,8 +15,7 @@ import {
   Plus, Trash2, Edit2, Save, Search, HelpCircle, 
   Home, BarChart, Users, Database, Map, Navigation, Info, FileText,
   PieChart, Activity, Shield, MapPin, Filter, ShoppingCart, Camera, Image, Loader2, Car, Bus, Link as LinkIcon,
-  Baby, Banknote, BookOpen, Building2, ClipboardList, FlameKindling, Globe, HardHat, Library, Mail, Microscope,
-  Radio, Satellite, Smartphone, Telescope, Tractor, Truck, Umbrella, Wallet
+  Copy, CheckCheck
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -25,10 +24,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const NAV_ICONS = [
   'Home', 'BarChart', 'Users', 'Database', 'Map', 'Navigation', 'Info', 'FileText',
-  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'Car', 'Bus',
-  'Baby', 'Banknote', 'BookOpen', 'Building2', 'ClipboardList', 'FlameKindling', 'Globe', 'HardHat',
-  'Library', 'Mail', 'Microscope', 'Radio', 'Satellite', 'Smartphone', 'Telescope', 'Tractor', 'Truck',
-  'Umbrella', 'Wallet'
+  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'Car', 'Bus'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -39,9 +35,13 @@ const DynamicIcon = ({ name, className }: { name: string, className?: string }) 
 
 export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
+  const { toast } = useToast();
+  
   const menuQuery = query(collection(db, 'menus'), orderBy('order', 'asc'));
   const { data: allMenus, isLoading } = useCollection(menuQuery);
-  const { toast } = useToast();
+
+  const pagesQuery = query(collection(db, 'pages'), orderBy('title', 'asc'));
+  const { data: pages } = useCollection(pagesQuery);
 
   const menus = useMemo(() => 
     (allMenus || []).filter((m: any) => ['bottom', 'header', 'left'].includes(m.position)), 
@@ -58,6 +58,7 @@ export default function PengaturanNavigasiUtamaPage() {
     position: 'bottom' as 'bottom' | 'header' | 'left'
   });
   const [iconSearch, setIconSearch] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const filteredIcons = NAV_ICONS.filter(icon => 
     icon.toLowerCase().includes(iconSearch.toLowerCase())
@@ -73,6 +74,13 @@ export default function PengaturanNavigasiUtamaPage() {
         position: 'bottom' 
     });
     setIconSearch('');
+  };
+
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+    toast({ title: "Tautan Disalin", description: "Gunakan tautan ini pada kolom Tautan (URL)." });
   };
 
   const handleAction = async (e: React.FormEvent) => {
@@ -116,123 +124,127 @@ export default function PengaturanNavigasiUtamaPage() {
   const handleDelete = async (id: string) => {
     const docRef = doc(db, 'menus', id);
     deleteDoc(docRef)
-      .then(() => {
-        toast({ title: "Berhasil", description: "Menu telah dihapus." });
-      })
-      .catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-          path: docRef.path, 
-          operation: 'delete' 
-        }));
-      });
+      .then(() => toast({ title: "Berhasil", description: "Menu telah dihapus." }))
+      .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' })));
   };
 
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Konfigurasi Navigasi Global</h1>
-        <p className="text-muted-foreground">Kelola semua elemen navigasi interaktif pada antarmuka peta publik.</p>
+        <p className="text-muted-foreground">Hubungkan halaman statistik dan halaman dinamis Anda ke antarmuka peta publik.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
-        <Card className="lg:col-span-4 shadow-sm border-slate-200 sticky top-6">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              {isEditing ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
-              {isEditing ? 'Edit Navigasi' : 'Tambah Navigasi'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAction} className="space-y-5">
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Label Menu</Label>
-                <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Profil Desa" required />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Tautan (URL)</Label>
-                <div className="flex gap-2">
-                  <div className="bg-slate-100 flex items-center px-3 rounded-lg border border-slate-200">
-                    <LinkIcon className="h-4 w-4 text-slate-400" />
-                  </div>
-                  <Input value={formData.href} onChange={e => setFormData({...formData, href: e.target.value})} placeholder="/village/id atau #" required />
+        <div className="lg:col-span-4 space-y-6">
+          <Card className="shadow-sm border-slate-200">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                {isEditing ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
+                {isEditing ? 'Edit Menu' : 'Tambah Menu'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAction} className="space-y-5">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Label Menu</Label>
+                  <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Data Statistik" required />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Pilih Ikon</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between gap-2 h-11 border-slate-200">
-                      <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-slate-100 rounded-lg">
+
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Tautan (URL)</Label>
+                  <div className="flex gap-2">
+                    <div className="bg-slate-100 flex items-center px-3 rounded-lg border border-slate-200">
+                      <LinkIcon className="h-4 w-4 text-slate-400" />
+                    </div>
+                    <Input value={formData.href} onChange={e => setFormData({...formData, href: e.target.value})} placeholder="/visualizations atau /p/id" required />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Pilih Ikon</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between gap-2 h-11 border-slate-200">
+                        <div className="flex items-center gap-3">
                           <DynamicIcon name={formData.icon} className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium">{formData.icon}</span>
                         </div>
-                        <span className="text-sm font-medium">{formData.icon}</span>
+                        <Search className="h-4 w-4 text-slate-400" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-72 p-0" align="start">
+                      <div className="p-3 border-b border-slate-100"><Input placeholder="Cari ikon..." className="h-9" value={iconSearch} onChange={e => setIconSearch(e.target.value)} /></div>
+                      <div className="p-2 grid grid-cols-5 gap-1 max-h-60 overflow-y-auto">
+                        {filteredIcons.map(icon => (
+                          <Button key={icon} type="button" variant="ghost" size="icon" onClick={() => setFormData({...formData, icon})} className={`h-10 w-10 ${formData.icon === icon ? 'bg-primary/10 text-primary' : ''}`}><DynamicIcon name={icon} className="h-5 w-5" /></Button>
+                        ))}
                       </div>
-                      <Search className="h-4 w-4 text-slate-400" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-72 p-0" align="start">
-                    <div className="p-3 border-b border-slate-100 bg-slate-50/50">
-                      <Input 
-                        placeholder="Cari ikon..." 
-                        className="h-9 bg-white" 
-                        value={iconSearch} 
-                        onChange={e => setIconSearch(e.target.value)} 
-                      />
-                    </div>
-                    <div className="p-2 grid grid-cols-5 gap-1 max-h-60 overflow-y-auto">
-                      {filteredIcons.map(icon => (
-                        <Button 
-                          key={icon} 
-                          type="button" 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => setFormData({...formData, icon})} 
-                          className={`h-10 w-10 ${formData.icon === icon ? 'bg-primary/10 text-primary' : ''}`}
-                        >
-                          <DynamicIcon name={icon} className="h-5 w-5" />
-                        </Button>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Tampilan</Label>
-                <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="header">Atas (Header Info)</SelectItem>
-                    <SelectItem value="left">Samping (Toolbar Kiri)</SelectItem>
-                    <SelectItem value="bottom">Bawah (Bar Utama)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Posisi Tampilan</Label>
+                  <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
+                    <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="header">Atas (Header Info)</SelectItem>
+                      <SelectItem value="left">Samping (Toolbar Kiri)</SelectItem>
+                      <SelectItem value="bottom">Bawah (Bar Utama)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan Tampil</Label>
-                <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} required />
-              </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan</Label>
+                  <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} required />
+                </div>
 
-              <div className="pt-2 flex flex-col gap-2">
-                <Button type="submit" className="w-full h-11 shadow-md" disabled={isSubmitting}>
-                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
-                  {isEditing ? 'Simpan' : 'Tambah'}
-                </Button>
-                {isEditing && (
-                  <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>
-                    Batal
+                <div className="pt-2 flex flex-col gap-2">
+                  <Button type="submit" className="w-full h-11 shadow-md" disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
+                    {isEditing ? 'Simpan' : 'Tambah'}
                   </Button>
-                )}
+                  {isEditing && <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>Batal</Button>}
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Reference Links Section */}
+          <Card className="shadow-sm border-primary/20 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                <LinkIcon className="h-4 w-4" /> Referensi Tautan Cepat
+              </CardTitle>
+              <CardDescription className="text-[10px]">Klik ikon untuk menyalin tautan halaman statistik atau halaman dinamis.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-primary/10">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <BarChart className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span className="text-xs font-bold truncate">Dashboard Statistik Utama</span>
+                </div>
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleCopy('/visualizations', 'viz')}>
+                  {copiedId === 'viz' ? <CheckCheck className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
+                </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+
+              {pages?.map((page: any) => (
+                <div key={page.id} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <FileText className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                    <span className="text-xs truncate">{page.title}</span>
+                  </div>
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleCopy(`/p/${page.id}`, page.id)}>
+                    {copiedId === page.id ? <CheckCheck className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
 
         <Card className="lg:col-span-8 shadow-sm border-slate-200">
           <CardHeader>
@@ -242,7 +254,7 @@ export default function PengaturanNavigasiUtamaPage() {
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
-                  <TableHead>Label & Ikon</TableHead>
+                  <TableHead>Label</TableHead>
                   <TableHead>Tautan</TableHead>
                   <TableHead>Posisi</TableHead>
                   <TableHead className="text-center">Urutan</TableHead>
@@ -258,30 +270,16 @@ export default function PengaturanNavigasiUtamaPage() {
                   <TableRow key={menu.id} className="hover:bg-slate-50/50">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-primary">
-                          <DynamicIcon name={menu.icon} className="h-5 w-5" />
-                        </div>
+                        <div className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-primary"><DynamicIcon name={menu.icon} className="h-5 w-5" /></div>
                         <span className="font-semibold text-slate-700">{menu.label}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-xs text-slate-500 font-mono truncate max-w-[150px]">{menu.href}</TableCell>
-                    <TableCell>
-                      <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full ${
-                        menu.position === 'bottom' ? 'bg-green-100 text-green-700' : 
-                        menu.position === 'header' ? 'bg-blue-100 text-blue-700' : 
-                        'bg-amber-100 text-amber-700'
-                      }`}>
-                        {menu.position === 'bottom' ? 'Bawah' : menu.position === 'header' ? 'Atas' : 'Samping'}
-                      </span>
-                    </TableCell>
+                    <TableCell><span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-full ${menu.position === 'bottom' ? 'bg-green-100 text-green-700' : menu.position === 'header' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>{menu.position === 'bottom' ? 'Bawah' : menu.position === 'header' ? 'Atas' : 'Samping'}</span></TableCell>
                     <TableCell className="text-center font-mono text-xs">{menu.order}</TableCell>
                     <TableCell className="text-right space-x-1 pr-6">
-                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary" onClick={() => { setIsEditing(menu.id); setFormData(menu); }}>
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-red-500" onClick={() => handleDelete(menu.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary" onClick={() => { setIsEditing(menu.id); setFormData(menu); }}><Edit2 className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-red-500" onClick={() => handleDelete(menu.id)}><Trash2 className="h-4 w-4" /></Button>
                     </TableCell>
                   </TableRow>
                 ))}
