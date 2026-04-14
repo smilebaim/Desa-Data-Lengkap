@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, Edit2, Save, FileText, Loader2, Link as LinkIcon, Eye } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, FileText, Loader2, Link as LinkIcon, Eye, BarChart3, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -101,7 +101,7 @@ export default function PagesManagementPage() {
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Manajemen Halaman Dinamis</h1>
-        <p className="text-muted-foreground">Buat halaman kustom untuk profil, berita, atau laporan desa.</p>
+        <p className="text-muted-foreground">Buat halaman profil atau laporan dengan opsi penyisipan data statistik desa.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -119,31 +119,42 @@ export default function PagesManagementPage() {
                 <Input 
                   value={formData.title} 
                   onChange={e => setFormData({...formData, title: e.target.value})} 
-                  placeholder="Misal: Sejarah Desa" 
+                  placeholder="Misal: Profil Ekonomi Desa" 
                   required 
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500">Konten (Markdown/Teks)</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500">Konten Halaman</Label>
                 <Textarea 
                   value={formData.content} 
                   onChange={e => setFormData({...formData, content: e.target.value})} 
-                  placeholder="Tulis konten halaman di sini..." 
+                  placeholder="Tulis narasi atau konten profil di sini..." 
                   className="min-h-[200px]"
                   required 
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="space-y-0.5">
-                  <Label className="text-sm font-bold">Sisipkan Statistik</Label>
-                  <p className="text-xs text-slate-500">Tampilkan dashboard data di bawah konten.</p>
+              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm font-bold flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4 text-primary" />
+                      Sisipkan Statistik & Data
+                    </Label>
+                    <p className="text-[10px] text-slate-500">Aktifkan untuk menampilkan dashboard infografis otomatis.</p>
+                  </div>
+                  <Switch 
+                    checked={formData.showStats} 
+                    onCheckedChange={(checked) => setFormData({...formData, showStats: checked})} 
+                  />
                 </div>
-                <Switch 
-                  checked={formData.showStats} 
-                  onCheckedChange={(checked) => setFormData({...formData, showStats: checked})} 
-                />
+                {formData.showStats && (
+                  <div className="flex items-start gap-2 text-[9px] text-primary/70 bg-white/50 p-2 rounded-lg border border-primary/5">
+                    <Info className="h-3 w-3 shrink-0 mt-0.5" />
+                    <span>Halaman ini akan secara otomatis menyertakan visualisasi populasi dan luas wilayah dari modul Statistik Desa.</span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-2 flex flex-col gap-2">
@@ -163,14 +174,14 @@ export default function PagesManagementPage() {
 
         <Card className="lg:col-span-7 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle className="text-lg">Daftar Halaman</CardTitle>
+            <CardTitle className="text-lg">Daftar Halaman Terdaftar</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead>Judul</TableHead>
-                  <TableHead>Tautan Publik</TableHead>
+                  <TableHead>Status Data</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
@@ -186,10 +197,11 @@ export default function PagesManagementPage() {
                       {page.title}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200 w-fit">
-                        <LinkIcon className="h-3 w-3" />
-                        /p/{page.id}
-                      </div>
+                      {page.showStats ? (
+                        <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase">Tersemat Statistik</span>
+                      ) : (
+                        <span className="text-[9px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full font-bold uppercase">Hanya Teks</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right space-x-1">
                       <Link href={`/p/${page.id}`} target="_blank">
