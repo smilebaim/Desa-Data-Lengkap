@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -6,13 +7,15 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, 
-  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend
+  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
 } from 'recharts';
 import { 
   Loader2, PieChart as PieIcon, BarChart3, TrendingUp, Users, Map as MapIcon, 
-  Share2, Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles 
+  Share2, Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles,
+  Settings2, LayoutPanelLeft, MousePointerClick
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
@@ -23,6 +26,10 @@ export default function VisualizationsPage() {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   
+  // State untuk Builder
+  const [builderMetric, setBuilderMetric] = useState('populasi');
+  const [builderType, setBuilderType] = useState('bar');
+
   const villageQuery = useMemo(() => query(collection(db, 'villages'), orderBy('name', 'asc')), [db]);
   const { data: villages, isLoading } = useCollection(villageQuery);
 
@@ -45,6 +52,8 @@ export default function VisualizationsPage() {
     setTimeout(() => setCopiedId(null), 2000);
     toast({ title: "Berhasil Disalin", description: "Gunakan tautan ini untuk menyisipkan data statistik." });
   };
+
+  const getEmbedId = () => `stats-${builderMetric}-${builderType}`;
 
   if (isLoading) {
     return (
@@ -78,7 +87,7 @@ export default function VisualizationsPage() {
                 variant="ghost" 
                 size="sm" 
                 className="h-8 text-[10px] font-bold text-primary px-3 rounded-xl hover:bg-primary/10"
-                onClick={() => handleCopy('STATS_EMBED_GLOBAL', 'embed-id')}
+                onClick={() => handleCopy(getEmbedId(), 'embed-id')}
               >
                 {copiedId === 'embed-id' ? <CheckCheck className="h-3 w-3 mr-2" /> : <Share2 className="h-3 w-3 mr-2" />}
                 REFERENSI SEMATAN
@@ -87,6 +96,113 @@ export default function VisualizationsPage() {
         </div>
       </div>
 
+      {/* Visualizer Builder Tool */}
+      <Card className="border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white overflow-hidden">
+        <CardHeader className="border-b border-white/5 pb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/20 rounded-xl">
+              <Settings2 className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">Visualizer Builder</CardTitle>
+              <CardDescription className="text-slate-400">Rancang jenis grafik yang ingin Anda sematkan ke modul lain.</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-8">
+          <div className="grid gap-8 lg:grid-cols-12 items-center">
+            {/* Konfigurasi */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pilih Metrik Data</label>
+                <Select value={builderMetric} onValueChange={setBuilderMetric}>
+                  <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-2xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="populasi">Jumlah Populasi</SelectItem>
+                    <SelectItem value="luas">Luas Wilayah</SelectItem>
+                    <SelectItem value="kepadatan">Kepadatan Penduduk</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Tipe Visualisasi</label>
+                <Select value={builderType} onValueChange={setBuilderType}>
+                  <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-2xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
+                    <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
+                    <SelectItem value="line">Grafik Garis (Line)</SelectItem>
+                    <SelectItem value="area">Grafik Area</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="pt-4">
+                <Button 
+                  className="w-full h-12 rounded-2xl shadow-xl shadow-primary/20"
+                  onClick={() => handleCopy(getEmbedId(), 'copy-embed')}
+                >
+                  {copiedId === 'copy-embed' ? <CheckCheck className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                  Salin ID Referensi: {getEmbedId()}
+                </Button>
+                <p className="mt-3 text-[9px] text-center text-slate-500 italic">Gunakan ID ini di modul "Map Tools" atau "Halaman Dinamis".</p>
+              </div>
+            </div>
+
+            {/* Live Preview */}
+            <div className="lg:col-span-8 bg-white/5 rounded-[2rem] p-6 border border-white/5 relative min-h-[300px]">
+              <div className="absolute top-4 left-6 flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Preview</span>
+              </div>
+              
+              <div className="h-[250px] w-full mt-8">
+                <ResponsiveContainer width="100%" height="100%">
+                  {builderType === 'bar' ? (
+                    <BarChart data={statsData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="name" fontSize={9} axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
+                      <YAxis fontSize={9} axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
+                      <ChartTooltip contentStyle={{ borderRadius: '12px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)' }} />
+                      <Bar dataKey={builderMetric} fill="#22c55e" radius={[4, 4, 0, 0]} barSize={32} />
+                    </BarChart>
+                  ) : builderType === 'pie' ? (
+                    <PieChart>
+                      <Pie data={statsData} dataKey={builderMetric} nameKey="name" cx="50%" cy="50%" innerRadius={40} outerRadius={80} paddingAngle={5}>
+                        {statsData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                      </Pie>
+                      <ChartTooltip />
+                    </PieChart>
+                  ) : builderType === 'line' ? (
+                    <LineChart data={statsData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="name" fontSize={9} tick={{fill: '#64748b'}} />
+                      <YAxis fontSize={9} tick={{fill: '#64748b'}} />
+                      <ChartTooltip />
+                      <Line type="monotone" dataKey={builderMetric} stroke="#22c55e" strokeWidth={3} dot={{r: 4}} />
+                    </LineChart>
+                  ) : (
+                    <AreaChart data={statsData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="name" fontSize={9} tick={{fill: '#64748b'}} />
+                      <YAxis fontSize={9} tick={{fill: '#64748b'}} />
+                      <ChartTooltip />
+                      <Area type="monotone" dataKey={builderMetric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.1} />
+                    </AreaChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Overview Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="bg-primary text-white shadow-lg border-none rounded-3xl overflow-hidden">
           <CardContent className="pt-6">
@@ -192,7 +308,7 @@ export default function VisualizationsPage() {
                    <Sparkles className="h-5 w-5 text-primary" />
                    Gunakan Statistik di Modul Lain
                  </h3>
-                 <p className="text-slate-400 text-sm">Aktifkan opsi "Sematkan Statistik" di Editor Spasial atau Manajemen Halaman untuk menyisipkan data ini secara otomatis.</p>
+                 <p className="text-slate-400 text-sm">Gunakan ID Referensi dari Builder di atas untuk memilih grafik spesifik yang ingin ditampilkan di peta atau halaman profil.</p>
               </div>
               <div className="flex gap-3 shrink-0">
                  <Button variant="outline" className="border-white/10 text-white hover:bg-white/5 rounded-2xl" onClick={() => handleCopy('/visualizations', 'footer-link')}>
