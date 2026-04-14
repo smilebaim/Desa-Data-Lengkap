@@ -15,7 +15,7 @@ import {
   Plus, Trash2, Edit2, Save, Search, HelpCircle, 
   Home, BarChart, Users, Database, Map, Navigation, Info, FileText,
   PieChart, Activity, Shield, MapPin, Filter, ShoppingCart, Camera, Image, Loader2, Car, Bus, Link as LinkIcon,
-  Copy, CheckCheck, Sparkles
+  Copy, CheckCheck, Sparkles, TrendingUp
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const NAV_ICONS = [
   'Home', 'BarChart', 'Users', 'Database', 'Map', 'Navigation', 'Info', 'FileText',
-  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'Car', 'Bus'
+  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'Car', 'Bus', 'TrendingUp'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -212,7 +212,7 @@ export default function PengaturanNavigasiUtamaPage() {
             </CardContent>
           </Card>
 
-          {/* Quick References Section - PERFECTED */}
+          {/* Quick References Section */}
           <Card className="shadow-sm border-primary/20 bg-primary/5 rounded-[2rem]">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
@@ -223,7 +223,7 @@ export default function PengaturanNavigasiUtamaPage() {
             <CardContent className="space-y-3 pb-6">
               <div className="flex items-center justify-between p-3 bg-white rounded-2xl border border-primary/10 group">
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="h-8 w-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><BarChart className="h-4 w-4" /></div>
+                  <div className="h-8 w-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><TrendingUp className="h-4 w-4" /></div>
                   <span className="text-xs font-bold truncate">Dashboard Statistik</span>
                 </div>
                 <Button size="icon" variant="ghost" className="h-9 w-9 hover:bg-primary/5" onClick={() => handleCopy('/visualizations', 'viz')}>
