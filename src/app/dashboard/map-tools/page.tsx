@@ -20,7 +20,7 @@ import {
   Layers, MapPin, Map as MapIcon, Info, Hexagon, FileJson, 
   Ruler, Waypoints, Circle as CircleIcon, Square, Landmark, 
   Construction, TreePine, Droplets, Zap, ShieldAlert, Navigation,
-  BarChart3, Sparkles, PlusCircle, X
+  BarChart3, Sparkles, PlusCircle, X, ExternalLink
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -224,34 +224,38 @@ export default function SpasialManagementPage() {
                 </Popover>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500">Keterangan / Deskripsi</Label>
-                <Textarea 
-                  placeholder="Berikan penjelasan detail tentang objek ini..." 
-                  className="min-h-[100px] text-sm resize-none"
-                  value={currentFeature.description}
-                  onChange={e => setCurrentFeature({...currentFeature, description: e.target.value})}
-                />
-              </div>
-
-              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-3">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label className="text-xs font-bold flex items-center gap-2 text-primary">
-                      <BarChart3 className="h-3.5 w-3.5" />
-                      Sematkan Statistik
-                    </Label>
-                    <p className="text-[10px] text-slate-500">Tampilkan ringkasan data statistik desa di popup.</p>
+                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Keterangan / Deskripsi</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-primary uppercase">Sematkan Statistik</span>
+                    <Switch 
+                      checked={currentFeature.showStats} 
+                      onCheckedChange={(checked) => setCurrentFeature({...currentFeature, showStats: checked})}
+                      className="scale-75"
+                    />
                   </div>
-                  <Switch 
-                    checked={currentFeature.showStats} 
-                    onCheckedChange={(checked) => setCurrentFeature({...currentFeature, showStats: checked})} 
+                </div>
+                
+                <div className="relative group">
+                  <Textarea 
+                    placeholder="Berikan penjelasan detail tentang objek ini..." 
+                    className="min-h-[120px] text-sm resize-none pr-10 focus:ring-primary/20"
+                    value={currentFeature.description}
+                    onChange={e => setCurrentFeature({...currentFeature, description: e.target.value})}
                   />
+                  {currentFeature.showStats && (
+                    <div className="absolute bottom-3 right-3 animate-pulse">
+                       <div className="bg-primary/10 p-1.5 rounded-lg border border-primary/20">
+                         <BarChart3 className="h-3.5 w-3.5 text-primary" />
+                       </div>
+                    </div>
+                  )}
                 </div>
                 {currentFeature.showStats && (
-                  <div className="flex items-start gap-2 text-[9px] text-primary/70 bg-white/50 p-2 rounded-xl border border-primary/5">
-                    <Sparkles className="h-2.5 w-2.5 shrink-0 mt-0.5" />
-                    <span>Popup pada peta akan menyertakan data populasi dan luas wilayah secara real-time.</span>
+                  <div className="flex items-center gap-2 p-2 bg-primary/5 rounded-xl border border-primary/10 text-[9px] text-primary/80 leading-tight">
+                    <Sparkles className="h-3 w-3 shrink-0" />
+                    <span>Data dari modul "Statistik & Data" akan otomatis disisipkan di bawah deskripsi pada peta.</span>
                   </div>
                 )}
               </div>
