@@ -84,6 +84,18 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "content"]
+    },
+    "Visualizer": {
+      "title": "Visualizer",
+      "description": "Konfigurasi grafik kustom untuk disematkan",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "metric": { "type": "string", "enum": ["population", "area", "density"] },
+        "chartType": { "type": "string", "enum": ["bar", "pie", "line", "area"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "metric", "chartType"]
     }
   },
   "auth": {
@@ -109,6 +121,10 @@
     "/pages/{pageId}": {
       "schema": { "$ref": "#/entities/DynamicPage" },
       "description": "Koleksi halaman dinamis"
+    },
+    "/visualizers/{visualizerId}": {
+      "schema": { "$ref": "#/entities/Visualizer" },
+      "description": "Koleksi konfigurasi grafik kustom"
     }
   }
 }
