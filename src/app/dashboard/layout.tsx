@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser } from '@/firebase';
@@ -6,7 +7,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   LogOut, LayoutDashboard, Menu as MenuIcon, Shield, MousePointer2, 
-  Loader2, Map as MapIcon, BarChart3, Landmark, Settings2
+  Loader2, Map as MapIcon, BarChart3, Landmark, FileText
 } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useAuth } from '@/firebase';
@@ -43,6 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { href: '/dashboard', label: 'Ringkasan', icon: LayoutDashboard },
     { href: '/dashboard/villages', label: 'Manajemen Desa', icon: Landmark },
+    { href: '/dashboard/pages', label: 'Manajemen Halaman', icon: FileText },
     { href: '/dashboard/map-tools', label: 'Editor Spasial', icon: MapIcon },
     { href: '/dashboard/menus', label: 'Navigasi Publik', icon: MenuIcon },
     { href: '/dashboard/visualizations', label: 'Statistik & Data', icon: BarChart3 },
