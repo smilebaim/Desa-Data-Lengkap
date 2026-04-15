@@ -37,11 +37,9 @@ export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
+  // Memoize query to prevent infinite reload loop
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading } = useCollection(menuQuery);
-
-  const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('title', 'asc')), [db]);
-  const { data: pages } = useCollection(pagesQuery);
 
   const menus = useMemo(() => 
     (allMenus || []).filter((m: any) => ['bottom', 'header', 'left'].includes(m.position)), 
@@ -58,7 +56,6 @@ export default function PengaturanNavigasiUtamaPage() {
     position: 'bottom' as 'bottom' | 'header' | 'left'
   });
   const [iconSearch, setIconSearch] = useState('');
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const filteredIcons = useMemo(() => 
     NAV_ICONS.filter(icon => icon.toLowerCase().includes(iconSearch.toLowerCase())),
@@ -76,13 +73,6 @@ export default function PengaturanNavigasiUtamaPage() {
     });
     setIconSearch('');
   }, [menus?.length]);
-
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-    toast({ title: "Tautan Disalin", description: "Gunakan tautan ini pada kolom Tautan (URL)." });
-  };
 
   const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
