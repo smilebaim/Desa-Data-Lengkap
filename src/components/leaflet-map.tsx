@@ -23,8 +23,8 @@ if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/leaflet/1.3.1/images/marker-shadow.png',
   });
 }
 
@@ -110,7 +110,6 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
     return groups;
   }, [features]);
 
-  // Detector and renderer for content with [CHART:ID] support
   const renderTextWithCharts = (content: string) => {
     if (!content) return null;
     const regex = /(\[CHART:[a-zA-Z0-9_-]+\])/g;
@@ -190,7 +189,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
         {showVillages && (
           <LayersControl.Overlay checked name="Batas Desa">
             <FeatureGroup>
-              {villages.map((village) => (
+              {(villages || []).map((village) => (
                 <div key={village.id}>
                   {village.boundary && (
                     <Polygon positions={village.boundary.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#22c55e', fillOpacity: 0.3 }}>
@@ -205,9 +204,11 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                       </Popup>
                     </Polygon>
                   )}
-                  <Marker position={[village.location.lat, village.location.lng]}>
-                    <LeafletTooltip direction="top"><span className="font-bold text-[10px]">{village.name}</span></LeafletTooltip>
-                  </Marker>
+                  {village.location && (
+                    <Marker position={[village.location.lat, village.location.lng]}>
+                      <LeafletTooltip direction="top"><span className="font-bold text-[10px]">{village.name}</span></LeafletTooltip>
+                    </Marker>
+                  )}
                 </div>
               ))}
             </FeatureGroup>
