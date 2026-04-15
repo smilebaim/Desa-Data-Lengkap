@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, serverTimestamp, getDocs, query, limit } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, deleteDoc, getDocs, query } from 'firebase/firestore';
 import { LayoutDashboard, Map as MapIcon, Menu as MenuIcon, Sparkles, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -18,48 +18,92 @@ export default function DashboardPage() {
   const seedDemoData = async () => {
     setIsSeeding(true);
     try {
-      // 1. Create Villages
+      // 1. Bersihkan data lama jika diperlukan (Opsional, untuk demo kita tambah saja)
+      
+      // 2. Buat Koleksi Desa (Data Dasar)
       const villagesRef = collection(db, 'villages');
-      const v1 = await addDoc(villagesRef, { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, location: { lat: -6.9175, lng: 107.6191 }, description: 'Desa percontohan digital.' });
-      const v2 = await addDoc(villagesRef, { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan tangan.' });
+      const villageData = [
+        { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan.' },
+        { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya.' },
+        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional.' },
+        { name: 'Desa Bahari', province: 'Sulawesi Utara', population: 2100, area: 5.6, location: { lat: 1.4748, lng: 124.8484 }, description: 'Kawasan konservasi terumbu karang.' },
+        { name: 'Desa Rindang', province: 'Kalimantan Timur', population: 1500, area: 45.0, location: { lat: 0.5021, lng: 117.1534 }, description: 'Desa percontohan ekonomi hijau.' }
+      ];
 
-      // 2. Create Visualizers (Charts)
+      const villageIds = [];
+      for (const v of villageData) {
+        const docRef = await addDoc(villagesRef, v);
+        villageIds.push(docRef.id);
+      }
+
+      // 3. Buat Koleksi Visualizers (Grafik)
       const vizRef = collection(db, 'visualizers');
-      const vizPop = await addDoc(vizRef, { title: 'Perbandingan Populasi', metric: 'population', chartType: 'bar', createdAt: serverTimestamp() });
-      const vizArea = await addDoc(vizRef, { title: 'Distribusi Wilayah', metric: 'area', chartType: 'pie', createdAt: serverTimestamp() });
-      const vizDensity = await addDoc(vizRef, { title: 'Tren Kepadatan', metric: 'density', chartType: 'line', createdAt: serverTimestamp() });
+      const vizPop = await addDoc(vizRef, { title: 'Populasi Jaringan Desa', metric: 'population', chartType: 'bar', createdAt: serverTimestamp() });
+      const vizArea = await addDoc(vizRef, { title: 'Distribusi Luas Wilayah', metric: 'area', chartType: 'pie', createdAt: serverTimestamp() });
+      const vizDensity = await addDoc(vizRef, { title: 'Tren Kepadatan Penduduk', metric: 'density', chartType: 'area', createdAt: serverTimestamp() });
+      const vizPopLine = await addDoc(vizRef, { title: 'Analisis Demografi', metric: 'population', chartType: 'line', createdAt: serverTimestamp() });
 
-      // 3. Create Dynamic Pages
+      // 4. Buat Koleksi Halaman Dinamis (Konten Utama)
       const pagesRef = collection(db, 'pages');
-      await addDoc(pagesRef, { 
-        title: 'Statistik Nasional Desa', 
-        content: `Halaman ini menampilkan agregat data desa secara nasional.\n\nBerikut adalah grafik populasi:\n[CHART:${vizPop.id}]\n\nDan distribusi luas wilayah:\n[CHART:${vizArea.id}]`, 
+      
+      // Halaman Statistik
+      const pStat = await addDoc(pagesRef, { 
+        title: 'Dashboard Statistik Nasional', 
+        content: `Selamat datang di portal data agregat desa Indonesia.\n\n### Analisis Populasi\nGrafik di bawah menunjukkan perbandingan jumlah penduduk antar desa anggota jaringan.\n[CHART:${vizPop.id}]\n\n### Distribusi Wilayah\nVisualisasi luas area administratif desa dalam kilometer persegi.\n[CHART:${vizArea.id}]`, 
         showStats: true, 
         updatedAt: serverTimestamp() 
       });
 
-      await addDoc(pagesRef, { 
+      // Halaman IDM
+      const pIdm = await addDoc(pagesRef, { 
         title: 'Indeks Desa Membangun (IDM)', 
-        content: `Analisis perkembangan kemandirian desa berdasarkan indikator sosial, ekonomi, dan ekologi.\n\nGrafik Kepadatan:\n[CHART:${vizDensity.id}]`, 
+        content: `Analisis kemandirian desa berdasarkan indikator sosial, ekonomi, dan lingkungan.\n\n### Kepadatan Wilayah\nIndikator kepadatan penduduk sangat mempengaruhi alokasi dana pembangunan.\n[CHART:${vizDensity.id}]\n\nData ini diperbarui setiap bulan sesuai dengan laporan dari perangkat desa.`, 
         showStats: true, 
         updatedAt: serverTimestamp() 
       });
 
-      await addDoc(pagesRef, { 
+      // Halaman Harga
+      const pHarga = await addDoc(pagesRef, { 
         title: 'Informasi Harga Komoditas', 
-        content: 'Daftar harga bahan pokok di tingkat desa untuk memantau inflasi lokal.', 
+        content: `Pantau harga bahan pokok di tingkat produsen desa untuk menjaga stabilitas ekonomi.\n\n- Beras: Rp 12.500/kg\n- Jagung: Rp 6.000/kg\n- Cabai Merah: Rp 35.000/kg\n\n### Perbandingan Volume Produksi\n[CHART:${vizPopLine.id}]`, 
         showStats: false, 
         updatedAt: serverTimestamp() 
       });
 
-      // 4. Create Menus
-      const menusRef = collection(db, 'menus');
-      await addDoc(menusRef, { label: 'Statistik', icon: 'BarChart', href: '/visualizations', order: 1, position: 'bottom' });
-      await addDoc(menusRef, { label: 'Data Desa', icon: 'Landmark', href: '/dashboard/villages', order: 2, position: 'bottom' });
+      // Halaman Bergabung
+      const pJoin = await addDoc(pagesRef, { 
+        title: 'Bergabung dalam Jaringan', 
+        content: `Jadilah bagian dari transformasi digital pedesaan Indonesia. Dapatkan akses ke alat analisis geospasial dan dashboard statistik secara gratis.\n\n### Persyaratan:\n1. SK Pengangkatan Kepala Desa\n2. Data Profil Desa Terbaru\n3. Peta Batas Desa (Format Shapefile/Digital)`, 
+        showStats: false, 
+        updatedAt: serverTimestamp() 
+      });
 
-      toast({ title: "Demo Data Berhasil", description: "Halaman, Grafik, dan Menu dummy telah dibuat." });
+      // Halaman Data Desa
+      const pData = await addDoc(pagesRef, { 
+        title: 'Katalog Data Desa Lengkap', 
+        content: `Akses publik terhadap data mentah dan ringkasan eksekutif profil desa.\n\n[CHART:${vizPop.id}]\n\nData di atas merupakan hasil sinkronisasi dari 38 provinsi di Indonesia.`, 
+        showStats: true, 
+        updatedAt: serverTimestamp() 
+      });
+
+      // 5. Buat Koleksi Menu (Navigasi)
+      const menusRef = collection(db, 'menus');
+      const menuItems = [
+        { label: 'Statistik', icon: 'BarChart', href: `/p/${pStat.id}`, order: 1, position: 'bottom' },
+        { label: 'IDM', icon: 'TrendingUp', href: `/p/${pIdm.id}`, order: 2, position: 'bottom' },
+        { label: 'Data Desa', icon: 'Landmark', href: `/p/${pData.id}`, order: 3, position: 'bottom' },
+        { label: 'Harga', icon: 'ShoppingCart', href: `/p/${pHarga.id}`, order: 4, position: 'bottom' },
+        { label: 'Bergabung', icon: 'Users', href: `/p/${pJoin.id}`, order: 5, position: 'bottom' }
+      ];
+
+      for (const m of menuItems) {
+        await addDoc(menusRef, m);
+      }
+
+      toast({ title: "Sukses!", description: "Seluruh ekosistem data dummy (Desa, Grafik, Halaman, & Menu) telah dibuat dan disinkronkan.", variant: "default" });
     } catch (error) {
-      toast({ title: "Gagal Membuat Data", variant: "destructive" });
+      console.error(error);
+      toast({ title: "Gagal!", description: "Terjadi kesalahan saat membuat data demo.", variant: "destructive" });
     } finally {
       setIsSeeding(false);
     }
@@ -75,9 +119,9 @@ export default function DashboardPage() {
         <Button 
           onClick={seedDemoData} 
           disabled={isSeeding}
-          className="bg-primary hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20"
+          className="bg-primary hover:bg-primary/90 rounded-2xl shadow-lg shadow-primary/20 h-12 px-6 font-bold"
         >
-          {isSeeding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+          {isSeeding ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
           Buat Data Demo (Dummy)
         </Button>
       </header>
@@ -114,7 +158,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-slate-900">Nasional</div>
-            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">38 Provinsi Terdeteksi</p>
+            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Daftar Desa Terverifikasi</p>
           </CardContent>
         </Card>
       </div>
