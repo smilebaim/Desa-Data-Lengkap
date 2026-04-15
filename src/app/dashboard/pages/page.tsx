@@ -46,7 +46,6 @@ export default function PagesManagementPage() {
       content: page.content || '',
       showStats: !!page.showStats
     });
-    // Scroll smoothly to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -64,36 +63,25 @@ export default function PagesManagementPage() {
       updatedAt: serverTimestamp()
     };
 
-    if (isEditing) {
-      const docRef = doc(db, 'pages', isEditing);
-      updateDoc(docRef, dataToSave)
-        .then(() => {
-          toast({ title: "Berhasil", description: "Halaman diperbarui." });
-          resetForm();
-        })
-        .catch(async () => {
-          errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-            path: docRef.path, 
-            operation: 'update', 
-            requestResourceData: dataToSave 
-          }));
-        })
-        .finally(() => setIsSubmitting(false));
-    } else {
-      const collRef = collection(db, 'pages');
-      addDoc(collRef, dataToSave)
-        .then(() => {
-          toast({ title: "Berhasil", description: "Halaman baru dibuat." });
-          resetForm();
-        })
-        .catch(async () => {
-          errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-            path: collRef.path, 
-            operation: 'create', 
-            requestResourceData: dataToSave 
-          }));
-        })
-        .finally(() => setIsSubmitting(false));
+    try {
+      if (isEditing) {
+        const docRef = doc(db, 'pages', isEditing);
+        await updateDoc(docRef, dataToSave);
+        toast({ title: "Berhasil", description: "Halaman diperbarui." });
+      } else {
+        const collRef = collection(db, 'pages');
+        await addDoc(collRef, dataToSave);
+        toast({ title: "Berhasil", description: "Halaman baru dibuat." });
+      }
+      resetForm();
+    } catch (error) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+        path: 'pages', 
+        operation: isEditing ? 'update' : 'create', 
+        requestResourceData: dataToSave 
+      }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -101,16 +89,15 @@ export default function PagesManagementPage() {
     if (!id || !confirm('Hapus halaman ini secara permanen?')) return;
     
     const docRef = doc(db, 'pages', id);
-    deleteDoc(docRef)
-      .then(() => {
-        toast({ title: "Berhasil", description: "Halaman telah dihapus dari sistem." });
-      })
-      .catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-          path: docRef.path, 
-          operation: 'delete' 
-        }));
-      });
+    try {
+      await deleteDoc(docRef);
+      toast({ title: "Berhasil", description: "Halaman telah dihapus." });
+    } catch (error) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+        path: docRef.path, 
+        operation: 'delete' 
+      }));
+    }
   };
 
   return (
@@ -160,7 +147,7 @@ export default function PagesManagementPage() {
                       <BarChart3 className="h-4 w-4" />
                       Sematkan Modul Statistik
                     </Label>
-                    <p className="text-[10px] text-slate-500 leading-relaxed">Secara otomatis menampilkan infografis populasi dan wilayah di bawah konten.</p>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">Otomatis menampilkan infografis populasi dan wilayah di bawah konten.</p>
                   </div>
                   <Switch 
                     checked={formData.showStats} 
@@ -170,7 +157,7 @@ export default function PagesManagementPage() {
               </div>
 
               <div className="pt-2 flex flex-col gap-2">
-                <Button type="submit" className="w-full h-12 shadow-lg shadow-primary/20" disabled={isSubmitting}>
+                <Button type="submit" className="w-full h-12 shadow-lg" disabled={isSubmitting}>
                   {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                   {isEditing ? 'Simpan Perubahan' : 'Terbitkan Sekarang'}
                 </Button>
@@ -196,7 +183,7 @@ export default function PagesManagementPage() {
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead className="pl-6">Judul Halaman</TableHead>
-                  <TableHead>Integrasi Data</TableHead>
+                  <TableHead>Integrasi</TableHead>
                   <TableHead className="text-right pr-6">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
@@ -204,7 +191,7 @@ export default function PagesManagementPage() {
                 {isLoading ? (
                   <TableRow><TableCell colSpan={3} className="text-center py-12"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
                 ) : pages?.length === 0 ? (
-                  <TableRow><TableCell colSpan={3} className="text-center py-12 text-slate-400">Belum ada halaman dinamis yang terdaftar.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={3} className="text-center py-12 text-slate-400">Belum ada halaman dinamis.</TableCell></TableRow>
                 ) : pages?.map((page: any) => (
                   <TableRow key={page.id} className="group hover:bg-slate-50/50 transition-colors">
                     <TableCell className="pl-6">
@@ -221,11 +208,11 @@ export default function PagesManagementPage() {
                     <TableCell>
                       {page.showStats ? (
                         <div className="flex items-center gap-2 text-[9px] bg-green-50 text-green-700 px-2.5 py-1 rounded-full font-black uppercase tracking-wider border border-green-100">
-                          <BarChart3 className="h-3 w-3" /> Statistik Aktif
+                          <BarChart3 className="h-3 w-3" /> Statistik
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-[9px] bg-slate-100 text-slate-400 px-2.5 py-1 rounded-full font-black uppercase tracking-wider border border-slate-200">
-                          <Info className="h-3 w-3" /> Narasi Saja
+                        <div className="flex items-center gap-2 text-[9px] bg-slate-100 text-slate-400 px-2.5 py-1 rounded-full font-black uppercase tracking-wider">
+                          <Info className="h-3 w-3" /> Narasi
                         </div>
                       )}
                     </TableCell>

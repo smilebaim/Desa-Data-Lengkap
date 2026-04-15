@@ -144,7 +144,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
         {f.showStats && (
            <div className="mt-4 pt-3 border-t border-dashed border-slate-200">
              <div className="flex items-center gap-2 mb-2 text-[9px] font-bold text-primary">
-               <BarChart3 className="h-3 w-3" /> RINGKASAN DATA JARINGAN
+               <BarChart3 className="h-3 w-3" /> RINGKASAN DATA
              </div>
              <div className="grid grid-cols-2 gap-2">
                 <div className="bg-slate-50 p-2 rounded-lg border">

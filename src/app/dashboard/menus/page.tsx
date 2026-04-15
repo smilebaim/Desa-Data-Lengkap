@@ -24,7 +24,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const NAV_ICONS = [
   'Home', 'BarChart', 'Users', 'Database', 'Map', 'Navigation', 'Info', 'FileText',
-  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'TrendingUp'
+  'PieChart', 'Activity', 'Shield', 'MapPin', 'Filter', 'ShoppingCart', 'Camera', 'Image', 'TrendingUp', 'Landmark'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -65,45 +65,37 @@ export default function PengaturanNavigasiUtamaPage() {
     setIsSubmitting(true);
     const dataToSave = { ...formData, order: Number(formData.order) };
 
-    if (isEditing) {
-      const docRef = doc(db, 'menus', isEditing);
-      updateDoc(docRef, dataToSave)
-        .then(() => {
-          toast({ title: "Berhasil", description: "Navigasi telah diperbarui." });
-          resetForm();
-        })
-        .catch(async () => {
-          errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-            path: docRef.path, 
-            operation: 'update', 
-            requestResourceData: dataToSave 
-          }));
-        })
-        .finally(() => setIsSubmitting(false));
-    } else {
-      const collRef = collection(db, 'menus');
-      addDoc(collRef, dataToSave)
-        .then(() => {
-          toast({ title: "Berhasil", description: "Navigasi baru telah ditambahkan." });
-          resetForm();
-        })
-        .catch(async () => {
-          errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-            path: collRef.path, 
-            operation: 'create', 
-            requestResourceData: dataToSave 
-          }));
-        })
-        .finally(() => setIsSubmitting(false));
+    try {
+      if (isEditing) {
+        const docRef = doc(db, 'menus', isEditing);
+        await updateDoc(docRef, dataToSave);
+        toast({ title: "Berhasil", description: "Navigasi telah diperbarui." });
+      } else {
+        const collRef = collection(db, 'menus');
+        await addDoc(collRef, dataToSave);
+        toast({ title: "Berhasil", description: "Navigasi baru telah ditambahkan." });
+      }
+      resetForm();
+    } catch (error) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+        path: 'menus', 
+        operation: isEditing ? 'update' : 'create', 
+        requestResourceData: dataToSave 
+      }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!id || !confirm('Hapus menu ini?')) return;
     const docRef = doc(db, 'menus', id);
-    deleteDoc(docRef)
-      .then(() => toast({ title: "Berhasil", description: "Menu telah dihapus." }))
-      .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' })));
+    try {
+      await deleteDoc(docRef);
+      toast({ title: "Berhasil", description: "Menu telah dihapus." });
+    } catch (error) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' }));
+    }
   };
 
   const startEdit = (menu: any) => {
