@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -86,14 +85,15 @@ export default function DashboardPage() {
         { label: 'IDM', icon: 'TrendingUp', href: `/p/${pIdm.id}`, order: 2, position: 'bottom' },
         { label: 'Data Desa', icon: 'Landmark', href: `/p/${pData.id}`, order: 3, position: 'bottom' },
         { label: 'Harga', icon: 'ShoppingCart', href: `/p/${pHarga.id}`, order: 4, position: 'bottom' },
-        { label: 'Bergabung', icon: 'Users', href: `/p/${pJoin.id}`, order: 5, position: 'bottom' }
+        { label: 'Bergabung', icon: 'Users', href: `/p/${pJoin.id}`, order: 5, position: 'bottom' },
+        { label: 'Tentang', icon: 'Info', href: '#', order: 6, position: 'header' }
       ];
 
       for (const m of menuItems) {
         await addDoc(menusRef, m);
       }
 
-      toast({ title: "Berhasil!", description: "Seluruh ekosistem data dummy strategis telah dibuat.", variant: "default" });
+      toast({ title: "Berhasil!", description: "Seluruh ekosistem data dummy strategis telah dibuat secara rapi.", variant: "default" });
     } catch (error) {
       console.error(error);
       toast({ title: "Gagal!", description: "Terjadi kesalahan saat membuat data demo.", variant: "destructive" });
