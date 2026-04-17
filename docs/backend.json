@@ -13,12 +13,12 @@
       "required": ["name", "role"]
     },
     "MenuItem": {
-      "title": "Menu Item",
+      "title": "MenuItem",
       "description": "Konfigurasi item menu navigasi",
       "type": "object",
       "properties": {
         "label": { "type": "string" },
-        "icon": { "type": "string", "description": "Nama ikon Lucide" },
+        "icon": { "type": "string" },
         "href": { "type": "string" },
         "order": { "type": "number" },
         "position": { "type": "string", "enum": ["bottom", "left", "header"] }
@@ -59,7 +59,7 @@
     },
     "MapFeature": {
       "title": "Map Feature",
-      "description": "Objek spasial tambahan (Marker, Line, POI)",
+      "description": "Objek spasial tambahan",
       "type": "object",
       "properties": {
         "name": { "type": "string" },
@@ -75,7 +75,7 @@
     },
     "DynamicPage": {
       "title": "Dynamic Page",
-      "description": "Halaman konten kustom yang dapat dibuat oleh admin",
+      "description": "Halaman konten kustom",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
@@ -87,7 +87,7 @@
     },
     "Visualizer": {
       "title": "Visualizer",
-      "description": "Konfigurasi grafik kustom untuk disematkan",
+      "description": "Konfigurasi grafik kustom",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
@@ -104,27 +104,27 @@
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Data pengguna sistem"
+      "description": "Data pengguna"
     },
     "/menus/{menuId}": {
       "schema": { "$ref": "#/entities/MenuItem" },
-      "description": "Koleksi item menu dinamis"
+      "description": "Navigasi"
     },
     "/villages/{villageId}": {
       "schema": { "$ref": "#/entities/Village" },
-      "description": "Data spasial desa"
+      "description": "Desa"
     },
     "/features/{featureId}": {
       "schema": { "$ref": "#/entities/MapFeature" },
-      "description": "Data overlay peta (POI, Jalan, Aset)"
+      "description": "Aset Peta"
     },
     "/pages/{pageId}": {
       "schema": { "$ref": "#/entities/DynamicPage" },
-      "description": "Koleksi halaman dinamis"
+      "description": "Halaman"
     },
     "/visualizers/{visualizerId}": {
       "schema": { "$ref": "#/entities/Visualizer" },
-      "description": "Koleksi konfigurasi grafik kustom"
+      "description": "Grafik"
     }
   }
 }

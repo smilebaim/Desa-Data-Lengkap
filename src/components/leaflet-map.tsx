@@ -9,12 +9,11 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { HelpCircle, ArrowRight, BarChart3, Users, TrendingUp } from 'lucide-react';
+import { HelpCircle, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, 
-  ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area,
+  BarChart, Bar, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ScatterChart, Scatter, ComposedChart
 } from 'recharts';
@@ -67,6 +66,15 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
             <PolarAngleAxis dataKey="name" fontSize={8} />
             <Radar name={metric} dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
           </RadarChart>
+        ) : type === 'composed' ? (
+          <ComposedChart data={data}>
+            <Bar dataKey={metric} fill="#3b82f6" barSize={15} />
+            <Line type="monotone" dataKey={metric} stroke="#ef4444" strokeWidth={2} />
+          </ComposedChart>
+        ) : type === 'scatter' ? (
+          <ScatterChart>
+            <Scatter name={metric} data={data} fill="#f59e0b" />
+          </ScatterChart>
         ) : (
           <LineChart data={data}>
             <Line type="monotone" dataKey={metric} stroke="#22c55e" strokeWidth={2} dot={false} />

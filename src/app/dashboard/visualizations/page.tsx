@@ -7,9 +7,8 @@ import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, up
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
-  Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles,
-  Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info, Database, Edit2, X,
-  PieChart as PieIcon, Save
+  Copy, CheckCheck, ExternalLink, Sparkles,
+  Database, Edit2, X, PieChart, Save, LayoutGrid, Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +26,6 @@ export default function VisualizationsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Memoize queries to prevent infinite loop
   const villageQuery = useMemo(() => query(collection(db, 'villages'), orderBy('name', 'asc')), [db]);
   const { data: villages, isLoading: isVillagesLoading } = useCollection(villageQuery);
 
@@ -63,32 +61,30 @@ export default function VisualizationsPage() {
     if (!formData.title) return toast({ title: "Galat", description: "Judul grafik harus diisi.", variant: "destructive" });
     
     setIsSubmitting(true);
-    const data = { 
+    const dataToSave = { 
       ...formData, 
       createdAt: editingId ? undefined : serverTimestamp(), 
       updatedAt: serverTimestamp() 
     };
 
-    const actionPromise = editingId 
-      ? updateDoc(doc(db, 'visualizers', editingId), data)
-      : addDoc(collection(db, 'visualizers'), data);
-
-    actionPromise
-      .then(() => {
-        toast({ 
-          title: "Berhasil", 
-          description: editingId ? "Konfigurasi grafik diperbarui." : "Grafik baru ditambahkan ke pustaka." 
-        });
-        resetForm();
-      })
-      .catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-          path: 'visualizers', 
-          operation: editingId ? 'update' : 'create', 
-          requestResourceData: data 
-        }));
-      })
-      .finally(() => setIsSubmitting(false));
+    if (editingId) {
+      const docRef = doc(db, 'visualizers', editingId);
+      updateDoc(docRef, dataToSave)
+        .then(() => {
+          toast({ title: "Berhasil", description: "Konfigurasi grafik diperbarui." });
+          resetForm();
+        })
+        .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: dataToSave })))
+        .finally(() => setIsSubmitting(false));
+    } else {
+      addDoc(collection(db, 'visualizers'), dataToSave)
+        .then(() => {
+          toast({ title: "Berhasil", description: "Grafik baru ditambahkan ke pustaka." });
+          resetForm();
+        })
+        .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: 'visualizers', operation: 'create', requestResourceData: dataToSave })))
+        .finally(() => setIsSubmitting(false));
+    }
   };
 
   const handleEdit = (viz: any) => {
@@ -227,8 +223,8 @@ export default function VisualizationsPage() {
                     <SelectItem value="line">Line Chart</SelectItem>
                     <SelectItem value="area">Area Chart</SelectItem>
                     <SelectItem value="radar">Radar Chart</SelectItem>
-                    <SelectItem value="composed">Composed (Combo)</SelectItem>
-                    <SelectItem value="scatter">Scatter Plot</SelectItem>
+                    <SelectItem value="composed">Composed Chart</SelectItem>
+                    <SelectItem value="scatter">Scatter Chart</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -271,7 +267,7 @@ export default function VisualizationsPage() {
                   <div key={viz.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-all group">
                     <div className="flex items-center gap-5">
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
-                        {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
+                        {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChart className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-900 flex items-center gap-2">
