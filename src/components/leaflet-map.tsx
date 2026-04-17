@@ -1,15 +1,13 @@
 
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
-import * as LucideIcons from 'lucide-react';
-import { HelpCircle } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -155,3 +153,5 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
 };
 
 export default LeafletMap;
+
+    

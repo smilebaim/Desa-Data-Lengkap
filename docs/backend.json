@@ -34,7 +34,7 @@
         "province": { "type": "string" },
         "population": { "type": "number" },
         "area": { "type": "number" },
-        "idmScore": { "type": "number", "description": "Indeks Desa Membangun" },
+        "idmScore": { "type": "number", "description": "Indeks Desa Membangun (0.00 - 1.00)" },
         "budgetAllocation": { "type": "number", "description": "Anggaran Desa (Rp)" },
         "location": {
           "type": "object",
@@ -130,3 +130,5 @@
     }
   }
 }
+
+    
