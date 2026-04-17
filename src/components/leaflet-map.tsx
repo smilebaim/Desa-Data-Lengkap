@@ -1,7 +1,6 @@
-
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, FeatureGroup } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
@@ -21,26 +20,28 @@ if (typeof window !== 'undefined') {
 interface LeafletMapProps {
   villages?: any[];
   showVillages?: boolean;
+  activeCategories?: string[];
   onSelectVillage?: (id: string) => void;
   onSelectFeature?: (id: string) => void;
 }
 
-const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSelectFeature }: LeafletMapProps) => {
+const LeafletMap = ({ 
+  villages = [], 
+  showVillages = true, 
+  activeCategories = [],
+  onSelectVillage, 
+  onSelectFeature 
+}: LeafletMapProps) => {
   const db = useFirestore();
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features } = useCollection(featuresQuery);
 
   const indonesiaBounds: LatLngBoundsExpression = [[-11.0, 94.0], [6.5, 141.5]];
 
-  const categories = useMemo(() => {
-    const groups: Record<string, any[]> = {};
-    features?.forEach(f => {
-      const cat = f.category || 'LAINNYA';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(f);
-    });
-    return groups;
-  }, [features]);
+  const filteredFeatures = useMemo(() => {
+    if (!features) return [];
+    return features.filter(f => activeCategories.includes(f.category || 'LAINNYA'));
+  }, [features, activeCategories]);
 
   const renderFeature = (f: any) => {
     if (!f.geometry) return null;
@@ -85,7 +86,6 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
         subdomains={['mt0','mt1','mt2','mt3']} 
       />
       
-      {/* Batas Desa Rendered directly based on state from parent */}
       {showVillages && (
         <FeatureGroup>
           {(villages || []).map((v) => (
@@ -107,19 +107,13 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
         </FeatureGroup>
       )}
 
-      <LayersControl position="topright">
-        {Object.entries(categories).map(([key, group]) => (
-          <LayersControl.Overlay checked key={key} name={key.replace('_', ' ').toUpperCase()}>
-            <FeatureGroup>
-              {group.map(f => (
-                <Fragment key={f.id}>
-                  {renderFeature(f)}
-                </Fragment>
-              ))}
-            </FeatureGroup>
-          </LayersControl.Overlay>
+      <FeatureGroup>
+        {filteredFeatures.map(f => (
+          <Fragment key={f.id}>
+            {renderFeature(f)}
+          </Fragment>
         ))}
-      </LayersControl>
+      </FeatureGroup>
     </MapContainer>
   );
 };

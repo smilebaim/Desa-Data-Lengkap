@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
@@ -114,42 +113,6 @@ export default function VisualizationsPage() {
         </Link>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="rounded-[2rem] border-none shadow-xl bg-green-50/50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white rounded-2xl text-green-600 shadow-sm border border-green-100"><Users className="h-6 w-6" /></div>
-              <div className="text-left">
-                <p className="text-[10px] font-black text-green-800/40 uppercase tracking-widest">Total Populasi</p>
-                <h3 className="text-2xl font-black text-green-900">{totalPopulasi.toLocaleString()} <span className="text-sm font-medium opacity-40">Jiwa</span></h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-[2rem] border-none shadow-xl bg-blue-50/50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white rounded-2xl text-blue-600 shadow-sm border border-blue-100"><Coins className="h-6 w-6" /></div>
-              <div className="text-left">
-                <p className="text-[10px] font-black text-blue-800/40 uppercase tracking-widest">Dana Terkelola</p>
-                <h3 className="text-2xl font-black text-blue-900">Rp{(totalAnggaran / 1000000000).toFixed(1)} <span className="text-sm font-medium opacity-40">Miliar</span></h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="rounded-[2rem] border-none shadow-xl bg-amber-50/50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white rounded-2xl text-amber-600 shadow-sm border border-amber-100"><TrendingUp className="h-6 w-6" /></div>
-              <div className="text-left">
-                <p className="text-[10px] font-black text-amber-800/40 uppercase tracking-widest">Rerata IDM</p>
-                <h3 className="text-2xl font-black text-amber-900">{(statsData.length > 0 ? statsData.reduce((a,b) => a + b.idmScore, 0) / statsData.length : 0).toFixed(2)}</h3>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       <div className="grid gap-8 lg:grid-cols-12">
         <Card className="lg:col-span-4 border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white p-8 h-fit sticky top-6">
           <CardHeader className="px-0 pt-0 text-left">
@@ -195,13 +158,10 @@ export default function VisualizationsPage() {
                 </Select>
               </div>
             </div>
-            <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (editingId ? <Save className="h-5 w-5 mr-2" /> : <Sparkles className="h-5 w-5 mr-2" />)}
+            <Button type="submit" className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold shadow-lg" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (editingId ? <Save className="h-5 w-5 mr-2" /> : <Plus className="h-5 w-5 mr-2" />)}
               {editingId ? 'Simpan Perubahan' : 'Tambahkan ke Pustaka'}
             </Button>
-            {editingId && (
-              <Button type="button" variant="ghost" onClick={resetForm} className="w-full text-white/40 hover:text-white">Batalkan Pengeditan</Button>
-            )}
           </form>
         </Card>
 

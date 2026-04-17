@@ -1,15 +1,14 @@
-
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { 
   Search, Shield, LogIn, HelpCircle, Plus, Minus, Landmark, 
   LayoutDashboard, X, MapPin, BarChart3, 
-  Users, TrendingUp, Info, Zap, Compass, 
+  Users, TrendingUp, Info, Zap, 
   Navigation, Eye, EyeOff, Construction, TreePine, Sparkles, Loader2, BrainCircuit,
-  Map as MapIcon, ChevronRight, LocateFixed
+  LocateFixed, ChevronRight
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFirestore, useCollection, useUser, useDoc } from '@/firebase';
@@ -88,14 +87,12 @@ export default function HomePage() {
   const db = useFirestore();
   const { user, isLoading: isAuthLoading } = useUser();
   const [showVillages, setShowVillages] = useState(true);
+  const [activeCategories, setActiveCategories] = useState<string[]>(['infrastructure', 'public_facility', 'natural_resource']);
   const [panelOpen, setPanelOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{ type: 'page' | 'village' | 'feature', id: string } | null>(null);
   
-  // State Pencarian
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-
-  // State untuk Analisis AI
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<AnalyzeVillageOutput | null>(null);
 
@@ -113,7 +110,12 @@ export default function HomePage() {
   const bottomMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'bottom'), [menus]);
   const headerMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'header'), [menus]);
 
-  // Logika Pencarian
+  const toggleCategory = (cat: string) => {
+    setActiveCategories(prev => 
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    );
+  };
+
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return { villages: [], features: [] };
     const q = searchQuery.toLowerCase();
@@ -189,12 +191,12 @@ export default function HomePage() {
           <LeafletMap 
             villages={villages} 
             showVillages={showVillages} 
+            activeCategories={activeCategories}
             onSelectVillage={(id) => handleSelectItem('village', id)}
             onSelectFeature={(id) => handleSelectItem('feature', id)}
           />
         </div>
 
-        {/* Header Atas & Pencarian */}
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/70 backdrop-blur-3xl border border-white/10 p-1 rounded-full shadow-2xl ring-1 ring-white/10">
@@ -220,72 +222,29 @@ export default function HomePage() {
                     onFocus={() => setIsSearchFocused(true)}
                     onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                   />
-                  {searchQuery && (
-                    <button onClick={() => setSearchQuery('')} className="p-1 hover:text-red-400 transition-colors">
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
                 </div>
 
-                {/* Hasil Pencarian Popover */}
                 {isSearchFocused && searchQuery.trim() && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                     <ScrollArea className="max-h-[350px]">
                       {searchResults.villages.length === 0 && searchResults.features.length === 0 ? (
                         <div className="p-8 text-center">
-                          <HelpCircle className="h-8 w-8 mx-auto text-slate-700 mb-2" />
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tidak ada hasil ditemukan</p>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tidak ada hasil</p>
                         </div>
                       ) : (
-                        <div className="p-2 space-y-4">
+                        <div className="p-2 space-y-4 text-left">
                           {searchResults.villages.length > 0 && (
                             <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
-                                <Landmark className="h-3 w-3" /> Wilayah Desa
-                              </p>
-                              <div className="mt-1 space-y-1">
-                                {searchResults.villages.map(v => (
-                                  <button 
-                                    key={v.id} 
-                                    onClick={() => handleSelectItem('village', v.id)}
-                                    className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between"
-                                  >
-                                    <div>
-                                      <p className="text-[11px] font-bold text-white group-hover:text-primary transition-colors">{v.name}</p>
-                                      <p className="text-[9px] text-slate-500">{v.province}</p>
-                                    </div>
-                                    <ChevronRight className="h-3 w-3 text-slate-700" />
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {searchResults.features.length > 0 && (
-                            <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2">
-                                <MapPin className="h-3 w-3" /> Aset & Fitur Peta
-                              </p>
-                              <div className="mt-1 space-y-1">
-                                {searchResults.features.map(f => (
-                                  <button 
-                                    key={f.id} 
-                                    onClick={() => handleSelectItem('feature', f.id)}
-                                    className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <div className="h-7 w-7 bg-white/5 border border-white/5 rounded-lg flex items-center justify-center text-blue-400">
-                                        <DynamicIcon name={f.icon || 'MapPin'} className="h-3.5 w-3.5" />
-                                      </div>
-                                      <div>
-                                        <p className="text-[11px] font-bold text-white group-hover:text-blue-400 transition-colors">{f.name}</p>
-                                        <p className="text-[9px] text-slate-500 uppercase tracking-tighter">{f.category?.replace('_', ' ')}</p>
-                                      </div>
-                                    </div>
-                                    <ChevronRight className="h-3 w-3 text-slate-700" />
-                                  </button>
-                                ))}
-                              </div>
+                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah Desa</p>
+                              {searchResults.villages.map(v => (
+                                <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                  <div>
+                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
+                                    <p className="text-[9px] text-slate-500">{v.province}</p>
+                                  </div>
+                                  <ChevronRight className="h-3 w-3 text-slate-700" />
+                                </button>
+                              ))}
                             </div>
                           )}
                         </div>
@@ -315,16 +274,15 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Toolbar Kiri */}
         <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5">
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white/60"}>
               {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Fasilitas Umum" className="text-blue-400"><Landmark className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Infrastruktur" className="text-amber-400"><Construction className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Sumber Daya Alam" className="text-green-400"><TreePine className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/10" : "text-white/60"}><Landmark className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/10" : "text-white/60"}><Construction className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/10" : "text-white/60"}><TreePine className="h-4 w-4" /></ToolbarButton>
           </div>
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
             <ToolbarButton tooltip="Reset Pandangan" onClick={() => window.location.reload()}><LocateFixed className="h-4 w-4" /></ToolbarButton>
@@ -334,9 +292,7 @@ export default function HomePage() {
           </div>
         </aside>
 
-        {/* Dock Bawah */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3">
-          <span className="text-[7px] text-white/40 font-black uppercase tracking-[0.5em]">Jaringan Spasial Desa</span>
           <nav className="flex items-center gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[90vw]">
             {bottomMenus.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
@@ -346,7 +302,6 @@ export default function HomePage() {
           </nav>
         </div>
 
-        {/* Panel Samping (Right Side Popup) */}
         <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
           <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none bg-white overflow-hidden shadow-2xl">
             <ScrollArea className="h-full">
@@ -355,8 +310,6 @@ export default function HomePage() {
               ) : itemDetail ? (
                 <div className="flex flex-col h-full animate-in fade-in duration-500">
                   <div className="relative h-48 bg-slate-950 shrink-0">
-                    <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2013')] bg-cover bg-center grayscale" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent" />
                     <div className="absolute bottom-6 left-8 right-8 z-10 text-left">
                       <Badge className="bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-2">
                         {selectedItem?.type === 'village' ? 'Profil Wilayah' : 'Informasi'}
@@ -364,7 +317,6 @@ export default function HomePage() {
                       <h2 className="text-3xl font-black text-slate-900 leading-none uppercase">{itemDetail.name || itemDetail.title}</h2>
                     </div>
                   </div>
-
                   <div className="px-8 py-10 space-y-8 text-left">
                     {selectedItem?.type === 'village' && (
                       <div className="space-y-6">
@@ -378,42 +330,22 @@ export default function HomePage() {
                             <p className="text-lg font-bold text-slate-800">{(itemDetail.idmScore || 0).toFixed(2)}</p>
                           </div>
                         </div>
-
-                        <Button 
-                          onClick={runAiAnalysis} 
-                          disabled={isAiAnalyzing}
-                          className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold gap-3 shadow-xl"
-                        >
+                        <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold gap-3 shadow-xl">
                           {isAiAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <BrainCircuit className="h-5 w-5 text-primary" />}
-                          {isAiAnalyzing ? 'Menganalisis Data...' : 'Analisis Strategis AI'}
+                          Analisis Strategis AI
                         </Button>
-
                         {aiAnalysisResult && (
-                          <div className="p-6 bg-primary/5 rounded-[2.5rem] border border-primary/10 animate-in slide-in-from-top-4 duration-500">
-                            <div className="flex items-center gap-2 mb-4">
-                              <Sparkles className="h-4 w-4 text-primary" />
-                              <span className="text-[10px] font-black text-primary uppercase tracking-widest">Rekomendasi AI</span>
-                              <Badge className="ml-auto bg-primary/20 text-primary border-none text-[8px] uppercase">{aiAnalysisResult.efficiencyLevel}</Badge>
-                            </div>
+                          <div className="p-6 bg-primary/5 rounded-[2.5rem] border border-primary/10">
                             <p className="text-sm text-slate-700 leading-relaxed font-medium mb-4">{aiAnalysisResult.analysis}</p>
-                            <div className="space-y-2">
-                              {aiAnalysisResult.recommendations.map((rec, i) => (
-                                <div key={i} className="flex gap-3 text-xs text-slate-600 bg-white p-3 rounded-xl border border-primary/10">
-                                  <Zap className="h-4 w-4 text-primary shrink-0" /> {rec}
-                                </div>
-                              ))}
-                            </div>
                           </div>
                         )}
                       </div>
                     )}
-
                     <div className="whitespace-pre-line text-slate-700 leading-relaxed text-lg font-medium">
                       {renderContentWithCharts(itemDetail.content || itemDetail.description)}
                     </div>
-
                     <Separator className="bg-slate-100" />
-                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200" onClick={() => setPanelOpen(false)}>Tutup Detail</Button>
+                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200" onClick={() => setPanelOpen(false)}>Tutup</Button>
                   </div>
                 </div>
               ) : null}
