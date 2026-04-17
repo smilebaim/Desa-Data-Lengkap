@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { 
   Plus, Trash2, Edit2, Save, Sparkles, Landmark, 
   Loader2, Users, MapPin, Search, Info, Globe, Tag,
-  BarChart3, Ruler
+  BarChart3, Ruler, X, PlusCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { suggestVillageContent } from '@/ai';
@@ -41,12 +41,40 @@ export default function VillageManagementPage() {
     area: 0,
     description: '',
     tagline: '',
+    potentials: [] as string[],
     location: { lat: -6.9175, lng: 107.6191 }
   });
 
+  const [potentialInput, setPotentialInput] = useState('');
+
   const handleEdit = (village: any) => {
-    setSelectedVillage(village);
+    setSelectedVillage({
+      ...village,
+      potentials: village.potentials || []
+    });
     setIsEditing(village.id);
+  };
+
+  const handleAddPotential = (type: 'edit' | 'add') => {
+    if (!potentialInput.trim()) return;
+    if (type === 'edit') {
+      setSelectedVillage({ ...selectedVillage, potentials: [...(selectedVillage.potentials || []), potentialInput.trim()] });
+    } else {
+      setNewVillage({ ...newVillage, potentials: [...(newVillage.potentials || []), potentialInput.trim()] });
+    }
+    setPotentialInput('');
+  };
+
+  const removePotential = (type: 'edit' | 'add', index: number) => {
+    if (type === 'edit') {
+      const newPots = [...selectedVillage.potentials];
+      newPots.splice(index, 1);
+      setSelectedVillage({ ...selectedVillage, potentials: newPots });
+    } else {
+      const newPots = [...newVillage.potentials];
+      newPots.splice(index, 1);
+      setNewVillage({ ...newVillage, potentials: newPots });
+    }
   };
 
   const handleAdd = async () => {
@@ -57,7 +85,7 @@ export default function VillageManagementPage() {
       .then(() => {
         toast({ title: "Berhasil", description: "Desa baru telah ditambahkan ke basis data." });
         setIsAdding(false);
-        setNewVillage({ name: '', province: 'Jawa Barat', population: 0, area: 0, description: '', tagline: '', location: { lat: -6.9175, lng: 107.6191 } });
+        setNewVillage({ name: '', province: 'Jawa Barat', population: 0, area: 0, description: '', tagline: '', potentials: [], location: { lat: -6.9175, lng: 107.6191 } });
       })
       .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: newVillage })))
       .finally(() => setIsSubmitting(false));
@@ -93,9 +121,19 @@ export default function VillageManagementPage() {
     try {
       const result = await suggestVillageContent({ name: target.name, province: target.province });
       if (type === 'edit') {
-        setSelectedVillage({ ...selectedVillage, description: result.description, tagline: result.tagline });
+        setSelectedVillage({ 
+          ...selectedVillage, 
+          description: result.description, 
+          tagline: result.tagline,
+          potentials: result.potentials || []
+        });
       } else {
-        setNewVillage({ ...newVillage, description: result.description, tagline: result.tagline });
+        setNewVillage({ 
+          ...newVillage, 
+          description: result.description, 
+          tagline: result.tagline,
+          potentials: result.potentials || []
+        });
       }
       toast({ title: "AI Berhasil", description: "Saran konten telah dihasilkan." });
     } catch (error) {
@@ -116,8 +154,8 @@ export default function VillageManagementPage() {
     <div className="space-y-8 pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Sumber Data Statistik</h1>
-          <p className="text-muted-foreground">Isi data populasi dan wilayah di sini untuk memberi makan grafik di dashboard statistik.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Manajemen Wilayah & Potensi</h1>
+          <p className="text-muted-foreground">Kelola data populasi, potensi wilayah, dan profil naratif desa.</p>
         </div>
         
         <Dialog open={isAdding} onOpenChange={setIsAdding}>
@@ -126,10 +164,10 @@ export default function VillageManagementPage() {
               <Plus className="mr-2 h-4 w-4" /> Tambah Data Desa
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Input Data Desa Baru</DialogTitle>
-              <DialogDescription>Data yang Anda masukkan akan langsung mempengaruhi grafik statistik nasional.</DialogDescription>
+              <DialogDescription>Data yang Anda masukkan akan langsung mempengaruhi statistik nasional.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -140,15 +178,38 @@ export default function VillageManagementPage() {
                 <div className="space-y-2"><Label>Populasi (Jiwa)</Label><Input type="number" value={newVillage.population} onChange={e => setNewVillage({...newVillage, population: parseInt(e.target.value)})} /></div>
                 <div className="space-y-2"><Label>Luas Wilayah (km²)</Label><Input type="number" value={newVillage.area} onChange={e => setNewVillage({...newVillage, area: parseFloat(e.target.value)})} /></div>
               </div>
+              
+              <div className="space-y-2">
+                <Label>Potensi Desa</Label>
+                <div className="flex gap-2 mb-2">
+                  <Input 
+                    placeholder="Tambah potensi (misal: Wisata Bahari)" 
+                    value={potentialInput} 
+                    onChange={e => setPotentialInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAddPotential('add')}
+                  />
+                  <Button type="button" size="icon" onClick={() => handleAddPotential('add')}><PlusCircle className="h-4 w-4" /></Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {newVillage.potentials?.map((pot, idx) => (
+                    <div key={idx} className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">
+                      {pot}
+                      <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removePotential('add', idx)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold text-slate-500 uppercase">Profil Naratif</Label>
+                  <Label className="text-xs font-bold text-slate-500 uppercase">Profil & Tagline</Label>
                   <Button variant="ghost" size="sm" className="h-7 text-[10px] text-primary" onClick={() => handleAiSuggest('add')} disabled={isAiLoading}>
                     {isAiLoading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
-                    ISI DENGAN AI
+                    ISI OTOMATIS DENGAN AI
                   </Button>
                 </div>
-                <Textarea className="h-24 bg-white" value={newVillage.description} onChange={e => setNewVillage({...newVillage, description: e.target.value})} />
+                <Input placeholder="Tagline desa..." value={newVillage.tagline} onChange={e => setNewVillage({...newVillage, tagline: e.target.value})} className="bg-white" />
+                <Textarea className="h-24 bg-white" placeholder="Deskripsi profil desa..." value={newVillage.description} onChange={e => setNewVillage({...newVillage, description: e.target.value})} />
               </div>
             </div>
             <DialogFooter>
@@ -161,7 +222,7 @@ export default function VillageManagementPage() {
 
       <Card className="shadow-sm border-slate-200 overflow-hidden">
         <CardHeader className="bg-slate-50/50">
-          <CardTitle className="text-lg">Katalog & Auditor Data</CardTitle>
+          <CardTitle className="text-lg">Katalog Desa Terdaftar</CardTitle>
           <CardDescription>Total {villages?.length || 0} entitas desa berkontribusi pada statistik publik.</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -171,7 +232,7 @@ export default function VillageManagementPage() {
                 <TableHead className="pl-6">Entitas Desa</TableHead>
                 <TableHead>Populasi</TableHead>
                 <TableHead>Luas</TableHead>
-                <TableHead>Kepadatan</TableHead>
+                <TableHead>Potensi</TableHead>
                 <TableHead className="text-right pr-6">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -190,7 +251,14 @@ export default function VillageManagementPage() {
                   </TableCell>
                   <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><Users className="h-3 w-3 text-primary/40" /> {v.population?.toLocaleString() || 0} Jiwa</div></TableCell>
                   <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><Ruler className="h-3 w-3 text-primary/40" /> {v.area || 0} km²</div></TableCell>
-                  <TableCell className="text-xs font-mono">{(v.area > 0 ? (v.population / v.area) : 0).toFixed(0)}/km²</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {v.potentials?.slice(0, 2).map((p: string, i: number) => (
+                        <span key={i} className="text-[8px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 uppercase font-bold">{p}</span>
+                      ))}
+                      {v.potentials?.length > 2 && <span className="text-[8px] text-slate-400">+{v.potentials.length - 2}</span>}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right pr-6 space-x-1">
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleEdit(v)}><Edit2 className="h-4 w-4" /></Button>
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" onClick={() => handleDelete(v.id)}><Trash2 className="h-4 w-4" /></Button>
@@ -203,11 +271,11 @@ export default function VillageManagementPage() {
       </Card>
 
       <Dialog open={!!isEditing} onOpenChange={(open) => !open && setIsEditing(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              Audit Data Statistik: {selectedVillage?.name}
+              <Landmark className="h-5 w-5 text-primary" />
+              Edit Data Wilayah: {selectedVillage?.name}
             </DialogTitle>
           </DialogHeader>
 
@@ -228,14 +296,36 @@ export default function VillageManagementPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label>Potensi Desa</Label>
+              <div className="flex gap-2 mb-2">
+                <Input 
+                  placeholder="Tambah potensi..." 
+                  value={potentialInput} 
+                  onChange={e => setPotentialInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleAddPotential('edit')}
+                />
+                <Button type="button" size="icon" onClick={() => handleAddPotential('edit')}><PlusCircle className="h-4 w-4" /></Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedVillage?.potentials?.map((pot: string, idx: number) => (
+                  <div key={idx} className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">
+                    {pot}
+                    <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removePotential('edit', idx)} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-3 p-4 bg-primary/5 rounded-2xl border border-primary/10">
               <div className="flex items-center justify-between">
-                <Label className="text-xs uppercase font-bold text-primary flex items-center gap-2">Profil Naratif</Label>
+                <Label className="text-xs uppercase font-bold text-primary flex items-center gap-2">Narasi Profil</Label>
                 <Button size="sm" variant="outline" className="h-8 text-[10px]" onClick={() => handleAiSuggest('edit')} disabled={isAiLoading}>
                   {isAiLoading ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Sparkles className="h-3 w-3 mr-2" />}
                   SARANKAN DENGAN AI
                 </Button>
               </div>
+              <Input placeholder="Tagline desa..." value={selectedVillage?.tagline || ''} onChange={e => setSelectedVillage({...selectedVillage, tagline: e.target.value})} className="bg-white mb-2" />
               <Textarea className="h-32 bg-white" value={selectedVillage?.description || ''} onChange={e => setSelectedVillage({...selectedVillage, description: e.target.value})} />
             </div>
           </div>

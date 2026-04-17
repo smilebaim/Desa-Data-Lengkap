@@ -233,11 +233,6 @@ export default function VisualizationsPage() {
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (editingId ? <Save className="h-5 w-5 mr-2" /> : <Sparkles className="h-5 w-5 mr-2" />)}
               {editingId ? 'Simpan Perubahan' : 'Tambahkan ke Pustaka'}
             </Button>
-            {editingId && (
-              <Button type="button" variant="ghost" className="w-full text-slate-400" onClick={resetForm}>
-                Batalkan Pengeditan
-              </Button>
-            )}
           </form>
         </Card>
 
