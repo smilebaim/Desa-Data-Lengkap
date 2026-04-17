@@ -13,7 +13,7 @@ import {
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles,
   Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info, Database, Edit2, X,
-  PieChart as PieIcon
+  PieChart as PieIcon, Save
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,7 +67,11 @@ export default function VisualizationsPage() {
     if (!formData.title) return toast({ title: "Galat", description: "Judul grafik harus diisi.", variant: "destructive" });
     
     setIsSubmitting(true);
-    const data = { ...formData, createdAt: editingId ? undefined : serverTimestamp(), updatedAt: serverTimestamp() };
+    const data = { 
+      ...formData, 
+      createdAt: editingId ? undefined : serverTimestamp(), 
+      updatedAt: serverTimestamp() 
+    };
 
     const actionPromise = editingId 
       ? updateDoc(doc(db, 'visualizers', editingId), data)
