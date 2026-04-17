@@ -200,7 +200,7 @@ export default function HomePage() {
 
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/70 backdrop-blur-3xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
+            <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/70 backdrop-blur-3xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
               <div className="flex items-center gap-2 pl-2">
                 <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
                   <Shield className="h-4 w-4 text-primary-foreground" />
@@ -211,68 +211,69 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="flex-1 flex justify-center mx-2 pointer-events-auto relative">
-                <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-full max-w-[140px] px-3 h-8 bg-white/20' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
-                  <button 
-                    onClick={() => setIsSearchFocused(!isSearchFocused)}
-                    className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
-                  >
-                    <Search className="h-3.5 w-3.5" />
-                  </button>
-                  {isSearchFocused && (
-                    <input 
-                      autoFocus
-                      type="text" 
-                      placeholder="Cari..." 
-                      className="bg-transparent text-[10px] font-bold text-white outline-none placeholder:text-slate-500 w-full"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onBlur={() => {
-                        if (!searchQuery) setTimeout(() => setIsSearchFocused(false), 200);
-                      }}
-                    />
+              <div className="flex items-center gap-1.5 pr-1 pointer-events-auto">
+                {/* Search Tool moved next to login */}
+                <div className="relative flex items-center">
+                  <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-48 px-3 h-8 bg-white/20' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
+                    <button 
+                      onClick={() => setIsSearchFocused(!isSearchFocused)}
+                      className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
+                    >
+                      <Search className="h-3.5 w-3.5" />
+                    </button>
+                    {isSearchFocused && (
+                      <input 
+                        autoFocus
+                        type="text" 
+                        placeholder="Cari..." 
+                        className="bg-transparent text-[10px] font-bold text-white outline-none placeholder:text-slate-500 w-full"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onBlur={() => {
+                          if (!searchQuery) setTimeout(() => setIsSearchFocused(false), 200);
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {isSearchFocused && searchQuery.trim() && (
+                    <div className="absolute top-full right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                      <ScrollArea className="max-h-[350px]">
+                        <div className="p-2 space-y-4">
+                          {searchResults.villages.length > 0 && (
+                            <div>
+                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah</p>
+                              {searchResults.villages.map(v => (
+                                <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                  <div>
+                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
+                                    <p className="text-[9px] text-slate-500">{v.province}</p>
+                                  </div>
+                                  <ChevronRight className="h-3 w-3 text-slate-700" />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          {searchResults.features.length > 0 && (
+                            <div>
+                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset</p>
+                              {searchResults.features.map(f => (
+                                <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                  <div>
+                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
+                                    <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
+                                  </div>
+                                  <ChevronRight className="h-3 w-3 text-slate-700" />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </ScrollArea>
+                    </div>
                   )}
                 </div>
 
-                {isSearchFocused && searchQuery.trim() && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-full max-w-sm bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                    <ScrollArea className="max-h-[350px]">
-                      <div className="p-2 space-y-4">
-                        {searchResults.villages.length > 0 && (
-                          <div>
-                            <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah</p>
-                            {searchResults.villages.map(v => (
-                              <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
-                                <div>
-                                  <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
-                                  <p className="text-[9px] text-slate-500">{v.province}</p>
-                                </div>
-                                <ChevronRight className="h-3 w-3 text-slate-700" />
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {searchResults.features.length > 0 && (
-                          <div>
-                            <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset</p>
-                            {searchResults.features.map(f => (
-                              <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
-                                <div>
-                                  <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
-                                  <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
-                                </div>
-                                <ChevronRight className="h-3 w-3 text-slate-700" />
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1 pr-1 pointer-events-auto">
                 {headerMenus?.map((menu: any) => (
                   <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-8 rounded-full px-3 text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
                     <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 text-primary" />
