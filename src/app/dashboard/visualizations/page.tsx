@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
@@ -52,9 +53,6 @@ export default function VisualizationsPage() {
       budgetAllocation: v.budgetAllocation || 0
     }));
   }, [villages]);
-
-  const totalPopulasi = useMemo(() => statsData.reduce((acc, curr) => acc + curr.population, 0), [statsData]);
-  const totalAnggaran = useMemo(() => statsData.reduce((acc, curr) => acc + curr.budgetAllocation, 0), [statsData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

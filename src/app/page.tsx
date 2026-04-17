@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
@@ -211,12 +212,12 @@ export default function HomePage() {
               </div>
 
               <div className="flex-1 relative max-w-md mx-2 pointer-events-auto">
-                <div className={`flex items-center bg-white/5 border border-white/5 rounded-full px-3 h-8 sm:h-9 transition-all ${isSearchFocused ? 'bg-white/15 border-primary/40 ring-2 ring-primary/10' : ''}`}>
-                  <Search className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${isSearchFocused ? 'text-primary' : 'text-slate-500'}`} />
+                <div className={`flex items-center bg-white/10 border border-white/5 rounded-full px-3 h-8 sm:h-9 transition-all ${isSearchFocused ? 'bg-white/20 border-primary/40 ring-2 ring-primary/20' : ''}`}>
+                  <Search className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${isSearchFocused ? 'text-primary' : 'text-slate-400'}`} />
                   <input 
                     type="text" 
                     placeholder="Cari desa atau aset..." 
-                    className="bg-transparent text-[9px] sm:text-[11px] font-medium outline-none placeholder:text-slate-600 w-full ml-1.5 sm:ml-3"
+                    className="bg-transparent text-[9px] sm:text-[11px] font-bold text-white outline-none placeholder:text-slate-500 w-full ml-1.5 sm:ml-3"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
@@ -256,14 +257,14 @@ export default function HomePage() {
 
               <div className="flex items-center gap-1 pr-1 pointer-events-auto">
                 {headerMenus.map((menu: any) => (
-                  <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-7 sm:h-8 rounded-full px-2 sm:px-4 text-[9px] sm:text-[10px] font-bold gap-2 text-slate-300 hover:bg-white/10">
+                  <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-7 sm:h-8 rounded-full px-2 sm:px-4 text-[9px] sm:text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
                     <DynamicIcon name={menu.icon} className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                     <span className="hidden md:inline">{menu.label}</span>
                   </Button>
                 ))}
                 {!isAuthLoading && (
                   <Link href={user ? "/dashboard" : "/login"}>
-                    <Button className="h-7 sm:h-8 px-4 rounded-full text-[9px] sm:text-[10px] font-bold gap-2 bg-primary">
+                    <Button className="h-7 sm:h-8 px-4 rounded-full text-[9px] sm:text-[10px] font-bold gap-2 bg-primary hover:bg-primary/90">
                       {user ? <LayoutDashboard className="h-3 w-3" /> : <LogIn className="h-3 w-3" />}
                       <span>{user ? "Dasbor" : "Masuk"}</span>
                     </Button>
@@ -276,19 +277,19 @@ export default function HomePage() {
 
         <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5">
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
-            <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white/60"}>
+            <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white/70"}>
               {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/10" : "text-white/60"}><Landmark className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/10" : "text-white/60"}><Construction className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/10" : "text-white/60"}><TreePine className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white/70"}><Landmark className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white/70"}><Construction className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white/70"}><TreePine className="h-4 w-4" /></ToolbarButton>
           </div>
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
-            <ToolbarButton tooltip="Reset Pandangan" onClick={() => window.location.reload()}><LocateFixed className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Reset Pandangan" onClick={() => window.location.reload()} className="text-white/70"><LocateFixed className="h-4 w-4" /></ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Perbesar Peta"><Plus className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Perkecil Peta"><Minus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perbesar Peta" className="text-white/70"><Plus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perkecil Peta" className="text-white/70"><Minus className="h-4 w-4" /></ToolbarButton>
           </div>
         </aside>
 
@@ -309,34 +310,41 @@ export default function HomePage() {
                 <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : itemDetail ? (
                 <div className="flex flex-col h-full animate-in fade-in duration-500">
-                  <div className="relative h-48 bg-slate-950 shrink-0">
+                  <div className="relative h-56 bg-slate-900 shrink-0 overflow-hidden">
+                    <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
                     <div className="absolute bottom-6 left-8 right-8 z-10 text-left">
-                      <Badge className="bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-2">
-                        {selectedItem?.type === 'village' ? 'Profil Wilayah' : 'Informasi'}
+                      <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none">
+                        {selectedItem?.type === 'village' ? 'Profil Wilayah' : 'Informasi Publik'}
                       </Badge>
-                      <h2 className="text-3xl font-black text-slate-900 leading-none uppercase">{itemDetail.name || itemDetail.title}</h2>
+                      <h2 className="text-3xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
+                      {itemDetail.province && <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
                     </div>
                   </div>
                   <div className="px-8 py-10 space-y-8 text-left">
                     {selectedItem?.type === 'village' && (
                       <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100">
-                            <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Populasi</p>
-                            <p className="text-lg font-bold text-slate-800">{itemDetail.population?.toLocaleString()} <span className="text-[10px] opacity-40">Jiwa</span></p>
+                          <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                            <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Populasi</p>
+                            <p className="text-2xl font-bold text-slate-900 leading-none">{itemDetail.population?.toLocaleString()} <span className="text-[10px] text-slate-400 font-bold ml-1">JIWA</span></p>
                           </div>
-                          <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100">
-                            <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Skor IDM</p>
-                            <p className="text-lg font-bold text-slate-800">{(itemDetail.idmScore || 0).toFixed(2)}</p>
+                          <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                            <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Skor IDM</p>
+                            <p className="text-2xl font-bold text-slate-900 leading-none">{(itemDetail.idmScore || 0).toFixed(2)}</p>
                           </div>
                         </div>
-                        <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 text-white font-bold gap-3 shadow-xl">
+                        <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold gap-3 shadow-xl transition-all">
                           {isAiAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <BrainCircuit className="h-5 w-5 text-primary" />}
                           Analisis Strategis AI
                         </Button>
                         {aiAnalysisResult && (
-                          <div className="p-6 bg-primary/5 rounded-[2.5rem] border border-primary/10">
-                            <p className="text-sm text-slate-700 leading-relaxed font-medium mb-4">{aiAnalysisResult.analysis}</p>
+                          <div className="p-8 bg-primary/5 rounded-[2.5rem] border border-primary/10 animate-in zoom-in-95 duration-300">
+                            <div className="flex items-center gap-2 mb-4">
+                              <Sparkles className="h-4 w-4 text-primary" />
+                              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Rekomendasi Strategis</p>
+                            </div>
+                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{aiAnalysisResult.analysis}</p>
                           </div>
                         )}
                       </div>
@@ -344,8 +352,20 @@ export default function HomePage() {
                     <div className="whitespace-pre-line text-slate-700 leading-relaxed text-lg font-medium">
                       {renderContentWithCharts(itemDetail.content || itemDetail.description)}
                     </div>
+                    {itemDetail.potentials && itemDetail.potentials.length > 0 && (
+                      <div className="space-y-4">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Potensi Wilayah</p>
+                        <div className="flex flex-wrap gap-2">
+                          {itemDetail.potentials.map((pot: string, i: number) => (
+                            <Badge key={i} variant="outline" className="rounded-full px-4 py-1.5 text-slate-600 border-slate-200 bg-slate-50 font-bold text-[10px] uppercase">
+                              {pot}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <Separator className="bg-slate-100" />
-                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200" onClick={() => setPanelOpen(false)}>Tutup</Button>
+                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200 text-slate-500 font-bold hover:bg-slate-50 transition-colors" onClick={() => setPanelOpen(false)}>Tutup Panel</Button>
                   </div>
                 </div>
               ) : null}
@@ -361,11 +381,11 @@ function ToolbarButton({ children, tooltip, onClick, className }: { children: Re
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick} className={`h-10 w-10 text-slate-400 hover:bg-white/10 hover:text-white rounded-2xl transition-all ${className}`}>
+        <Button variant="ghost" size="icon" onClick={onClick} className={`h-10 w-10 hover:bg-white/10 transition-all rounded-2xl ${className}`}>
           {children}
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="right" className="bg-slate-950 text-[9px] font-bold uppercase tracking-widest">{tooltip}</TooltipContent>
+      <TooltipContent side="right" className="bg-slate-950 border-white/10 text-[9px] font-bold uppercase tracking-widest text-white">{tooltip}</TooltipContent>
     </Tooltip>
   );
 }
@@ -374,12 +394,12 @@ function NavButton({ children, label, onClick }: { children: React.ReactNode, la
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" onClick={onClick} className="flex items-center gap-3 h-10 px-6 rounded-full text-slate-300 hover:bg-white/10 transition-all group">
+        <Button variant="ghost" onClick={onClick} className="flex items-center gap-3 h-10 px-6 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-all group border border-transparent hover:border-white/10">
           <div className="text-primary group-hover:scale-110 transition-transform">{children}</div>
-          <span className="text-[9px] font-bold uppercase tracking-widest whitespace-nowrap">{label}</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">{label}</span>
         </Button>
       </TooltipTrigger>
-      <TooltipContent side="top" className="bg-slate-950 mb-4 text-[9px] font-bold uppercase tracking-widest">{label}</TooltipContent>
+      <TooltipContent side="top" className="bg-slate-950 border-white/10 mb-4 text-[9px] font-bold uppercase tracking-widest text-white">{label}</TooltipContent>
     </Tooltip>
   );
 }
