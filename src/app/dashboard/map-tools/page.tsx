@@ -1,10 +1,10 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, addDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,6 +64,7 @@ export default function SpasialManagementPage() {
   const { data: features, isLoading: isFeaturesLoading } = useCollection(featureQuery);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [iconSearch, setIconSearch] = useState('');
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   
@@ -78,6 +79,21 @@ export default function SpasialManagementPage() {
     properties: {}
   });
 
+  const resetForm = useCallback(() => {
+    setEditingId(null);
+    setCurrentFeature({
+      name: '',
+      description: '',
+      showStats: false,
+      type: '',
+      category: 'infrastructure',
+      icon: 'MapPin',
+      geometry: null,
+      properties: {}
+    });
+    setIsCustomCategory(false);
+  }, []);
+
   const handleSaveFeature = async () => {
     if (!currentFeature.name || !currentFeature.geometry) {
       return toast({ title: "Galat", description: "Lengkapi nama dan gambar objek di peta.", variant: "destructive" });
@@ -86,30 +102,67 @@ export default function SpasialManagementPage() {
     setIsSubmitting(true);
     const isBoundary = currentFeature.category === 'village_boundary';
     const collName = isBoundary ? 'villages' : 'features';
-    const collRef = collection(db, collName);
     
     const dataToSave = isBoundary 
       ? {
           name: currentFeature.name,
           description: currentFeature.description,
-          province: 'Jawa Barat',
-          population: 0,
+          province: currentFeature.province || 'Jawa Barat',
+          population: currentFeature.population || 0,
           area: currentFeature.properties.area || 0,
           location: Array.isArray(currentFeature.geometry) ? currentFeature.geometry[0] : currentFeature.geometry,
           boundary: Array.isArray(currentFeature.geometry) ? currentFeature.geometry : []
         }
       : currentFeature;
 
-    addDoc(collRef, dataToSave)
+    const actionPromise = editingId 
+      ? updateDoc(doc(db, collName, editingId), dataToSave)
+      : addDoc(collection(db, collName), dataToSave);
+
+    actionPromise
       .then(() => {
-        toast({ title: "Berhasil", description: "Data spasial telah disinkronkan ke peta utama." });
-        setCurrentFeature({ name: '', description: '', showStats: false, type: '', category: 'infrastructure', icon: 'MapPin', geometry: null, properties: {} });
-        setIsCustomCategory(false);
+        toast({ title: "Berhasil", description: editingId ? "Data spasial telah diperbarui." : "Data spasial telah ditambahkan." });
+        resetForm();
       })
-      .catch(async () => {
-        errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: dataToSave }));
+      .catch(async (error) => {
+        errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+          path: collName, 
+          operation: editingId ? 'update' : 'create', 
+          requestResourceData: dataToSave 
+        }));
       })
       .finally(() => setIsSubmitting(false));
+  };
+
+  const handleEdit = (type: 'features' | 'villages', item: any) => {
+    setEditingId(item.id);
+    if (type === 'villages') {
+      setCurrentFeature({
+        name: item.name || '',
+        description: item.description || '',
+        showStats: true,
+        type: 'polygon',
+        category: 'village_boundary',
+        icon: 'Landmark',
+        geometry: item.boundary || null,
+        properties: { area: item.area || 0 },
+        province: item.province,
+        population: item.population
+      });
+    } else {
+      setCurrentFeature({
+        name: item.name || '',
+        description: item.description || '',
+        showStats: !!item.showStats,
+        type: item.type || '',
+        category: item.category || 'infrastructure',
+        icon: item.icon || 'MapPin',
+        geometry: item.geometry || null,
+        properties: item.properties || {}
+      });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    toast({ title: "Mode Edit", description: `Memuat data ${item.name}` });
   };
 
   const handleDelete = async (coll: string, id: string) => {
@@ -135,7 +188,14 @@ export default function SpasialManagementPage() {
         <div className="lg:col-span-4 space-y-6">
           <Card className="shadow-lg border-primary/10">
             <CardHeader>
-              <CardTitle className="text-lg">Atribut Objek</CardTitle>
+              <CardTitle className="text-lg flex items-center justify-between">
+                <span>{editingId ? 'Edit Objek Spasial' : 'Atribut Objek'}</span>
+                {editingId && (
+                  <Button variant="ghost" size="sm" onClick={resetForm} className="h-7 text-xs">
+                    <X className="h-3 w-3 mr-1" /> Batal
+                  </Button>
+                )}
+              </CardTitle>
               <CardDescription>Detail teknis untuk objek yang akan disimpan.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -151,21 +211,23 @@ export default function SpasialManagementPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between mb-1">
                   <Label className="text-xs font-bold uppercase text-slate-500">Kategori Layer</Label>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-6 text-[10px] font-bold text-primary hover:bg-primary/5 px-2"
-                    onClick={() => {
-                      setIsCustomCategory(!isCustomCategory);
-                      setCurrentFeature({...currentFeature, category: isCustomCategory ? 'infrastructure' : ''});
-                    }}
-                  >
-                    {isCustomCategory ? (
-                      <span className="flex items-center gap-1"><X className="h-3 w-3" /> Batal</span>
-                    ) : (
-                      <span className="flex items-center gap-1"><PlusCircle className="h-3 w-3" /> Kategori Baru</span>
-                    )}
-                  </Button>
+                  {!editingId && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 text-[10px] font-bold text-primary hover:bg-primary/5 px-2"
+                      onClick={() => {
+                        setIsCustomCategory(!isCustomCategory);
+                        setCurrentFeature({...currentFeature, category: isCustomCategory ? 'infrastructure' : ''});
+                      }}
+                    >
+                      {isCustomCategory ? (
+                        <span className="flex items-center gap-1"><X className="h-3 w-3" /> Batal</span>
+                      ) : (
+                        <span className="flex items-center gap-1"><PlusCircle className="h-3 w-3" /> Kategori Baru</span>
+                      )}
+                    </Button>
+                  )}
                 </div>
                 {isCustomCategory ? (
                   <div className="animate-in fade-in slide-in-from-top-1 duration-200">
@@ -180,6 +242,7 @@ export default function SpasialManagementPage() {
                   <Select 
                     value={currentFeature.category} 
                     onValueChange={(v) => setCurrentFeature({...currentFeature, category: v})}
+                    disabled={!!editingId}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih kategori..." />
@@ -252,12 +315,6 @@ export default function SpasialManagementPage() {
                     </div>
                   )}
                 </div>
-                {currentFeature.showStats && (
-                  <div className="flex items-center gap-2 p-2 bg-primary/5 rounded-xl border border-primary/10 text-[9px] text-primary/80 leading-tight">
-                    <Sparkles className="h-3 w-3 shrink-0" />
-                    <span>Data dari modul "Statistik & Data" akan otomatis disisipkan di bawah deskripsi pada peta.</span>
-                  </div>
-                )}
               </div>
 
               <div className="p-4 bg-slate-50 rounded-xl border space-y-2">
@@ -286,7 +343,7 @@ export default function SpasialManagementPage() {
                 onClick={handleSaveFeature}
               >
                 {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
-                Simpan ke Database
+                {editingId ? 'Pindahkan Perubahan' : 'Simpan ke Database'}
               </Button>
             </CardContent>
           </Card>
@@ -335,8 +392,9 @@ export default function SpasialManagementPage() {
                             {f.name}
                           </TableCell>
                           <TableCell><span className="text-[10px] bg-slate-100 px-2.5 py-1 rounded-full font-black uppercase tracking-wider text-slate-500 border border-slate-200">{f.category?.replace('_', ' ')}</span></TableCell>
-                          <TableCell className="text-right pr-6">
-                            <Button size="icon" variant="ghost" className="text-red-500 hover:bg-red-50" onClick={() => handleDelete('features', f.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <TableCell className="text-right pr-6 space-x-1">
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleEdit('features', f)}><Edit2 className="h-4 w-4" /></Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" onClick={() => handleDelete('features', f.id)}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -353,8 +411,9 @@ export default function SpasialManagementPage() {
                           <TableCell className="pl-6 font-bold">{v.name}</TableCell>
                           <TableCell className="text-xs">{v.province}</TableCell>
                           <TableCell className="text-center text-xs font-mono">{v.area} km²</TableCell>
-                          <TableCell className="text-right pr-6">
-                            <Button size="icon" variant="ghost" className="text-red-500 hover:bg-red-50" onClick={() => handleDelete('villages', v.id)}><Trash2 className="h-4 w-4" /></Button>
+                          <TableCell className="text-right pr-6 space-x-1">
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleEdit('villages', v)}><Edit2 className="h-4 w-4" /></Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" onClick={() => handleDelete('villages', v.id)}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>
                         </TableRow>
                       ))}
