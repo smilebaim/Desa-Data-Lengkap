@@ -12,7 +12,8 @@ import {
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles,
-  Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info, Database, Edit2, X
+  Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info, Database, Edit2, X,
+  PieChart as PieIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
