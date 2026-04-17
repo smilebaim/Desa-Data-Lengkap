@@ -7,8 +7,8 @@ import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, up
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
-  Copy, CheckCheck, ExternalLink, Sparkles, Save,
-  Database, Edit2, X, PieChart as PieChartIcon, LayoutGrid, Trash2, Coins, Plus
+  Copy, CheckCheck, ExternalLink, Sparkles, Save, Plus,
+  Database, Edit2, X, PieChart as PieChartIcon, LayoutGrid, Trash2, Coins
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
