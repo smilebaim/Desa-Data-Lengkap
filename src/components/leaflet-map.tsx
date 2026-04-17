@@ -1,3 +1,4 @@
+
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
@@ -83,29 +84,30 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
         url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
         subdomains={['mt0','mt1','mt2','mt3']} 
       />
+      
+      {/* Batas Desa Rendered directly based on state from parent */}
+      {showVillages && (
+        <FeatureGroup>
+          {(villages || []).map((v) => (
+            <Fragment key={v.id}>
+              {v.boundary && (
+                <Polygon 
+                  positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
+                  pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }} 
+                  eventHandlers={{ click: () => onSelectVillage?.(v.id) }} 
+                />
+              )}
+              {v.location && (
+                <Marker position={[v.location.lat, v.location.lng]} eventHandlers={{ click: () => onSelectVillage?.(v.id) }}>
+                  <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase">{v.name}</span></LeafletTooltip>
+                </Marker>
+              )}
+            </Fragment>
+          ))}
+        </FeatureGroup>
+      )}
+
       <LayersControl position="topright">
-        {showVillages && (
-          <LayersControl.Overlay checked name="Batas Desa">
-            <FeatureGroup>
-              {(villages || []).map((v) => (
-                <Fragment key={v.id}>
-                  {v.boundary && (
-                    <Polygon 
-                      positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
-                      pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }} 
-                      eventHandlers={{ click: () => onSelectVillage?.(v.id) }} 
-                    />
-                  )}
-                  {v.location && (
-                    <Marker position={[v.location.lat, v.location.lng]} eventHandlers={{ click: () => onSelectVillage?.(v.id) }}>
-                      <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase">{v.name}</span></LeafletTooltip>
-                    </Marker>
-                  )}
-                </Fragment>
-              ))}
-            </FeatureGroup>
-          </LayersControl.Overlay>
-        )}
         {Object.entries(categories).map(([key, group]) => (
           <LayersControl.Overlay checked key={key} name={key.replace('_', ' ').toUpperCase()}>
             <FeatureGroup>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
@@ -7,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, ExternalLink, Sparkles, Save,
-  Database, Edit2, X, PieChart, LayoutGrid, Trash2, Coins, Plus
+  Database, Edit2, X, PieChart as PieChartIcon, LayoutGrid, Trash2, Coins, Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -217,7 +218,7 @@ export default function VisualizationsPage() {
                   <div key={viz.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 group">
                     <div className="flex items-center gap-5">
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
-                        {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChart className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
+                        {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChartIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
                       <div className="text-left">
                         <h4 className="font-bold text-slate-900 flex items-center gap-2">
