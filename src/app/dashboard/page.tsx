@@ -21,11 +21,11 @@ export default function DashboardPage() {
       // 1. Data Desa Dasar untuk statistik
       const villagesRef = collection(db, 'villages');
       const villageData = [
-        { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, idmScore: 0.82, budgetAllocation: 1200000000, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ] },
-        { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, idmScore: 0.78, budgetAllocation: 950000000, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.' },
-        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, idmScore: 0.85, budgetAllocation: 1800000000, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.' },
-        { name: 'Desa Bahari', province: 'Sulawesi Utara', population: 2100, area: 5.6, idmScore: 0.72, budgetAllocation: 850000000, location: { lat: 1.4748, lng: 124.8484 }, description: 'Kawasan konservasi terumbu karang dan wisata bahari.' },
-        { name: 'Desa Rindang', province: 'Kalimantan Timur', population: 1500, area: 45.0, idmScore: 0.65, budgetAllocation: 2500000000, location: { lat: 0.5021, lng: 117.1534 }, description: 'Desa percontohan ekonomi hijau dan pelestarian hutan.' }
+        { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, idmScore: 0.82, budgetAllocation: 1200000000, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ], potentials: ['Pertanian Digital', 'Ekonomi Kreatif'] },
+        { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, idmScore: 0.78, budgetAllocation: 950000000, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.', potentials: ['Pariwisata Budaya', 'Kerajinan Tangan'] },
+        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, idmScore: 0.85, budgetAllocation: 1800000000, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.', potentials: ['Pangan Organik', 'Irigasi Modern'] },
+        { name: 'Desa Bahari', province: 'Sulawesi Utara', population: 2100, area: 5.6, idmScore: 0.72, budgetAllocation: 850000000, location: { lat: 1.4748, lng: 124.8484 }, description: 'Kawasan konservasi terumbu karang dan wisata bahari.', potentials: ['Wisata Bahari', 'Konservasi Laut'] },
+        { name: 'Desa Rindang', province: 'Kalimantan Timur', population: 1500, area: 45.0, idmScore: 0.65, budgetAllocation: 2500000000, location: { lat: 0.5021, lng: 117.1534 }, description: 'Desa percontohan ekonomi hijau dan pelestarian hutan.', potentials: ['Ekonomi Hijau', 'Pelestarian Hutan'] }
       ];
 
       for (const v of villageData) {
