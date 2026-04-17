@@ -105,7 +105,7 @@ export default function VisualizationsPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12">
-        <Card className="lg:col-span-4 border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white p-8 h-fit sticky top-6 text-left">
+        <Card className="lg:col-span-4 border-none shadow-2xl rounded-3xl bg-slate-900 text-white p-8 h-fit sticky top-6 text-left">
           <CardHeader className="px-0 pt-0">
             <CardTitle className="text-xl flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export default function VisualizationsPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Judul Grafik</Label>
-              <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="bg-white/5 border-white/10 text-white h-12" required />
+              <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="bg-white/5 border-white/10 text-white h-12 focus:ring-primary/20" required />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -152,7 +152,7 @@ export default function VisualizationsPage() {
           </form>
         </Card>
 
-        <Card className="lg:col-span-8 shadow-xl border-none rounded-[2.5rem] bg-white overflow-hidden text-left">
+        <Card className="lg:col-span-8 shadow-xl border-none rounded-3xl bg-white overflow-hidden text-left">
           <CardHeader className="p-8 border-b">
             <CardTitle className="text-lg flex items-center gap-3"><LayoutGrid className="h-5 w-5 text-primary" /> Katalog Visualisasi</CardTitle>
           </CardHeader>

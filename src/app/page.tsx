@@ -211,22 +211,31 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="flex-1 relative max-w-[120px] sm:max-w-md mx-1 sm:mx-2 pointer-events-auto text-left">
-                <div className={`flex items-center bg-white/10 border border-white/5 rounded-full px-3 h-8 sm:h-9 transition-all ${isSearchFocused ? 'bg-white/20 border-primary/40 ring-2 ring-primary/20' : ''}`}>
-                  <Search className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${isSearchFocused ? 'text-primary' : 'text-slate-400'}`} />
-                  <input 
-                    type="text" 
-                    placeholder="Cari desa..." 
-                    className="bg-transparent text-[9px] sm:text-[11px] font-bold text-white outline-none placeholder:text-slate-500 w-full ml-1.5 sm:ml-3"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setIsSearchFocused(true)}
-                    onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-                  />
+              <div className="flex-1 flex justify-center mx-2 pointer-events-auto relative">
+                <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-full max-w-md px-3 h-9 bg-white/20' : 'w-8 h-8 sm:w-9 sm:h-9 justify-center cursor-pointer hover:bg-white/15'}`}>
+                  <button 
+                    onClick={() => setIsSearchFocused(!isSearchFocused)}
+                    className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
+                  >
+                    <Search className="h-3.5 w-3.5" />
+                  </button>
+                  {isSearchFocused && (
+                    <input 
+                      autoFocus
+                      type="text" 
+                      placeholder="Cari desa..." 
+                      className="bg-transparent text-[10px] sm:text-[11px] font-bold text-white outline-none placeholder:text-slate-500 w-full"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onBlur={() => {
+                        if (!searchQuery) setTimeout(() => setIsSearchFocused(false), 200);
+                      }}
+                    />
+                  )}
                 </div>
 
                 {isSearchFocused && searchQuery.trim() && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-full max-w-md bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                     <ScrollArea className="max-h-[350px]">
                       {searchResults.villages.length === 0 && searchResults.features.length === 0 ? (
                         <div className="p-8 text-center">
@@ -238,7 +247,7 @@ export default function HomePage() {
                             <div>
                               <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah Desa</p>
                               {searchResults.villages.map(v => (
-                                <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between text-left">
                                   <div>
                                     <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
                                     <p className="text-[9px] text-slate-500">{v.province}</p>
@@ -252,7 +261,7 @@ export default function HomePage() {
                             <div>
                               <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset Peta</p>
                               {searchResults.features.map(f => (
-                                <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between text-left">
                                   <div>
                                     <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
                                     <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
@@ -290,7 +299,7 @@ export default function HomePage() {
         </header>
 
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group">
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-3xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl">
+          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-2xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-2xl">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
@@ -323,10 +332,10 @@ export default function HomePage() {
                 <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : itemDetail ? (
                 <div className="flex flex-col h-full animate-in fade-in duration-500">
-                  <div className="relative h-56 bg-slate-900 shrink-0 overflow-hidden">
+                  <div className="relative h-56 bg-slate-900 shrink-0 overflow-hidden text-left">
                     <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
-                    <div className="absolute bottom-6 left-8 right-8 z-10 text-left">
+                    <div className="absolute bottom-6 left-8 right-8 z-10">
                       <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none text-white">
                         {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
                       </Badge>
@@ -339,11 +348,11 @@ export default function HomePage() {
                     {selectedItem?.type === 'village' && (
                       <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Populasi</p>
                             <p className="text-2xl font-bold text-slate-900 leading-none">{itemDetail.population?.toLocaleString()} <span className="text-[10px] text-slate-400 font-bold ml-1">JIWA</span></p>
                           </div>
-                          <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Skor IDM</p>
                             <p className="text-2xl font-bold text-slate-900 leading-none">{(itemDetail.idmScore || 0).toFixed(2)}</p>
                           </div>
@@ -353,7 +362,7 @@ export default function HomePage() {
                           Analisis Strategis AI
                         </Button>
                         {aiAnalysisResult && (
-                          <div className="p-8 bg-primary/5 rounded-[2.5rem] border border-primary/10 animate-in zoom-in-95 duration-300">
+                          <div className="p-8 bg-primary/5 rounded-3xl border border-primary/10 animate-in zoom-in-95 duration-300">
                             <div className="flex items-center gap-2 mb-4">
                               <Sparkles className="h-4 w-4 text-primary" />
                               <p className="text-[10px] font-black text-primary uppercase tracking-widest">Saran AI</p>
@@ -395,7 +404,7 @@ function ToolbarButton({ children, tooltip, onClick, className }: { children: Re
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick} className={`h-8 w-8 sm:h-9 sm:w-9 hover:bg-white/10 transition-all rounded-2xl shrink-0 ${className}`}>
+        <Button variant="ghost" size="icon" onClick={onClick} className={`h-8 w-8 sm:h-9 sm:w-9 hover:bg-white/10 transition-all rounded-xl shrink-0 ${className}`}>
           {children}
         </Button>
       </TooltipTrigger>
