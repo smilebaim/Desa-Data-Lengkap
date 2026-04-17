@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText, Loader2, BarChart3, Users, Map as MapIcon, TrendingUp, ChevronRight, Zap } from 'lucide-react';
+import { ArrowLeft, FileText, Loader2, BarChart3, Users, Map as MapIcon, TrendingUp, ChevronRight, Zap, Coins } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, Fragment } from 'react';
 import { 
@@ -118,15 +118,17 @@ export default function PublicDynamicPage() {
       name: v.name,
       population: v.population || 0,
       area: v.area || 0,
+      idmScore: v.idmScore || 0,
+      budgetAllocation: v.budgetAllocation || 0,
       density: v.area > 0 ? parseFloat(((v.population || 0) / v.area).toFixed(2)) : 0
     }));
   }, [villages]);
 
   const summary = useMemo(() => {
     const totalPop = statsData.reduce((acc, curr) => acc + curr.population, 0);
-    const totalArea = statsData.reduce((acc, curr) => acc + curr.area, 0);
-    const density = totalArea > 0 ? (totalPop / totalArea).toFixed(0) : 0;
-    return { totalPop, totalArea, density };
+    const totalBudget = statsData.reduce((acc, curr) => acc + curr.budgetAllocation, 0);
+    const avgIdm = statsData.length > 0 ? (statsData.reduce((acc, curr) => acc + curr.idmScore, 0) / statsData.length).toFixed(2) : 0;
+    return { totalPop, totalBudget, avgIdm };
   }, [statsData]);
 
   // Fungsi untuk merender konten dengan kode sematan [CHART:ID]
@@ -201,8 +203,8 @@ export default function PublicDynamicPage() {
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 { label: 'Populasi Total', value: summary.totalPop.toLocaleString(), unit: 'Jiwa', icon: Users, color: 'primary' },
-                { label: 'Luas Wilayah', value: summary.totalArea.toFixed(2), unit: 'km²', icon: MapIcon, color: 'blue' },
-                { label: 'Kepadatan', value: summary.density, unit: 'Jiwa/km²', icon: TrendingUp, color: 'amber' }
+                { label: 'Total Anggaran', value: (summary.totalBudget / 1000000).toLocaleString(), unit: 'Juta', icon: Coins, color: 'blue' },
+                { label: 'Rerata Skor IDM', value: summary.avgIdm, unit: 'IDM', icon: TrendingUp, color: 'amber' }
               ].map((item, i) => (
                 <Card key={i} className="group bg-white border-none shadow-xl shadow-slate-200/50 rounded-[2rem] p-8">
                   <div className="flex flex-col gap-6">
@@ -211,7 +213,7 @@ export default function PublicDynamicPage() {
                     </div>
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
-                      <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{item.value}</h3>
+                      <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{item.value} <span className="text-xs opacity-40">{item.unit}</span></h3>
                     </div>
                   </div>
                 </Card>

@@ -21,11 +21,11 @@ export default function DashboardPage() {
       // 1. Data Desa Dasar untuk statistik
       const villagesRef = collection(db, 'villages');
       const villageData = [
-        { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ] },
-        { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.' },
-        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.' },
-        { name: 'Desa Bahari', province: 'Sulawesi Utara', population: 2100, area: 5.6, location: { lat: 1.4748, lng: 124.8484 }, description: 'Kawasan konservasi terumbu karang dan wisata bahari.' },
-        { name: 'Desa Rindang', province: 'Kalimantan Timur', population: 1500, area: 45.0, location: { lat: 0.5021, lng: 117.1534 }, description: 'Desa percontohan ekonomi hijau dan pelestarian hutan.' }
+        { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, idmScore: 0.82, budgetAllocation: 1200000000, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ] },
+        { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, idmScore: 0.78, budgetAllocation: 950000000, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.' },
+        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, idmScore: 0.85, budgetAllocation: 1800000000, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.' },
+        { name: 'Desa Bahari', province: 'Sulawesi Utara', population: 2100, area: 5.6, idmScore: 0.72, budgetAllocation: 850000000, location: { lat: 1.4748, lng: 124.8484 }, description: 'Kawasan konservasi terumbu karang dan wisata bahari.' },
+        { name: 'Desa Rindang', province: 'Kalimantan Timur', population: 1500, area: 45.0, idmScore: 0.65, budgetAllocation: 2500000000, location: { lat: 0.5021, lng: 117.1534 }, description: 'Desa percontohan ekonomi hijau dan pelestarian hutan.' }
       ];
 
       for (const v of villageData) {
@@ -35,8 +35,8 @@ export default function DashboardPage() {
       // 2. Buat Visualizers (Grafik) yang akan disematkan
       const vizRef = collection(db, 'visualizers');
       const vizPop = await addDoc(vizRef, { title: 'Perbandingan Populasi', metric: 'population', chartType: 'bar', createdAt: serverTimestamp() });
-      const vizArea = await addDoc(vizRef, { title: 'Distribusi Luas Wilayah', metric: 'area', chartType: 'pie', createdAt: serverTimestamp() });
-      const vizDens = await addDoc(vizRef, { title: 'Analisis Kepadatan', metric: 'density', chartType: 'area', createdAt: serverTimestamp() });
+      const vizBudget = await addDoc(vizRef, { title: 'Alokasi Anggaran Desa', metric: 'budgetAllocation', chartType: 'pie', createdAt: serverTimestamp() });
+      const vizIdm = await addDoc(vizRef, { title: 'Analisis Skor IDM', metric: 'idmScore', chartType: 'radar', createdAt: serverTimestamp() });
 
       // 3. Buat Halaman Dinamis (Menggunakan ID Grafik di atas)
       const pagesRef = collection(db, 'pages');
@@ -50,29 +50,15 @@ export default function DashboardPage() {
 
       const pIdm = await addDoc(pagesRef, { 
         title: 'Indeks Desa Membangun (IDM)', 
-        content: `IDM memotret perkembangan kemandirian desa berdasarkan dimensi sosial, ekonomi, dan ekologi.\n\n### Visualisasi Kepadatan Wilayah\nKepadatan penduduk menjadi salah satu indikator utama dalam penentuan klasifikasi desa.\n[CHART:${vizDens.id}]\n\nTarget nasional adalah meningkatkan status 500 desa tertinggal menjadi desa mandiri pada tahun ini.`, 
+        content: `IDM memotret perkembangan kemandirian desa berdasarkan dimensi sosial, ekonomi, dan ekologi.\n\n### Visualisasi Skor IDM Wilayah\nIDM menjadi salah satu indikator utama dalam penentuan klasifikasi desa.\n[CHART:${vizIdm.id}]\n\nTarget nasional adalah meningkatkan status 500 desa tertinggal menjadi desa mandiri pada tahun ini.`, 
         showStats: true, 
         updatedAt: serverTimestamp() 
       });
 
-      const pPrice = await addDoc(pagesRef, { 
-        title: 'Harga Komoditas Desa', 
-        content: `Informasi harga pangan dan komoditas unggulan desa secara real-time.\n\n### Tren Harga Pasar\nFluktuasi harga komoditas utama dalam satu bulan terakhir.\n[CHART:${vizPop.id}]\n\nData ini diperbarui setiap pagi oleh tim ketahanan pangan desa.`, 
+      const pBudget = await addDoc(pagesRef, { 
+        title: 'Alokasi Dana Desa', 
+        content: `Informasi transparansi anggaran desa secara real-time.\n\n### Distribusi Anggaran\nProporsi alokasi dana untuk setiap wilayah binaan.\n[CHART:${vizBudget.id}]\n\nData ini diperbarui setiap pagi oleh tim ketahanan pangan desa.`, 
         showStats: false, 
-        updatedAt: serverTimestamp() 
-      });
-
-      const pJoin = await addDoc(pagesRef, { 
-        title: 'Bergabung dalam Jaringan', 
-        content: `Jadilah bagian dari transformasi digital pedesaan Indonesia. Dapatkan akses ke alat analisis geospasial dan dashboard statistik secara gratis.\n\n### Keuntungan Bergabung:\n1. Integrasi Peta Digital Nasional\n2. Dashboard Statistik Real-time\n3. Laporan Profil Desa Otomatis`, 
-        showStats: false, 
-        updatedAt: serverTimestamp() 
-      });
-
-      const pData = await addDoc(pagesRef, { 
-        title: 'Katalog Data Desa', 
-        content: `Akses publik terhadap ringkasan profil desa yang telah terverifikasi.\n\n[CHART:${vizArea.id}]\n\nVisualisasi di atas menunjukkan proporsi luas wilayah administratif desa-desa anggota.`, 
-        showStats: true, 
         updatedAt: serverTimestamp() 
       });
 
@@ -81,10 +67,8 @@ export default function DashboardPage() {
       const menuItems = [
         { label: 'Statistik', icon: 'BarChart', href: `/p/${pStat.id}`, order: 1, position: 'bottom' },
         { label: 'IDM', icon: 'TrendingUp', href: `/p/${pIdm.id}`, order: 2, position: 'bottom' },
-        { label: 'Data Desa', icon: 'Landmark', href: `/p/${pData.id}`, order: 3, position: 'bottom' },
-        { label: 'Harga', icon: 'ShoppingCart', href: `/p/${pPrice.id}`, order: 4, position: 'bottom' },
-        { label: 'Bergabung', icon: 'Users', href: `/p/${pJoin.id}`, order: 5, position: 'bottom' },
-        { label: 'Informasi', icon: 'Info', href: '#', order: 6, position: 'header' }
+        { label: 'Anggaran', icon: 'Coins', href: `/p/${pBudget.id}`, order: 3, position: 'bottom' },
+        { label: 'Informasi', icon: 'Info', href: '#', order: 4, position: 'header' }
       ];
 
       for (const m of menuItems) {

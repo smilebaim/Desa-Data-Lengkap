@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, ExternalLink, Sparkles,
-  Database, Edit2, X, PieChart, Save, LayoutGrid, Trash2
+  Database, Edit2, X, PieChart, Save, LayoutGrid, Trash2, Coins
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,12 +49,14 @@ export default function VisualizationsPage() {
       name: v.name,
       population: v.population || 0,
       area: v.area || 0,
+      idmScore: v.idmScore || 0,
+      budgetAllocation: v.budgetAllocation || 0,
       density: v.area > 0 ? parseFloat(((v.population || 0) / v.area).toFixed(2)) : 0
     }));
   }, [villages]);
 
   const totalPopulasi = useMemo(() => statsData.reduce((acc, curr) => acc + curr.population, 0), [statsData]);
-  const totalLuas = useMemo(() => statsData.reduce((acc, curr) => acc + curr.area, 0), [statsData]);
+  const totalAnggaran = useMemo(() => statsData.reduce((acc, curr) => acc + curr.budgetAllocation, 0), [statsData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,10 +151,10 @@ export default function VisualizationsPage() {
         <Card className="rounded-[2rem] border-none shadow-xl bg-blue-50/50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-white rounded-2xl text-blue-600 shadow-sm border border-blue-100"><MapIcon className="h-6 w-6" /></div>
+              <div className="p-3 bg-white rounded-2xl text-blue-600 shadow-sm border border-blue-100"><Coins className="h-6 w-6" /></div>
               <div>
-                <p className="text-[10px] font-black text-blue-800/40 uppercase tracking-widest">Luas Wilayah</p>
-                <h3 className="text-2xl font-black text-blue-900">{totalLuas.toFixed(2)} <span className="text-sm font-medium opacity-40">km²</span></h3>
+                <p className="text-[10px] font-black text-blue-800/40 uppercase tracking-widest">Total Anggaran Desa</p>
+                <h3 className="text-2xl font-black text-blue-900">Rp{(totalAnggaran / 1000000000).toFixed(1)} <span className="text-sm font-medium opacity-40">Miliar</span></h3>
               </div>
             </div>
           </CardContent>
@@ -162,8 +164,8 @@ export default function VisualizationsPage() {
             <div className="flex items-center gap-4">
               <div className="p-3 bg-white rounded-2xl text-amber-600 shadow-sm border border-amber-100"><TrendingUp className="h-6 w-6" /></div>
               <div>
-                <p className="text-[10px] font-black text-amber-800/40 uppercase tracking-widest">Kepadatan Rata-rata</p>
-                <h3 className="text-2xl font-black text-amber-900">{(totalLuas > 0 ? (totalPopulasi / totalLuas) : 0).toFixed(0)} <span className="text-sm font-medium opacity-40">/km²</span></h3>
+                <p className="text-[10px] font-black text-amber-800/40 uppercase tracking-widest">Rerata Skor IDM</p>
+                <h3 className="text-2xl font-black text-amber-900">{(statsData.length > 0 ? statsData.reduce((a,b) => a + b.idmScore, 0) / statsData.length : 0).toFixed(2)}</h3>
               </div>
             </div>
           </CardContent>
@@ -208,6 +210,8 @@ export default function VisualizationsPage() {
                     <SelectItem value="population">Populasi (Jiwa)</SelectItem>
                     <SelectItem value="area">Luas (km²)</SelectItem>
                     <SelectItem value="density">Kepadatan (/km²)</SelectItem>
+                    <SelectItem value="idmScore">Skor IDM</SelectItem>
+                    <SelectItem value="budgetAllocation">Anggaran Desa</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

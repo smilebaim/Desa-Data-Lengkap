@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { 
   Plus, Trash2, Edit2, Save, Sparkles, Landmark, 
   Loader2, Users, MapPin, Search, Info, Globe, Tag,
-  BarChart3, Ruler, X, PlusCircle
+  BarChart3, Ruler, X, PlusCircle, Coins, TrendingUp
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { suggestVillageContent } from '@/ai';
@@ -39,6 +39,8 @@ export default function VillageManagementPage() {
     province: 'Jawa Barat',
     population: 0,
     area: 0,
+    idmScore: 0,
+    budgetAllocation: 0,
     description: '',
     tagline: '',
     potentials: [] as string[],
@@ -50,7 +52,9 @@ export default function VillageManagementPage() {
   const handleEdit = (village: any) => {
     setSelectedVillage({
       ...village,
-      potentials: village.potentials || []
+      potentials: village.potentials || [],
+      idmScore: village.idmScore || 0,
+      budgetAllocation: village.budgetAllocation || 0
     });
     setIsEditing(village.id);
   };
@@ -85,7 +89,7 @@ export default function VillageManagementPage() {
       .then(() => {
         toast({ title: "Berhasil", description: "Desa baru telah ditambahkan ke basis data." });
         setIsAdding(false);
-        setNewVillage({ name: '', province: 'Jawa Barat', population: 0, area: 0, description: '', tagline: '', potentials: [], location: { lat: -6.9175, lng: 107.6191 } });
+        setNewVillage({ name: '', province: 'Jawa Barat', population: 0, area: 0, idmScore: 0, budgetAllocation: 0, description: '', tagline: '', potentials: [], location: { lat: -6.9175, lng: 107.6191 } });
       })
       .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collRef.path, operation: 'create', requestResourceData: newVillage })))
       .finally(() => setIsSubmitting(false));
@@ -155,7 +159,7 @@ export default function VillageManagementPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Manajemen Wilayah & Potensi</h1>
-          <p className="text-muted-foreground">Kelola data populasi, potensi wilayah, dan profil naratif desa.</p>
+          <p className="text-muted-foreground">Kelola data populasi, potensi wilayah, IDM, dan alokasi anggaran desa.</p>
         </div>
         
         <Dialog open={isAdding} onOpenChange={setIsAdding}>
@@ -177,6 +181,10 @@ export default function VillageManagementPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2"><Label>Populasi (Jiwa)</Label><Input type="number" value={newVillage.population} onChange={e => setNewVillage({...newVillage, population: parseInt(e.target.value)})} /></div>
                 <div className="space-y-2"><Label>Luas Wilayah (km²)</Label><Input type="number" value={newVillage.area} onChange={e => setNewVillage({...newVillage, area: parseFloat(e.target.value)})} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Skor IDM</Label><Input type="number" step="0.01" value={newVillage.idmScore} onChange={e => setNewVillage({...newVillage, idmScore: parseFloat(e.target.value)})} placeholder="Misal: 0.85" /></div>
+                <div className="space-y-2"><Label>Anggaran (Rp)</Label><Input type="number" value={newVillage.budgetAllocation} onChange={e => setNewVillage({...newVillage, budgetAllocation: parseInt(e.target.value)})} placeholder="Misal: 1500000000" /></div>
               </div>
               
               <div className="space-y-2">
@@ -231,8 +239,8 @@ export default function VillageManagementPage() {
               <TableRow>
                 <TableHead className="pl-6">Entitas Desa</TableHead>
                 <TableHead>Populasi</TableHead>
-                <TableHead>Luas</TableHead>
-                <TableHead>Potensi</TableHead>
+                <TableHead>IDM</TableHead>
+                <TableHead>Anggaran</TableHead>
                 <TableHead className="text-right pr-6">Aksi</TableHead>
               </TableRow>
             </TableHeader>
@@ -249,16 +257,9 @@ export default function VillageManagementPage() {
                       <p className="text-[10px] text-slate-400 uppercase font-black">{v.province}</p>
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><Users className="h-3 w-3 text-primary/40" /> {v.population?.toLocaleString() || 0} Jiwa</div></TableCell>
-                  <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><Ruler className="h-3 w-3 text-primary/40" /> {v.area || 0} km²</div></TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {v.potentials?.slice(0, 2).map((p: string, i: number) => (
-                        <span key={i} className="text-[8px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 uppercase font-bold">{p}</span>
-                      ))}
-                      {v.potentials?.length > 2 && <span className="text-[8px] text-slate-400">+{v.potentials.length - 2}</span>}
-                    </div>
-                  </TableCell>
+                  <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><Users className="h-3 w-3 text-primary/40" /> {v.population?.toLocaleString() || 0}</div></TableCell>
+                  <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><TrendingUp className="h-3 w-3 text-green-500/40" /> {v.idmScore || 0}</div></TableCell>
+                  <TableCell className="text-xs font-medium"><div className="flex items-center gap-2"><Coins className="h-3 w-3 text-amber-500/40" /> Rp{(v.budgetAllocation || 0).toLocaleString()}</div></TableCell>
                   <TableCell className="text-right pr-6 space-x-1">
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-primary" onClick={() => handleEdit(v)}><Edit2 className="h-4 w-4" /></Button>
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" onClick={() => handleDelete(v.id)}><Trash2 className="h-4 w-4" /></Button>
@@ -293,6 +294,17 @@ export default function VillageManagementPage() {
               <div className="space-y-2">
                 <Label>Luas Wilayah (km²)</Label>
                 <Input type="number" value={selectedVillage?.area || 0} onChange={e => setSelectedVillage({...selectedVillage, area: parseFloat(e.target.value)})} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Skor IDM</Label>
+                <Input type="number" step="0.01" value={selectedVillage?.idmScore || 0} onChange={e => setSelectedVillage({...selectedVillage, idmScore: parseFloat(e.target.value)})} />
+              </div>
+              <div className="space-y-2">
+                <Label>Alokasi Anggaran (Rp)</Label>
+                <Input type="number" value={selectedVillage?.budgetAllocation || 0} onChange={e => setSelectedVillage({...selectedVillage, budgetAllocation: parseInt(e.target.value)})} />
               </div>
             </div>
 

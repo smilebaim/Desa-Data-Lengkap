@@ -110,6 +110,8 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
       name: v.name,
       population: v.population || 0,
       area: v.area || 0,
+      idmScore: v.idmScore || 0,
+      budgetAllocation: v.budgetAllocation || 0,
       density: v.area > 0 ? parseFloat(((v.population || 0) / v.area).toFixed(2)) : 0
     }));
   }, [villages]);
@@ -166,8 +168,8 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                   <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.population, 0).toLocaleString()} Jiwa</p>
                 </div>
                 <div className="bg-slate-50 p-2 rounded-lg border">
-                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Luas</p>
-                  <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.area, 0).toFixed(1)} km²</p>
+                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Anggaran</p>
+                  <p className="text-[10px] font-bold text-slate-700">Rp{(statsData.reduce((a,b) => a + b.budgetAllocation, 0) / 1000000).toFixed(1)}jt</p>
                 </div>
              </div>
            </div>

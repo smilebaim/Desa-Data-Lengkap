@@ -34,6 +34,8 @@
         "province": { "type": "string" },
         "population": { "type": "number" },
         "area": { "type": "number" },
+        "idmScore": { "type": "number", "description": "Indeks Desa Membangun" },
+        "budgetAllocation": { "type": "number", "description": "Anggaran Desa (Rp)" },
         "location": {
           "type": "object",
           "properties": {
@@ -91,7 +93,7 @@
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "metric": { "type": "string", "enum": ["population", "area", "density"] },
+        "metric": { "type": "string", "enum": ["population", "area", "density", "idmScore", "budgetAllocation"] },
         "chartType": { "type": "string", "enum": ["bar", "pie", "line", "area", "radar", "composed", "scatter"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
