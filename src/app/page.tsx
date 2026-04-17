@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { 
@@ -270,7 +270,7 @@ export default function HomePage() {
               </div>
 
               <div className="flex items-center gap-1 pr-1 pointer-events-auto">
-                {headerMenus.map((menu: any) => (
+                {headerMenus?.map((menu: any) => (
                   <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-7 sm:h-8 rounded-full px-2 sm:px-4 text-[9px] sm:text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
                     <DynamicIcon name={menu.icon} className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
                     <span className="hidden md:inline">{menu.label}</span>
@@ -300,16 +300,16 @@ export default function HomePage() {
             <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-4 w-4" /></ToolbarButton>
           </div>
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
-            <ToolbarButton tooltip="Reset Pandangan" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Reset Peta" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-4 w-4" /></ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Perbesar Peta" className="text-white"><Plus className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Perkecil Peta" className="text-white"><Minus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perbesar" className="text-white"><Plus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perkecil" className="text-white"><Minus className="h-4 w-4" /></ToolbarButton>
           </div>
         </aside>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3">
           <nav className="flex items-center gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[90vw]">
-            {bottomMenus.map((menu: any) => (
+            {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-4 w-4" />
               </NavButton>
@@ -357,7 +357,7 @@ export default function HomePage() {
                           <div className="p-8 bg-primary/5 rounded-[2.5rem] border border-primary/10 animate-in zoom-in-95 duration-300">
                             <div className="flex items-center gap-2 mb-4">
                               <Sparkles className="h-4 w-4 text-primary" />
-                              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Rekomendasi Strategis</p>
+                              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Saran AI</p>
                             </div>
                             <p className="text-sm text-slate-700 leading-relaxed font-medium">{aiAnalysisResult.analysis}</p>
                           </div>
@@ -380,7 +380,7 @@ export default function HomePage() {
                       </div>
                     )}
                     <Separator className="bg-slate-100" />
-                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200 text-slate-500 font-bold hover:bg-slate-50 transition-colors" onClick={() => setPanelOpen(false)}>Tutup Panel</Button>
+                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200 text-slate-500 font-bold hover:bg-slate-50 transition-colors" onClick={() => setPanelOpen(false)}>Tutup Detail</Button>
                   </div>
                 </div>
               ) : null}

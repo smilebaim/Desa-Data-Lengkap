@@ -90,12 +90,12 @@ export default function VisualizationsPage() {
     <div className="space-y-10 pb-20 text-left">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pusat Statistik & Visualisasi</h1>
-          <p className="text-slate-500">Kelola pustaka grafik untuk narasi profil desa atau laporan strategis.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pusat Statistik</h1>
+          <p className="text-slate-500">Buat infografis untuk narasi pembangunan desa.</p>
         </div>
         <Link href="/visualizations" target="_blank">
            <Button variant="outline" className="rounded-xl h-11 gap-2 shadow-sm">
-             <ExternalLink className="h-4 w-4" /> Dashboard Publik
+             <ExternalLink className="h-4 w-4" /> Buka Statistik Publik
            </Button>
         </Link>
       </div>
@@ -110,7 +110,6 @@ export default function VisualizationsPage() {
               </div>
               {editingId && <Button variant="ghost" size="icon" onClick={resetForm} className="text-white hover:bg-white/10"><X className="h-4 w-4" /></Button>}
             </CardTitle>
-            <CardDescription className="text-slate-400">Atur metrik dan gaya visual grafik.</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -126,7 +125,6 @@ export default function VisualizationsPage() {
                     <SelectItem value="population">Populasi</SelectItem>
                     <SelectItem value="idmScore">Skor IDM</SelectItem>
                     <SelectItem value="budgetAllocation">Anggaran</SelectItem>
-                    <SelectItem value="area">Luas Wilayah</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -138,16 +136,13 @@ export default function VisualizationsPage() {
                     <SelectItem value="bar">Bar Chart</SelectItem>
                     <SelectItem value="pie">Pie Chart</SelectItem>
                     <SelectItem value="radar">Radar Chart</SelectItem>
-                    <SelectItem value="line">Line Chart</SelectItem>
-                    <SelectItem value="area">Area Chart</SelectItem>
-                    <SelectItem value="composed">Composed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <Button type="submit" className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold shadow-lg" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (editingId ? <Save className="h-5 w-5 mr-2" /> : <Plus className="h-5 w-5 mr-2" />)}
-              {editingId ? 'Simpan Perubahan' : 'Tambahkan ke Pustaka'}
+              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5 mr-2" />}
+              {editingId ? 'Simpan Perubahan' : 'Tambahkan Grafik'}
             </Button>
           </form>
         </Card>
@@ -168,11 +163,8 @@ export default function VisualizationsPage() {
                         {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChartIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                          {viz.title}
-                          <span className="text-[9px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-500 border border-slate-200">{viz.metric}</span>
-                        </h4>
-                        <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Tipe: {viz.chartType}</p>
+                        <h4 className="font-bold text-slate-900">{viz.title}</h4>
+                        <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase">{viz.metric} • {viz.chartType}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -181,7 +173,7 @@ export default function VisualizationsPage() {
                         {copiedId === viz.id ? 'TERSALIN' : 'SALIN KODE'}
                       </Button>
                       <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl" onClick={() => handleEdit(viz)}><Edit2 className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl" onClick={() => { if(confirm('Hapus grafik ini secara permanen?')) deleteDoc(doc(db, 'visualizers', viz.id)) }}><Trash2 className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl" onClick={() => { if(confirm('Hapus?')) deleteDoc(doc(db, 'visualizers', viz.id)) }}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}

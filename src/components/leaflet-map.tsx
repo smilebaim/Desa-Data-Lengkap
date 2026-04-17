@@ -80,9 +80,16 @@ const LeafletMap = ({
   };
 
   return (
-    <MapContainer className="h-full w-full z-10" center={[-2.5489, 118.0149]} zoom={5} minZoom={5} maxBounds={indonesiaBounds} zoomControl={false}>
+    <MapContainer 
+      className="h-full w-full z-10" 
+      center={[-2.5489, 118.0149]} 
+      zoom={5} 
+      minZoom={5} 
+      maxBounds={indonesiaBounds} 
+      zoomControl={false}
+    >
       <TileLayer 
-        attribution='&copy; Google Maps'
+        attribution='&copy; Google Satelite'
         url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
         subdomains={['mt0','mt1','mt2','mt3']} 
       />
