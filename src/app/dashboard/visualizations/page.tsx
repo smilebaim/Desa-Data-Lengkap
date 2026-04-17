@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
@@ -96,7 +97,7 @@ export default function VisualizationsPage() {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
-    toast({ title: "Disalin!", description: "Kode sematan siap digunakan." });
+    toast({ title: "Disalin!", description: "Kode sematan siap digunakan di halaman profil." });
   };
 
   return (
@@ -163,30 +164,33 @@ export default function VisualizationsPage() {
           </CardHeader>
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-slate-400">JUDUL GRAFIK</Label>
+              <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Judul Grafik</Label>
               <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="bg-white/5 border-white/10 text-white h-12" required />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-slate-400">METRIK</Label>
+                <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Metrik</Label>
                 <Select value={formData.metric} onValueChange={v => setFormData({...formData, metric: v})}>
                   <SelectTrigger className="bg-white/5 border-white/10 h-12 text-white"><SelectValue /></SelectTrigger>
                   <SelectContent className="bg-slate-900 text-white border-white/10">
                     <SelectItem value="population">Populasi</SelectItem>
                     <SelectItem value="idmScore">Skor IDM</SelectItem>
                     <SelectItem value="budgetAllocation">Anggaran</SelectItem>
+                    <SelectItem value="area">Luas Wilayah</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-slate-400">GAYA</Label>
+                <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Gaya Visual</Label>
                 <Select value={formData.chartType} onValueChange={v => setFormData({...formData, chartType: v})}>
                   <SelectTrigger className="bg-white/5 border-white/10 h-12 text-white"><SelectValue /></SelectTrigger>
                   <SelectContent className="bg-slate-900 text-white border-white/10">
-                    <SelectItem value="bar">Bar</SelectItem>
-                    <SelectItem value="pie">Pie</SelectItem>
-                    <SelectItem value="radar">Radar</SelectItem>
-                    <SelectItem value="line">Line</SelectItem>
+                    <SelectItem value="bar">Bar Chart</SelectItem>
+                    <SelectItem value="pie">Pie Chart</SelectItem>
+                    <SelectItem value="radar">Radar Chart</SelectItem>
+                    <SelectItem value="line">Line Chart</SelectItem>
+                    <SelectItem value="area">Area Chart</SelectItem>
+                    <SelectItem value="composed">Composed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -195,6 +199,9 @@ export default function VisualizationsPage() {
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (editingId ? <Save className="h-5 w-5 mr-2" /> : <Sparkles className="h-5 w-5 mr-2" />)}
               {editingId ? 'Simpan Perubahan' : 'Tambahkan ke Pustaka'}
             </Button>
+            {editingId && (
+              <Button type="button" variant="ghost" onClick={resetForm} className="w-full text-white/40 hover:text-white">Batalkan Pengeditan</Button>
+            )}
           </form>
         </Card>
 
@@ -218,7 +225,7 @@ export default function VisualizationsPage() {
                           {viz.title}
                           <span className="text-[9px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-500 border border-slate-200">{viz.metric}</span>
                         </h4>
-                        <p className="text-[10px] text-slate-400 font-medium">Tipe: {viz.chartType}</p>
+                        <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Tipe: {viz.chartType}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -227,7 +234,7 @@ export default function VisualizationsPage() {
                         {copiedId === viz.id ? 'TERSALIN' : 'SALIN KODE'}
                       </Button>
                       <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl" onClick={() => handleEdit(viz)}><Edit2 className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl" onClick={() => { if(confirm('Hapus grafik ini?')) deleteDoc(doc(db, 'visualizers', viz.id)) }}><Trash2 className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl" onClick={() => { if(confirm('Hapus grafik ini secara permanen?')) deleteDoc(doc(db, 'visualizers', viz.id)) }}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
@@ -79,7 +80,7 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
   return (
     <MapContainer className="h-full w-full z-10" center={[-2.5489, 118.0149]} zoom={5} minZoom={5} maxBounds={indonesiaBounds} zoomControl={false}>
       <TileLayer 
-        attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+        attribution='&copy; Google Maps'
         url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
         subdomains={['mt0','mt1','mt2','mt3']} 
       />
@@ -108,7 +109,13 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
         )}
         {Object.entries(categories).map(([key, group]) => (
           <LayersControl.Overlay checked key={key} name={key.replace('_', ' ').toUpperCase()}>
-            <FeatureGroup>{group.map(f => renderFeature(f))}</FeatureGroup>
+            <FeatureGroup>
+              {group.map(f => (
+                <Fragment key={f.id}>
+                  {renderFeature(f)}
+                </Fragment>
+              ))}
+            </FeatureGroup>
           </LayersControl.Overlay>
         ))}
       </LayersControl>
