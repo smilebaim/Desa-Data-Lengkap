@@ -57,13 +57,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
           <Shield className="h-5 w-5 text-primary-foreground" />
         </div>
-        <div>
+        <div className="text-left">
           <h2 className="font-bold text-sm tracking-tight text-white">Sistem Informasi Desa</h2>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Admin Panel</p>
         </div>
       </div>
       
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto mt-4">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto mt-4 text-left">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       <div className="p-4 border-t border-slate-800 bg-slate-950/30 space-y-3">
-        <div className="flex items-center gap-3 px-3 py-2 bg-slate-800/50 rounded-lg mb-4">
+        <div className="flex items-center gap-3 px-3 py-2 bg-slate-800/50 rounded-lg mb-4 text-left">
           <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-primary capitalize">
             {profile?.name?.[0] || user.email?.[0] || 'A'}
           </div>
@@ -120,7 +120,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="md:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <Shield className="h-6 w-6 text-primary" />
-            <span className="font-bold text-white text-sm">SID Admin</span>
+            <span className="font-bold text-white text-sm uppercase tracking-widest">SID Admin</span>
           </div>
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>

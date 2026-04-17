@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, ExternalLink, Sparkles, Save, Plus,
-  Database, Edit2, X, LayoutGrid, Trash2, Coins
+  Database, Edit2, X, LayoutGrid, Trash2, Coins, PieChart as PieChartIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,6 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { PieChart as PieChartIcon } from 'lucide-react';
 
 export default function VisualizationsPage() {
   const db = useFirestore();
@@ -137,6 +136,7 @@ export default function VisualizationsPage() {
                     <SelectItem value="bar">Bar Chart</SelectItem>
                     <SelectItem value="pie">Pie Chart</SelectItem>
                     <SelectItem value="radar">Radar Chart</SelectItem>
+                    <SelectItem value="line">Line Chart</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -163,7 +163,7 @@ export default function VisualizationsPage() {
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
                         {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChartIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
-                      <div>
+                      <div className="text-left">
                         <h4 className="font-bold text-slate-900">{viz.title}</h4>
                         <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase">{viz.metric} • {viz.chartType}</p>
                       </div>

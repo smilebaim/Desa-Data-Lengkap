@@ -51,7 +51,7 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
   const type = config.chartType || 'bar';
 
   return (
-    <div className="h-56 w-full my-6 bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-inner overflow-hidden">
+    <div className="h-56 w-full my-6 bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-inner overflow-hidden text-left">
       <p className="text-[9px] font-black uppercase text-slate-400 mb-4 tracking-widest">{config.title}</p>
       <ResponsiveContainer width="100%" height="100%">
         {type === 'bar' ? (
@@ -230,7 +230,7 @@ export default function HomePage() {
                     <ScrollArea className="max-h-[350px]">
                       {searchResults.villages.length === 0 && searchResults.features.length === 0 ? (
                         <div className="p-8 text-center">
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tidak ada hasil</p>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tidak ada hasil</p>
                         </div>
                       ) : (
                         <div className="p-2 space-y-4">
@@ -289,8 +289,9 @@ export default function HomePage() {
           </div>
         </header>
 
-        <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5 text-left transition-all duration-300">
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
+        {/* Toolbar Kiri dengan Efek Peek-a-boo di Mobile */}
+        <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5 transition-all duration-500 group">
+          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-3xl shadow-2xl ring-1 ring-white/10 transform transition-transform duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </ToolbarButton>
@@ -299,7 +300,7 @@ export default function HomePage() {
             <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-4 w-4" /></ToolbarButton>
             <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-4 w-4" /></ToolbarButton>
           </div>
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
+          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-3xl shadow-2xl ring-1 ring-white/10 transform transition-transform duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl">
             <ToolbarButton tooltip="Reset Peta" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-4 w-4" /></ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
             <ToolbarButton tooltip="Perbesar" className="text-white"><Plus className="h-4 w-4" /></ToolbarButton>
@@ -307,8 +308,8 @@ export default function HomePage() {
           </div>
         </aside>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3">
-          <nav className="flex items-center gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[90vw]">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3 w-full px-4">
+          <nav className="flex items-center gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-4 w-4" />
@@ -396,7 +397,7 @@ function ToolbarButton({ children, tooltip, onClick, className }: { children: Re
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick} className={`h-10 w-10 hover:bg-white/10 transition-all rounded-2xl ${className}`}>
+        <Button variant="ghost" size="icon" onClick={onClick} className={`h-10 w-10 hover:bg-white/10 transition-all rounded-2xl shrink-0 ${className}`}>
           {children}
         </Button>
       </TooltipTrigger>
@@ -409,7 +410,7 @@ function NavButton({ children, label, onClick }: { children: React.ReactNode, la
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" onClick={onClick} className="flex items-center gap-3 h-10 px-6 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-all group border border-transparent hover:border-white/10">
+        <Button variant="ghost" onClick={onClick} className="flex items-center gap-3 h-10 px-6 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-all group border border-transparent hover:border-white/10 shrink-0">
           <div className="text-primary group-hover:scale-110 transition-transform">{children}</div>
           <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">{label}</span>
         </Button>
