@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, ExternalLink, Sparkles, Save, Plus,
-  Database, Edit2, X, PieChart as PieChartIcon, LayoutGrid, Trash2, Coins
+  Database, Edit2, X, LayoutGrid, Trash2, Coins
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { PieChart as PieChartIcon } from 'lucide-react';
 
 export default function VisualizationsPage() {
   const db = useFirestore();

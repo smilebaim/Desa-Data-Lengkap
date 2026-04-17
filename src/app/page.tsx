@@ -289,7 +289,7 @@ export default function HomePage() {
           </div>
         </header>
 
-        <aside className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5 text-left transition-all duration-300">
+        <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5 text-left transition-all duration-300">
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
