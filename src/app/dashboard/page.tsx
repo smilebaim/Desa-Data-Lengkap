@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, serverTimestamp, getDocs, query, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { LayoutDashboard, Map as MapIcon, Menu as MenuIcon, Sparkles, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -55,6 +55,13 @@ export default function DashboardPage() {
         updatedAt: serverTimestamp() 
       });
 
+      const pPrice = await addDoc(pagesRef, { 
+        title: 'Harga Komoditas Desa', 
+        content: `Informasi harga pangan dan komoditas unggulan desa secara real-time.\n\n### Tren Harga Pasar\nFluktuasi harga komoditas utama dalam satu bulan terakhir.\n[CHART:${vizPop.id}]\n\nData ini diperbarui setiap pagi oleh tim ketahanan pangan desa.`, 
+        showStats: false, 
+        updatedAt: serverTimestamp() 
+      });
+
       const pJoin = await addDoc(pagesRef, { 
         title: 'Bergabung dalam Jaringan', 
         content: `Jadilah bagian dari transformasi digital pedesaan Indonesia. Dapatkan akses ke alat analisis geospasial dan dashboard statistik secara gratis.\n\n### Keuntungan Bergabung:\n1. Integrasi Peta Digital Nasional\n2. Dashboard Statistik Real-time\n3. Laporan Profil Desa Otomatis`, 
@@ -75,8 +82,9 @@ export default function DashboardPage() {
         { label: 'Statistik', icon: 'BarChart', href: `/p/${pStat.id}`, order: 1, position: 'bottom' },
         { label: 'IDM', icon: 'TrendingUp', href: `/p/${pIdm.id}`, order: 2, position: 'bottom' },
         { label: 'Data Desa', icon: 'Landmark', href: `/p/${pData.id}`, order: 3, position: 'bottom' },
-        { label: 'Bergabung', icon: 'Users', href: `/p/${pJoin.id}`, order: 4, position: 'bottom' },
-        { label: 'Informasi', icon: 'Info', href: '#', order: 5, position: 'header' }
+        { label: 'Harga', icon: 'ShoppingCart', href: `/p/${pPrice.id}`, order: 4, position: 'bottom' },
+        { label: 'Bergabung', icon: 'Users', href: `/p/${pJoin.id}`, order: 5, position: 'bottom' },
+        { label: 'Informasi', icon: 'Info', href: '#', order: 6, position: 'header' }
       ];
 
       for (const m of menuItems) {

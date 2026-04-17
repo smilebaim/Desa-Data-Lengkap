@@ -37,7 +37,7 @@ export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Memoize kueri agar tidak terjadi infinite reload
+  // Memoize query to prevent infinite loop
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading } = useCollection(menuQuery);
 

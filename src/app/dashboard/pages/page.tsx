@@ -21,7 +21,7 @@ export default function PagesManagementPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Memoize kueri agar tidak terjadi render ulang tanpa henti
+  // Memoize query to prevent infinite loop
   const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('updatedAt', 'desc')), [db]);
   const { data: pages, isLoading } = useCollection(pagesQuery);
 

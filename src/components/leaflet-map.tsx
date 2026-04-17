@@ -22,9 +22,9 @@ const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#e
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-shadow.png',
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
   });
 }
 
@@ -77,17 +77,15 @@ interface LeafletMapProps {
 const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
   const db = useFirestore();
   
-  // Memoize data kueri untuk stabilitas peta
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features } = useCollection(featuresQuery);
 
   const visualizersQuery = useMemo(() => query(collection(db, 'visualizers')), [db]);
   const { data: visualizers } = useCollection(visualizersQuery);
 
-  // Batas Geografis Indonesia: [SouthWest, NorthEast]
   const indonesiaBounds: LatLngBoundsExpression = [
-    [-11.0, 94.0], // Sabang/Rote
-    [6.5, 141.5]   // Merauke/Natuna
+    [-11.0, 94.0],
+    [6.5, 141.5]
   ];
 
   const statsData = useMemo(() => {
