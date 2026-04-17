@@ -112,8 +112,8 @@ export default function VisualizationsPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12">
-        <Card className="lg:col-span-4 border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white p-8 h-fit sticky top-6">
-          <CardHeader className="px-0 pt-0 text-left">
+        <Card className="lg:col-span-4 border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white p-8 h-fit sticky top-6 text-left">
+          <CardHeader className="px-0 pt-0">
             <CardTitle className="text-xl flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {editingId ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
@@ -123,7 +123,7 @@ export default function VisualizationsPage() {
             </CardTitle>
             <CardDescription className="text-slate-400">Atur metrik dan gaya visual grafik.</CardDescription>
           </CardHeader>
-          <form onSubmit={handleSubmit} className="space-y-6 text-left">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Judul Grafik</Label>
               <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="bg-white/5 border-white/10 text-white h-12" required />
@@ -178,7 +178,7 @@ export default function VisualizationsPage() {
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
                         {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChartIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
-                      <div className="text-left">
+                      <div>
                         <h4 className="font-bold text-slate-900 flex items-center gap-2">
                           {viz.title}
                           <span className="text-[9px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-500 border border-slate-200">{viz.metric}</span>

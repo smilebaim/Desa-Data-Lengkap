@@ -211,7 +211,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="flex-1 relative max-w-md mx-2 pointer-events-auto">
+              <div className="flex-1 relative max-w-md mx-2 pointer-events-auto text-left">
                 <div className={`flex items-center bg-white/10 border border-white/5 rounded-full px-3 h-8 sm:h-9 transition-all ${isSearchFocused ? 'bg-white/20 border-primary/40 ring-2 ring-primary/20' : ''}`}>
                   <Search className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${isSearchFocused ? 'text-primary' : 'text-slate-400'}`} />
                   <input 
@@ -233,7 +233,7 @@ export default function HomePage() {
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tidak ada hasil</p>
                         </div>
                       ) : (
-                        <div className="p-2 space-y-4 text-left">
+                        <div className="p-2 space-y-4">
                           {searchResults.villages.length > 0 && (
                             <div>
                               <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah Desa</p>
@@ -242,6 +242,20 @@ export default function HomePage() {
                                   <div>
                                     <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
                                     <p className="text-[9px] text-slate-500">{v.province}</p>
+                                  </div>
+                                  <ChevronRight className="h-3 w-3 text-slate-700" />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          {searchResults.features.length > 0 && (
+                            <div>
+                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset Peta</p>
+                              {searchResults.features.map(f => (
+                                <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                  <div>
+                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
+                                    <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
                                   </div>
                                   <ChevronRight className="h-3 w-3 text-slate-700" />
                                 </button>
@@ -314,11 +328,12 @@ export default function HomePage() {
                     <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
                     <div className="absolute bottom-6 left-8 right-8 z-10 text-left">
-                      <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none">
-                        {selectedItem?.type === 'village' ? 'Profil Wilayah' : 'Informasi Publik'}
+                      <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none text-white">
+                        {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
                       </Badge>
                       <h2 className="text-3xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
                       {itemDetail.province && <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
+                      {itemDetail.category && <p className="text-primary/80 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
                     </div>
                   </div>
                   <div className="px-8 py-10 space-y-8 text-left">

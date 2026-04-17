@@ -23,62 +23,47 @@ export default function DashboardPage() {
       const villageData = [
         { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, idmScore: 0.82, budgetAllocation: 1200000000, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ], potentials: ['Pertanian Digital', 'Ekonomi Kreatif'] },
         { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, idmScore: 0.78, budgetAllocation: 950000000, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.', potentials: ['Pariwisata Budaya', 'Kerajinan Tangan'] },
-        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, idmScore: 0.85, budgetAllocation: 1800000000, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.', potentials: ['Pangan Organik', 'Irigasi Modern'] },
-        { name: 'Desa Bahari', province: 'Sulawesi Utara', population: 2100, area: 5.6, idmScore: 0.72, budgetAllocation: 850000000, location: { lat: 1.4748, lng: 124.8484 }, description: 'Kawasan konservasi terumbu karang dan wisata bahari.', potentials: ['Wisata Bahari', 'Konservasi Laut'] },
-        { name: 'Desa Rindang', province: 'Kalimantan Timur', population: 1500, area: 45.0, idmScore: 0.65, budgetAllocation: 2500000000, location: { lat: 0.5021, lng: 117.1534 }, description: 'Desa percontohan ekonomi hijau dan pelestarian hutan.', potentials: ['Ekonomi Hijau', 'Pelestarian Hutan'] }
+        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, idmScore: 0.85, budgetAllocation: 1800000000, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.', potentials: ['Pangan Organik', 'Irigasi Modern'] }
       ];
 
       for (const v of villageData) {
         await addDoc(villagesRef, v);
       }
 
-      // 2. Buat Visualizers (Grafik) yang akan disematkan
-      const vizRef = collection(db, 'visualizers');
-      const vizPop = await addDoc(vizRef, { title: 'Perbandingan Populasi', metric: 'population', chartType: 'bar', createdAt: serverTimestamp() });
-      const vizBudget = await addDoc(vizRef, { title: 'Alokasi Anggaran Desa', metric: 'budgetAllocation', chartType: 'pie', createdAt: serverTimestamp() });
-      const vizIdm = await addDoc(vizRef, { title: 'Analisis Skor IDM', metric: 'idmScore', chartType: 'radar', createdAt: serverTimestamp() });
-
-      // 3. Buat Halaman Dinamis (Menggunakan ID Grafik di atas)
-      const pagesRef = collection(db, 'pages');
-      
-      const pStat = await addDoc(pagesRef, { 
-        title: 'Statistik Nasional Desa', 
-        content: `Laporan agregat data desa seluruh Indonesia periode 2024.\n\n### Analisis Populasi Terpadu\nGrafik berikut menunjukkan sebaran penduduk pada desa-desa utama.\n[CHART:${vizPop.id}]\n\nData ini dihimpun melalui sistem sinkronisasi otomatis dari setiap perangkat desa.`, 
-        showStats: true, 
-        updatedAt: serverTimestamp() 
-      });
-
-      const pIdm = await addDoc(pagesRef, { 
-        title: 'Indeks Desa Membangun (IDM)', 
-        content: `IDM memotret perkembangan kemandirian desa berdasarkan dimensi sosial, ekonomi, dan ekologi.\n\n### Visualisasi Skor IDM Wilayah\nIDM menjadi salah satu indikator utama dalam penentuan klasifikasi desa.\n[CHART:${vizIdm.id}]\n\nTarget nasional adalah meningkatkan status 500 desa tertinggal menjadi desa mandiri pada tahun ini.`, 
-        showStats: true, 
-        updatedAt: serverTimestamp() 
-      });
-
-      const pBudget = await addDoc(pagesRef, { 
-        title: 'Alokasi Dana Desa', 
-        content: `Informasi transparansi anggaran desa secara real-time.\n\n### Distribusi Anggaran\nProporsi alokasi dana untuk setiap wilayah binaan.\n[CHART:${vizBudget.id}]\n\nData ini diperbarui setiap pagi oleh tim ketahanan pangan desa.`, 
-        showStats: false, 
-        updatedAt: serverTimestamp() 
-      });
-
-      // 4. Buat Menu Navigasi yang menautkan ke halaman di atas
-      const menusRef = collection(db, 'menus');
-      const menuItems = [
-        { label: 'Statistik', icon: 'BarChart', href: `/p/${pStat.id}`, order: 1, position: 'bottom' },
-        { label: 'IDM', icon: 'TrendingUp', href: `/p/${pIdm.id}`, order: 2, position: 'bottom' },
-        { label: 'Anggaran', icon: 'Coins', href: `/p/${pBudget.id}`, order: 3, position: 'bottom' },
-        { label: 'Informasi', icon: 'Info', href: '#', order: 4, position: 'header' }
+      // 2. Data Fitur Spasial (Aset Peta)
+      const featuresRef = collection(db, 'features');
+      const featureData = [
+        { name: 'Jembatan Ciujung', category: 'infrastructure', type: 'marker', icon: 'Construction', geometry: { lat: -6.918, lng: 107.620 }, description: 'Jembatan penghubung utama antar wilayah.', showStats: true },
+        { name: 'Kantor Desa Sukamaju', category: 'public_facility', type: 'marker', icon: 'Landmark', geometry: { lat: -6.917, lng: 107.619 }, description: 'Pusat administrasi desa terintegrasi.', showStats: false },
+        { name: 'Hutan Konservasi', category: 'natural_resource', type: 'polygon', icon: 'TreePine', geometry: [ {lat: -6.92, lng: 107.63}, {lat: -6.92, lng: 107.635}, {lat: -6.925, lng: 107.635}, {lat: -6.925, lng: 107.63} ], properties: { area: 2.5 }, description: 'Area lindung sumber daya air.', showStats: true }
       ];
 
-      for (const m of menuItems) {
-        await addDoc(menusRef, m);
+      for (const f of featureData) {
+        await addDoc(featuresRef, f);
       }
 
-      toast({ title: "Berhasil!", description: "Ekosistem data dummy strategis telah disinkronkan dengan sempurna.", variant: "default" });
+      // 3. Buat Visualizers (Grafik)
+      const vizRef = collection(db, 'visualizers');
+      const vizPop = await addDoc(vizRef, { title: 'Perbandingan Populasi', metric: 'population', chartType: 'bar', createdAt: serverTimestamp() });
+      const vizIdm = await addDoc(vizRef, { title: 'Analisis Skor IDM', metric: 'idmScore', chartType: 'radar', createdAt: serverTimestamp() });
+
+      // 4. Buat Halaman Dinamis
+      const pagesRef = collection(db, 'pages');
+      const pStat = await addDoc(pagesRef, { 
+        title: 'Statistik Nasional Desa', 
+        content: `Laporan agregat data desa seluruh Indonesia periode 2024.\n\n### Analisis Populasi Terpadu\n[CHART:${vizPop.id}]\n\n### Kemandirian Desa\n[CHART:${vizIdm.id}]`, 
+        showStats: true, 
+        updatedAt: serverTimestamp() 
+      });
+
+      // 5. Buat Menu Navigasi
+      const menusRef = collection(db, 'menus');
+      await addDoc(menusRef, { label: 'Statistik', icon: 'BarChart', href: `/p/${pStat.id}`, order: 1, position: 'bottom' });
+
+      toast({ title: "Berhasil!", description: "Ekosistem data dummy strategis telah disinkronkan.", variant: "default" });
     } catch (error) {
       console.error(error);
-      toast({ title: "Gagal!", description: "Terjadi kesalahan saat memproses data demo.", variant: "destructive" });
+      toast({ title: "Gagal!", description: "Terjadi kesalahan.", variant: "destructive" });
     } finally {
       setIsSeeding(false);
     }

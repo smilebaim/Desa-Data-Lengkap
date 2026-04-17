@@ -41,7 +41,7 @@ const LeafletMap = ({
 
   const filteredFeatures = useMemo(() => {
     if (!features) return [];
-    return features.filter(f => activeCategories.includes(f.category || 'LAINNYA'));
+    return features.filter(f => activeCategories.includes(f.category || ''));
   }, [features, activeCategories]);
 
   const renderFeature = (f: any) => {
@@ -57,7 +57,7 @@ const LeafletMap = ({
           </Marker>
         );
       }
-      if (f.type === 'polyline') {
+      if (f.type === 'polyline' && Array.isArray(f.geometry)) {
         return (
           <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }} eventHandlers={eventHandlers} />
         );
@@ -67,7 +67,7 @@ const LeafletMap = ({
           <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />
         );
       }
-      if (f.type === 'polygon' || f.type === 'rectangle') {
+      if ((f.type === 'polygon' || f.type === 'rectangle') && Array.isArray(f.geometry)) {
         return (
           <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />
         );
@@ -91,7 +91,7 @@ const LeafletMap = ({
         <FeatureGroup>
           {(villages || []).map((v) => (
             <Fragment key={v.id}>
-              {v.boundary && (
+              {v.boundary && Array.isArray(v.boundary) && (
                 <Polygon 
                   positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
                   pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }} 
