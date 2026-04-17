@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { 
   Search, Shield, LogIn, HelpCircle, Plus, Minus, Layers, Filter, 
   LayoutDashboard, X, ChevronRight, MapPin, Landmark, BarChart3, 
-  Users, Coins, TrendingUp, Info, Globe, FileText, Zap, Compass, RefreshCw
+  Users, Coins, TrendingUp, Info, Globe, FileText, Zap, Compass, RefreshCw,
+  Navigation, Eye, EyeOff, Construction, TreePine, Droplets, ZapOff
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFirestore, useCollection, useUser, useDoc } from '@/firebase';
@@ -144,8 +145,7 @@ export default function HomePage() {
   };
 
   const handleResetMap = () => {
-    // Pemicu render ulang peta atau reset view via event emitter jika diperlukan
-    window.location.reload(); // Sederhananya reload untuk reset view saat ini
+    window.location.reload();
   };
 
   return (
@@ -168,7 +168,7 @@ export default function HomePage() {
                 <div className="h-7 w-7 sm:h-8 sm:w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
                   <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
                 </div>
-                <div className="hidden lg:block">
+                <div className="hidden lg:block text-left">
                   <h1 className="text-[10px] sm:text-xs font-bold tracking-tight text-white leading-none">Desa Lengkap</h1>
                   <p className="text-[7px] sm:text-[8px] text-primary/80 font-bold uppercase tracking-widest mt-0.5">Sistem Informasi Spasial</p>
                 </div>
@@ -216,35 +216,33 @@ export default function HomePage() {
         </header>
 
         {/* Toolbar Samping Kiri (Kontrol Peta Atraktif) */}
-        <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-6">
-          {/* Kelompok Kontrol Lapisan */}
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
+        <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5">
+          {/* Kelompok Kontrol Lapisan & Visibilitas */}
+          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
             <ToolbarButton 
               tooltip={showVillages ? "Sembunyikan Batas Desa" : "Tampilkan Batas Desa"}
               onClick={() => setShowVillages(!showVillages)}
-              className={showVillages ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" : ""}
+              className={showVillages ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" : "text-white/60"}
             >
-              <Layers className="h-4 w-4" />
+              {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </ToolbarButton>
             
-            {leftMenus.map((menu: any) => (
-              <ToolbarButton 
-                key={menu.id} 
-                tooltip={menu.label}
-                onClick={() => {
-                  if (menu.href?.startsWith('/p/')) {
-                    handleSelectItem('page', menu.href.replace('/p/', ''));
-                  }
-                }}
-              >
-                <DynamicIcon name={menu.icon} className="h-4 w-4" />
-              </ToolbarButton>
-            ))}
+            <Separator className="bg-white/5 mx-2 my-0.5" />
+
+            <ToolbarButton tooltip="Fasilitas Umum" className="text-blue-400 hover:bg-blue-500/10">
+              <Landmark className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton tooltip="Infrastruktur Jalan" className="text-amber-400 hover:bg-amber-500/10">
+              <Construction className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton tooltip="Potensi Alam" className="text-green-400 hover:bg-green-500/10">
+              <TreePine className="h-4 w-4" />
+            </ToolbarButton>
           </div>
 
-          {/* Kelompok Navigasi & Zoom */}
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
-            <ToolbarButton tooltip="Fokus Indonesia" onClick={handleResetMap} className="hover:text-primary">
+          {/* Kelompok Alat & Navigasi */}
+          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
+            <ToolbarButton tooltip="Fokus Indonesia" onClick={handleResetMap} className="text-slate-300 hover:text-primary">
               <Compass className="h-4 w-4" />
             </ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
@@ -256,10 +254,29 @@ export default function HomePage() {
             </ToolbarButton>
           </div>
 
-          {/* Tombol Filter / Pencarian Cepat */}
+          {/* Kelompok Menu Dinamis Kiri */}
+          {leftMenus.length > 0 && (
+            <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
+              {leftMenus.map((menu: any) => (
+                <ToolbarButton 
+                  key={menu.id} 
+                  tooltip={menu.label}
+                  onClick={() => {
+                    if (menu.href?.startsWith('/p/')) {
+                      handleSelectItem('page', menu.href.replace('/p/', ''));
+                    }
+                  }}
+                >
+                  <DynamicIcon name={menu.icon} className="h-4 w-4" />
+                </ToolbarButton>
+              ))}
+            </div>
+          )}
+
+          {/* Tombol Help / Informasi */}
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-full shadow-[0_15px_35px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
-            <ToolbarButton tooltip="Saring Data" className="hover:text-amber-500">
-              <Filter className="h-4 w-4" />
+            <ToolbarButton tooltip="Pusat Bantuan" className="text-slate-400 hover:text-white">
+              <HelpCircle className="h-4 w-4" />
             </ToolbarButton>
           </div>
         </aside>
@@ -304,7 +321,7 @@ export default function HomePage() {
                   <div className="relative h-48 bg-slate-950 shrink-0">
                     <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2013')] bg-cover bg-center grayscale" />
                     <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent" />
-                    <div className="absolute bottom-6 left-8 right-8 z-10">
+                    <div className="absolute bottom-6 left-8 right-8 z-10 text-left">
                       <div className="flex flex-col gap-2">
                         <Badge className="w-fit bg-primary tracking-[0.2em] text-[8px] uppercase font-black px-3 py-1">
                           {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'page' ? 'Informasi Publik' : 'Aset Spasial'}
@@ -315,7 +332,7 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="px-8 py-10 space-y-8">
+                  <div className="px-8 py-10 space-y-8 text-left">
                     {(selectedItem?.type === 'village' || itemDetail.showStats) && (
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 flex flex-col gap-3">
@@ -394,7 +411,7 @@ function ToolbarButton({ children, tooltip, onClick, className }: { children: Re
           variant="ghost" 
           size="icon" 
           onClick={onClick}
-          className={`h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:bg-primary hover:text-white rounded-full transition-all duration-300 group ${className}`}
+          className={`h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:bg-white/10 hover:text-white rounded-2xl transition-all duration-300 group ${className}`}
         >
           <div className="transition-transform duration-300 group-hover:scale-110">
             {children}

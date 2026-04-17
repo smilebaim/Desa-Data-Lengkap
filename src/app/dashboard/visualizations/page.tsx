@@ -132,7 +132,7 @@ export default function VisualizationsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-white rounded-2xl text-green-600 shadow-sm border border-green-100"><Users className="h-6 w-6" /></div>
-              <div>
+              <div className="text-left">
                 <p className="text-[10px] font-black text-green-800/40 uppercase tracking-widest">Total Populasi</p>
                 <h3 className="text-2xl font-black text-green-900">{totalPopulasi.toLocaleString()} <span className="text-sm font-medium opacity-40">Jiwa</span></h3>
               </div>
@@ -143,7 +143,7 @@ export default function VisualizationsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-white rounded-2xl text-blue-600 shadow-sm border border-blue-100"><Coins className="h-6 w-6" /></div>
-              <div>
+              <div className="text-left">
                 <p className="text-[10px] font-black text-blue-800/40 uppercase tracking-widest">Total Anggaran Desa</p>
                 <h3 className="text-2xl font-black text-blue-900">Rp{(totalAnggaran / 1000000000).toFixed(1)} <span className="text-sm font-medium opacity-40">Miliar</span></h3>
               </div>
@@ -154,7 +154,7 @@ export default function VisualizationsPage() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-white rounded-2xl text-amber-600 shadow-sm border border-amber-100"><TrendingUp className="h-6 w-6" /></div>
-              <div>
+              <div className="text-left">
                 <p className="text-[10px] font-black text-amber-800/40 uppercase tracking-widest">Rerata Skor IDM</p>
                 <h3 className="text-2xl font-black text-amber-900">{(statsData.length > 0 ? statsData.reduce((a,b) => a + b.idmScore, 0) / statsData.length : 0).toFixed(2)}</h3>
               </div>
@@ -165,7 +165,7 @@ export default function VisualizationsPage() {
 
       <div className="grid gap-8 lg:grid-cols-12">
         <Card className="lg:col-span-4 border-none shadow-2xl rounded-[2.5rem] bg-slate-900 text-white p-8 h-fit sticky top-6">
-          <CardHeader className="px-0 pt-0">
+          <CardHeader className="px-0 pt-0 text-left">
             <CardTitle className="text-xl flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {editingId ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
@@ -179,7 +179,7 @@ export default function VisualizationsPage() {
             </CardTitle>
             <CardDescription className="text-slate-400">Tentukan metrik dan gaya visual untuk grafik Anda.</CardDescription>
           </CardHeader>
-          <form onSubmit={handleSubmit} className="px-0 space-y-6">
+          <form onSubmit={handleSubmit} className="px-0 space-y-6 text-left">
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-400 tracking-wider">JUDUL GRAFIK</Label>
               <Input 
@@ -232,7 +232,7 @@ export default function VisualizationsPage() {
         </Card>
 
         <Card className="lg:col-span-8 shadow-xl border-none rounded-[2.5rem] bg-white overflow-hidden">
-          <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between">
+          <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between text-left">
             <div>
               <CardTitle className="text-lg flex items-center gap-3">
                 <LayoutGrid className="h-5 w-5 text-primary" /> 
@@ -252,14 +252,14 @@ export default function VisualizationsPage() {
                 <p className="text-slate-400 font-medium">Belum ada grafik kustom yang terdaftar.</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-slate-50 text-left">
                 {visualizers?.map((viz: any) => (
                   <div key={viz.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 transition-all group">
                     <div className="flex items-center gap-5">
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
                         {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChart className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
-                      <div>
+                      <div className="text-left">
                         <h4 className="font-bold text-slate-900 flex items-center gap-2">
                           {viz.title}
                         </h4>
