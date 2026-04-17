@@ -21,7 +21,7 @@ export default function PagesManagementPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Memoize query to prevent infinite reload loop
+  // Memoize kueri agar tidak terjadi render ulang tanpa henti
   const pagesQuery = useMemo(() => query(collection(db, 'pages'), orderBy('updatedAt', 'desc')), [db]);
   const { data: pages, isLoading } = useCollection(pagesQuery);
 
@@ -54,7 +54,7 @@ export default function PagesManagementPage() {
     if (isSubmitting) return;
     
     if (!formData.title || !formData.content) {
-      return toast({ title: "Galat", description: "Judul dan konten harus diisi.", variant: "destructive" });
+      return toast({ title: "Galat", description: "Lengkapi judul dan konten publikasi.", variant: "destructive" });
     }
 
     setIsSubmitting(true);
@@ -67,11 +67,11 @@ export default function PagesManagementPage() {
       if (isEditing) {
         const docRef = doc(db, 'pages', isEditing);
         await updateDoc(docRef, dataToSave);
-        toast({ title: "Berhasil", description: "Halaman diperbarui." });
+        toast({ title: "Berhasil", description: "Konten halaman diperbarui secara global." });
       } else {
         const collRef = collection(db, 'pages');
         await addDoc(collRef, dataToSave);
-        toast({ title: "Berhasil", description: "Halaman baru dibuat." });
+        toast({ title: "Berhasil", description: "Halaman publikasi baru telah diterbitkan." });
       }
       resetForm();
     } catch (error) {
@@ -86,12 +86,12 @@ export default function PagesManagementPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!id || !confirm('Hapus halaman ini secara permanen?')) return;
+    if (!id || !confirm('Hapus halaman publikasi ini secara permanen?')) return;
     
     const docRef = doc(db, 'pages', id);
     try {
       await deleteDoc(docRef);
-      toast({ title: "Berhasil", description: "Halaman telah dihapus." });
+      toast({ title: "Berhasil", description: "Halaman telah dihapus dari sistem." });
     } catch (error) {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ 
         path: docRef.path, 
@@ -103,8 +103,8 @@ export default function PagesManagementPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Manajemen Halaman Dinamis</h1>
-        <p className="text-muted-foreground">Buat profil desa atau laporan publik yang terintegrasi dengan data real-time.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pusat Halaman Dinamis</h1>
+        <p className="text-muted-foreground">Kelola narasi publik dan laporan statistik yang muncul di peta utama.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -112,9 +112,9 @@ export default function PagesManagementPage() {
           <CardHeader className="border-b bg-slate-50/50">
             <CardTitle className="text-lg flex items-center gap-2">
               {isEditing ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
-              {isEditing ? 'Edit Konten Halaman' : 'Buat Halaman Baru'}
+              {isEditing ? 'Mode Edit Konten' : 'Terbitkan Konten Baru'}
             </CardTitle>
-            <CardDescription>Isi detail halaman untuk dipublikasikan ke peta.</CardDescription>
+            <CardDescription>Narasi ini akan terhubung langsung ke ID menu navigasi.</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleSave} className="space-y-5">
@@ -123,18 +123,18 @@ export default function PagesManagementPage() {
                 <Input 
                   value={formData.title} 
                   onChange={e => setFormData({...formData, title: e.target.value})} 
-                  placeholder="Misal: Profil Potensi Wisata Desa" 
+                  placeholder="Misal: Profil Ekonomi Desa" 
                   className="h-11"
                   required 
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Konten Naratif</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Isi Laporan / Profil</Label>
                 <Textarea 
                   value={formData.content} 
                   onChange={e => setFormData({...formData, content: e.target.value})} 
-                  placeholder="Tuliskan isi halaman di sini... Gunakan [CHART:ID] untuk menyematkan grafik." 
+                  placeholder="Tuliskan isi di sini... Gunakan sintaks [CHART:ID] untuk menyisipkan infografis." 
                   className="min-h-[250px] resize-none focus:ring-primary/20"
                   required 
                 />
@@ -147,7 +147,7 @@ export default function PagesManagementPage() {
                       <BarChart3 className="h-4 w-4" />
                       Sematkan Modul Statistik
                     </Label>
-                    <p className="text-[10px] text-slate-500 leading-relaxed">Otomatis menampilkan infografis populasi dan wilayah di bawah konten.</p>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">Menampilkan ringkasan otomatis data demografi wilayah di akhir halaman.</p>
                   </div>
                   <Switch 
                     checked={formData.showStats} 
@@ -163,7 +163,7 @@ export default function PagesManagementPage() {
                 </Button>
                 {isEditing && (
                   <Button type="button" variant="ghost" className="w-full text-slate-500" onClick={resetForm}>
-                    <X className="mr-2 h-4 w-4" /> Batalkan Edit
+                    Batal
                   </Button>
                 )}
               </div>
@@ -173,8 +173,8 @@ export default function PagesManagementPage() {
 
         <Card className="lg:col-span-7 shadow-sm border-slate-200">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Globe className="h-5 w-5 text-primary/60" />
+            <CardTitle className="text-lg flex items-center gap-2 text-slate-700">
+              <Globe className="h-5 w-5 text-primary/40" />
               Katalog Halaman Publik
             </CardTitle>
           </CardHeader>
@@ -183,7 +183,7 @@ export default function PagesManagementPage() {
               <TableHeader className="bg-slate-50">
                 <TableRow>
                   <TableHead className="pl-6">Judul Halaman</TableHead>
-                  <TableHead>Integrasi</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right pr-6">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
@@ -191,27 +191,27 @@ export default function PagesManagementPage() {
                 {isLoading ? (
                   <TableRow><TableCell colSpan={3} className="text-center py-12"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
                 ) : pages?.length === 0 ? (
-                  <TableRow><TableCell colSpan={3} className="text-center py-12 text-slate-400">Belum ada halaman dinamis.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={3} className="text-center py-12 text-slate-400 font-medium">Tidak ada halaman yang diterbitkan.</TableCell></TableRow>
                 ) : pages?.map((page: any) => (
-                  <TableRow key={page.id} className="group hover:bg-slate-50/50 transition-colors">
+                  <TableRow key={page.id} className="group hover:bg-slate-50/50">
                     <TableCell className="pl-6">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                        <div className="h-9 w-9 bg-white border rounded-xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
                           <FileText className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className="font-bold text-slate-700">{page.title}</p>
-                          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">ID: {page.id.substring(0, 8)}...</p>
+                          <p className="font-bold text-slate-700 leading-none">{page.title}</p>
+                          <p className="text-[9px] text-slate-400 font-black uppercase mt-1">ID: {page.id.substring(0, 8)}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       {page.showStats ? (
-                        <div className="flex items-center gap-2 text-[9px] bg-green-50 text-green-700 px-2.5 py-1 rounded-full font-black uppercase tracking-wider border border-green-100">
+                        <div className="flex items-center gap-2 text-[9px] bg-green-50 text-green-700 px-2.5 py-1 rounded-full font-black uppercase tracking-wider border border-green-100 w-fit">
                           <BarChart3 className="h-3 w-3" /> Statistik
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-[9px] bg-slate-100 text-slate-400 px-2.5 py-1 rounded-full font-black uppercase tracking-wider">
+                        <div className="flex items-center gap-2 text-[9px] bg-slate-100 text-slate-400 px-2.5 py-1 rounded-full font-black uppercase tracking-wider w-fit">
                           <Info className="h-3 w-3" /> Narasi
                         </div>
                       )}

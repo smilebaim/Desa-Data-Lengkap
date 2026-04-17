@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
@@ -20,7 +21,7 @@ export const FirebaseProvider: React.FC<{
   auth: Auth;
   children: React.ReactNode;
 }> = ({ firebaseApp, firestore, auth, children }) => {
-  // Memoisasi nilai konteks untuk mencegah re-render yang tidak perlu pada konsumen (useFirestore, dll)
+  // Memoize context value to prevent unnecessary re-renders across the app
   const value = useMemo(() => ({
     firebaseApp,
     firestore,

@@ -37,7 +37,7 @@ export default function PengaturanNavigasiUtamaPage() {
   const db = useFirestore();
   const { toast } = useToast();
   
-  // Memoize query to prevent infinite reload loop
+  // Memoize kueri agar tidak terjadi infinite reload
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: allMenus, isLoading } = useCollection(menuQuery);
 
@@ -69,11 +69,11 @@ export default function PengaturanNavigasiUtamaPage() {
       if (isEditing) {
         const docRef = doc(db, 'menus', isEditing);
         await updateDoc(docRef, dataToSave);
-        toast({ title: "Berhasil", description: "Navigasi telah diperbarui." });
+        toast({ title: "Berhasil", description: "Item navigasi diperbarui." });
       } else {
         const collRef = collection(db, 'menus');
         await addDoc(collRef, dataToSave);
-        toast({ title: "Berhasil", description: "Navigasi baru telah ditambahkan." });
+        toast({ title: "Berhasil", description: "Navigasi baru ditambahkan." });
       }
       resetForm();
     } catch (error) {
@@ -88,11 +88,11 @@ export default function PengaturanNavigasiUtamaPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!id || !confirm('Hapus menu ini?')) return;
+    if (!id || !confirm('Hapus item navigasi ini?')) return;
     const docRef = doc(db, 'menus', id);
     try {
       await deleteDoc(docRef);
-      toast({ title: "Berhasil", description: "Menu telah dihapus." });
+      toast({ title: "Berhasil", description: "Navigasi dihapus." });
     } catch (error) {
       errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'delete' }));
     }
@@ -118,7 +118,7 @@ export default function PengaturanNavigasiUtamaPage() {
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Konfigurasi Navigasi Global</h1>
-        <p className="text-muted-foreground">Hubungkan halaman publikasi dan data statistik ke antarmuka peta interaktif.</p>
+        <p className="text-muted-foreground">Kelola item navigasi untuk menghubungkan halaman publik ke peta interaktif.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -127,23 +127,23 @@ export default function PengaturanNavigasiUtamaPage() {
             <CardHeader className="bg-slate-50/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 {isEditing ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
-                {isEditing ? 'Edit Item Navigasi' : 'Tambah Item Baru'}
+                {isEditing ? 'Perbarui Navigasi' : 'Tambah Navigasi Baru'}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <form onSubmit={handleAction} className="space-y-5">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Label Tampilan</Label>
+                  <Label className="text-xs font-bold uppercase text-slate-500">Label Menu</Label>
                   <Input value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} placeholder="Misal: Profil Desa" className="h-11" required />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Alamat Tautan (URL)</Label>
+                  <Label className="text-xs font-bold uppercase text-slate-500">Alamat Tautan (HREF)</Label>
                   <Input value={formData.href} onChange={e => setFormData({...formData, href: e.target.value})} placeholder="/visualizations atau /p/ID_HALAMAN" className="h-11" required />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Ikon Menu</Label>
+                  <Label className="text-xs font-bold uppercase text-slate-500">Ikon Lucide</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-between gap-3 h-11 border-slate-200">
@@ -155,7 +155,7 @@ export default function PengaturanNavigasiUtamaPage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-72 p-0 rounded-2xl shadow-2xl" align="start">
-                      <div className="p-3 border-b border-slate-100"><Input placeholder="Cari ikon..." className="h-9" value={iconSearch} onChange={e => setIconSearch(e.target.value)} /></div>
+                      <div className="p-3 border-b"><Input placeholder="Cari ikon..." className="h-9" value={iconSearch} onChange={e => setIconSearch(e.target.value)} /></div>
                       <div className="p-2 grid grid-cols-5 gap-1 max-h-60 overflow-y-auto">
                         {filteredIcons.map(icon => (
                           <Button key={icon} type="button" variant="ghost" size="icon" onClick={() => setFormData({...formData, icon})} className={`h-10 w-10 rounded-xl ${formData.icon === icon ? 'bg-primary/10 text-primary' : ''}`}><DynamicIcon name={icon} className="h-5 w-5" /></Button>
@@ -166,7 +166,7 @@ export default function PengaturanNavigasiUtamaPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Tata Letak</Label>
+                  <Label className="text-xs font-bold uppercase text-slate-500">Posisi Tampilan</Label>
                   <Select value={formData.position} onValueChange={(v: any) => setFormData({...formData, position: v})}>
                     <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -178,16 +178,16 @@ export default function PengaturanNavigasiUtamaPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Urutan</Label>
+                  <Label className="text-xs font-bold uppercase text-slate-500">Urutan Sortir</Label>
                   <Input type="number" value={formData.order} onChange={e => setFormData({...formData, order: parseInt(e.target.value)})} className="h-11" required />
                 </div>
 
                 <div className="pt-2 flex flex-col gap-2">
                   <Button type="submit" className="w-full h-12 shadow-lg" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEditing ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />)}
-                    {isEditing ? 'Simpan' : 'Tambah'}
+                    {isEditing ? 'Simpan Perubahan' : 'Tambahkan Menu'}
                   </Button>
-                  {isEditing && <Button type="button" variant="ghost" className="w-full" onClick={resetForm}>Batal</Button>}
+                  {isEditing && <Button type="button" variant="ghost" className="w-full" onClick={resetForm}>Batalkan Edit</Button>}
                 </div>
               </form>
             </CardContent>
@@ -198,9 +198,9 @@ export default function PengaturanNavigasiUtamaPage() {
           <Table>
             <TableHeader className="bg-slate-50">
               <TableRow>
-                <TableHead className="pl-6">Label & Ikon</TableHead>
+                <TableHead className="pl-6">Identitas Menu</TableHead>
                 <TableHead>Alamat</TableHead>
-                <TableHead>Posisi</TableHead>
+                <TableHead>Lokasi</TableHead>
                 <TableHead className="text-center">Urutan</TableHead>
                 <TableHead className="text-right pr-6">Aksi</TableHead>
               </TableRow>
@@ -209,23 +209,23 @@ export default function PengaturanNavigasiUtamaPage() {
               {isLoading ? (
                 <TableRow><TableCell colSpan={5} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto text-primary opacity-20" /></TableCell></TableRow>
               ) : allMenus?.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-10 text-slate-400">Belum ada navigasi.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center py-10 text-slate-400">Belum ada item navigasi yang terdaftar.</TableCell></TableRow>
               ) : allMenus?.map((menu: any) => (
-                <TableRow key={menu.id} className="hover:bg-slate-50/50">
+                <TableRow key={menu.id} className="hover:bg-slate-50/50 group">
                   <TableCell className="pl-6">
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 bg-white border rounded-2xl flex items-center justify-center text-primary shadow-sm"><DynamicIcon name={menu.icon} className="h-5 w-5" /></div>
                       <span className="font-bold text-slate-700">{menu.label}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs text-slate-500 truncate max-w-[120px]">{menu.href}</TableCell>
+                  <TableCell className="text-xs text-slate-500 truncate max-w-[150px]">{menu.href}</TableCell>
                   <TableCell>
-                    <span className="text-[9px] font-black uppercase px-2 py-1 rounded-full border bg-slate-100">{menu.position}</span>
+                    <span className="text-[9px] font-black uppercase px-2 py-1 rounded-full border bg-slate-100 text-slate-500">{menu.position}</span>
                   </TableCell>
                   <TableCell className="text-center font-mono text-xs">{menu.order}</TableCell>
                   <TableCell className="text-right space-x-1 pr-6">
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-600" onClick={() => startEdit(menu)}><Edit2 className="h-4 w-4" /></Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500" onClick={() => handleDelete(menu.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-600 hover:bg-slate-100" onClick={() => startEdit(menu)}><Edit2 className="h-4 w-4" /></Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => handleDelete(menu.id)}><Trash2 className="h-4 w-4" /></Button>
                   </TableCell>
                 </TableRow>
               ))}

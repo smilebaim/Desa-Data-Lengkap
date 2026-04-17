@@ -22,9 +22,9 @@ const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#e
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png',
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-icon-2x.png',
     iconUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/leaflet/1.3.1/images/marker-shadow.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/AreaChart/leaflet/1.3.1/images/marker-shadow.png',
   });
 }
 
@@ -77,17 +77,17 @@ interface LeafletMapProps {
 const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
   const db = useFirestore();
   
-  // Memoize data requirements
+  // Memoize data kueri untuk stabilitas peta
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features } = useCollection(featuresQuery);
 
   const visualizersQuery = useMemo(() => query(collection(db, 'visualizers')), [db]);
   const { data: visualizers } = useCollection(visualizersQuery);
 
-  // Define Indonesia Bounds: [SouthWest, NorthEast]
+  // Batas Geografis Indonesia: [SouthWest, NorthEast]
   const indonesiaBounds: LatLngBoundsExpression = [
-    [-11.0, 95.0], // Sabang/Rote area
-    [6.0, 141.0]   // Merauke/Natuna area
+    [-11.0, 94.0], // Sabang/Rote
+    [6.5, 141.5]   // Merauke/Natuna
   ];
 
   const statsData = useMemo(() => {
@@ -128,9 +128,9 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
 
   const renderFeature = (f: any) => {
     const popupContent = (
-      <div className="p-1 min-w-[220px] max-w-[280px]">
+      <div className="p-1 min-w-[220px] max-w-[280px] font-body">
         <div className="flex items-center gap-2 font-bold text-slate-900 border-b pb-2 mb-2">
-          <div className="h-7 w-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+          <div className="h-7 w-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-sm">
             <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4" />
           </div>
           <div>
@@ -144,7 +144,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
         {f.showStats && (
            <div className="mt-4 pt-3 border-t border-dashed border-slate-200">
              <div className="flex items-center gap-2 mb-2 text-[9px] font-bold text-primary">
-               <BarChart3 className="h-3 w-3" /> RINGKASAN DATA
+               <BarChart3 className="h-3 w-3" /> ANALISIS AGREGAT
              </div>
              <div className="grid grid-cols-2 gap-2">
                 <div className="bg-slate-50 p-2 rounded-lg border">
@@ -152,7 +152,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                   <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.population, 0).toLocaleString()} Jiwa</p>
                 </div>
                 <div className="bg-slate-50 p-2 rounded-lg border">
-                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Wilayah</p>
+                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Luas</p>
                   <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.area, 0).toFixed(1)} km²</p>
                 </div>
              </div>
@@ -161,11 +161,17 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
       </div>
     );
 
-    const pos: LatLngExpression = [f.geometry.lat, f.geometry.lng];
-    if (f.type === 'marker') return <Marker key={f.id} position={pos}><Popup>{popupContent}</Popup></Marker>;
-    if (f.type === 'polyline') return <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }}><Popup>{popupContent}</Popup></Polyline>;
-    if (f.type === 'circle') return <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }}><Popup>{popupContent}</Popup></Circle>;
-    if (f.type === 'polygon' || f.type === 'rectangle') return <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }}><Popup>{popupContent}</Popup></Polygon>;
+    if (!f.geometry) return null;
+    const pos: LatLngExpression = [f.geometry.lat || 0, f.geometry.lng || 0];
+
+    try {
+      if (f.type === 'marker') return <Marker key={f.id} position={pos}><Popup>{popupContent}</Popup></Marker>;
+      if (f.type === 'polyline') return <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }}><Popup>{popupContent}</Popup></Polyline>;
+      if (f.type === 'circle') return <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }}><Popup>{popupContent}</Popup></Circle>;
+      if (f.type === 'polygon' || f.type === 'rectangle') return <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }}><Popup>{popupContent}</Popup></Polygon>;
+    } catch (e) {
+      return null;
+    }
     return null;
   };
 
@@ -187,18 +193,18 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
       />
       <LayersControl position="topright">
         {showVillages && (
-          <LayersControl.Overlay checked name="Batas Desa">
+          <LayersControl.Overlay checked name="Batas Administratif">
             <FeatureGroup>
               {(villages || []).map((village) => (
                 <div key={village.id}>
                   {village.boundary && (
                     <Polygon positions={village.boundary.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#22c55e', fillOpacity: 0.3 }}>
                       <Popup>
-                        <div className="p-1 min-w-[200px]">
+                        <div className="p-1 min-w-[200px] font-body">
                           <h3 className="font-bold text-slate-900">{village.name}</h3>
-                          <p className="text-[10px] text-primary font-bold uppercase">{village.province}</p>
-                          <Link href={`/village/${village.id}`} className="block mt-4">
-                            <Button size="sm" className="w-full text-[10px] h-8 bg-primary">PROFIL DESA</Button>
+                          <p className="text-[10px] text-primary font-bold uppercase mb-4 tracking-widest">{village.province}</p>
+                          <Link href={`/village/${village.id}`}>
+                            <Button size="sm" className="w-full text-[10px] h-8 bg-primary rounded-xl font-bold">BUKA PROFIL LENGKAP</Button>
                           </Link>
                         </div>
                       </Popup>
@@ -206,7 +212,7 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
                   )}
                   {village.location && (
                     <Marker position={[village.location.lat, village.location.lng]}>
-                      <LeafletTooltip direction="top"><span className="font-bold text-[10px]">{village.name}</span></LeafletTooltip>
+                      <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase tracking-wider">{village.name}</span></LeafletTooltip>
                     </Marker>
                   )}
                 </div>
