@@ -7,7 +7,7 @@ import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { useMemo, Fragment } from 'react';
+import { useMemo, Fragment, useEffect, useState } from 'react';
 
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -34,6 +34,12 @@ const LeafletMap = ({
   onSelectFeature 
 }: LeafletMapProps) => {
   const db = useFirestore();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features } = useCollection(featuresQuery);
 
@@ -73,23 +79,26 @@ const LeafletMap = ({
         );
       }
     } catch (e) {
-      console.error('Error rendering feature:', e);
       return null;
     }
     return null;
   };
 
+  if (!isMounted) return null;
+
   return (
     <MapContainer 
+      key="main-map-container"
       className="h-full w-full z-10" 
       center={[-2.5489, 118.0149]} 
       zoom={5} 
       minZoom={5} 
       maxBounds={indonesiaBounds} 
       zoomControl={false}
+      scrollWheelZoom={true}
     >
       <TileLayer 
-        attribution='&copy; Google Satelite'
+        attribution='&copy; Google Satellite'
         url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
         subdomains={['mt0','mt1','mt2','mt3']} 
       />

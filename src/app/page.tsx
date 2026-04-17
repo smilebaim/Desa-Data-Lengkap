@@ -290,7 +290,7 @@ export default function HomePage() {
         </header>
 
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group">
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-3xl shadow-2xl ring-1 ring-white/10 transform transition-transform duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl">
+          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-3xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>

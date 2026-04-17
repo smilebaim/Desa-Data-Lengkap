@@ -18,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { 
+  BarChart, PieChart, RadarChart, LineChart
+} from 'recharts';
 
 export default function VisualizationsPage() {
   const db = useFirestore();
@@ -94,7 +97,7 @@ export default function VisualizationsPage() {
           <p className="text-slate-500">Buat infografis untuk narasi pembangunan desa.</p>
         </div>
         <Link href="/visualizations" target="_blank">
-           <Button variant="outline" className="rounded-xl h-11 gap-2 shadow-sm">
+           <Button variant="outline" className="rounded-xl h-11 gap-2 shadow-sm text-sm font-bold">
              <ExternalLink className="h-4 w-4" /> Buka Statistik Publik
            </Button>
         </Link>
