@@ -12,7 +12,9 @@ import Link from 'next/link';
 import { useMemo, Fragment } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, 
-  ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area
+  ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area,
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ScatterChart, Scatter, ComposedChart
 } from 'recharts';
 
 const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -33,7 +35,7 @@ const DynamicChart = ({ config, data }: { config: any, data: any[] }) => {
           {chartTitle}
         </h3>
       </div>
-      <div className="h-72 w-full">
+      <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           {type === 'bar' ? (
             <BarChart data={data}>
@@ -60,7 +62,7 @@ const DynamicChart = ({ config, data }: { config: any, data: any[] }) => {
               <ChartTooltip />
               <Line type="monotone" dataKey={metric} stroke="#22c55e" strokeWidth={4} dot={{ r: 6, fill: '#22c55e', strokeWidth: 2, stroke: '#fff' }} />
             </LineChart>
-          ) : (
+          ) : type === 'area' ? (
             <AreaChart data={data}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
@@ -68,6 +70,31 @@ const DynamicChart = ({ config, data }: { config: any, data: any[] }) => {
               <ChartTooltip />
               <Area type="monotone" dataKey={metric} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} />
             </AreaChart>
+          ) : type === 'radar' ? (
+            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="name" fontSize={10} />
+              <PolarRadiusAxis fontSize={10} />
+              <Radar name={metric} dataKey={metric} stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+              <ChartTooltip />
+            </RadarChart>
+          ) : type === 'composed' ? (
+            <ComposedChart data={data}>
+              <CartesianGrid stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+              <YAxis fontSize={10} axisLine={false} tickLine={false} />
+              <ChartTooltip />
+              <Bar dataKey={metric} fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={20} />
+              <Line type="monotone" dataKey={metric} stroke="#ef4444" strokeWidth={2} />
+            </ComposedChart>
+          ) : (
+            <ScatterChart>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="name" name="Desa" unit="" fontSize={10} />
+              <YAxis dataKey={metric} name={metric} fontSize={10} />
+              <ChartTooltip cursor={{ strokeDasharray: '3 3' }} />
+              <Scatter name={metric} data={data} fill="#f59e0b" />
+            </ScatterChart>
           )}
         </ResponsiveContainer>
       </div>

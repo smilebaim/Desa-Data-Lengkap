@@ -92,7 +92,7 @@
       "properties": {
         "title": { "type": "string" },
         "metric": { "type": "string", "enum": ["population", "area", "density"] },
-        "chartType": { "type": "string", "enum": ["bar", "pie", "line", "area"] },
+        "chartType": { "type": "string", "enum": ["bar", "pie", "line", "area", "radar", "composed", "scatter"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "metric", "chartType"]

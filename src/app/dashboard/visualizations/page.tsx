@@ -6,10 +6,6 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, 
-  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
-} from 'recharts';
-import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, Link as LinkIcon, ExternalLink, Sparkles,
   Zap, Table as TableIcon, Plus, Trash2, LayoutGrid, Info, Database, Edit2, X,
@@ -230,6 +226,9 @@ export default function VisualizationsPage() {
                     <SelectItem value="pie">Pie Chart</SelectItem>
                     <SelectItem value="line">Line Chart</SelectItem>
                     <SelectItem value="area">Area Chart</SelectItem>
+                    <SelectItem value="radar">Radar Chart</SelectItem>
+                    <SelectItem value="composed">Composed (Combo)</SelectItem>
+                    <SelectItem value="scatter">Scatter Plot</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

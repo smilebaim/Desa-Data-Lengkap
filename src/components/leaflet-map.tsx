@@ -14,7 +14,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, 
-  ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area
+  ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area,
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ScatterChart, Scatter, ComposedChart
 } from 'recharts';
 
 const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -59,6 +61,12 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
           <AreaChart data={data}>
             <Area type="monotone" dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} />
           </AreaChart>
+        ) : type === 'radar' ? (
+          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="name" fontSize={8} />
+            <Radar name={metric} dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
+          </RadarChart>
         ) : (
           <LineChart data={data}>
             <Line type="monotone" dataKey={metric} stroke="#22c55e" strokeWidth={2} dot={false} />
