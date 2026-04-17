@@ -65,7 +65,6 @@ export default function VisualizationsPage() {
     setIsSubmitting(true);
     const dataToSave = { 
       ...formData, 
-      createdAt: editingId ? undefined : serverTimestamp(), 
       updatedAt: serverTimestamp() 
     };
 
@@ -79,7 +78,7 @@ export default function VisualizationsPage() {
         .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: dataToSave })))
         .finally(() => setIsSubmitting(false));
     } else {
-      addDoc(collection(db, 'visualizers'), dataToSave)
+      addDoc(collection(db, 'visualizers'), { ...dataToSave, createdAt: serverTimestamp() })
         .then(() => {
           toast({ title: "Berhasil", description: "Grafik baru ditambahkan ke pustaka." });
           resetForm();
@@ -113,14 +112,6 @@ export default function VisualizationsPage() {
     setTimeout(() => setCopiedId(null), 2000);
     toast({ title: "Disalin!", description: `Kode sematan ${text} siap digunakan.` });
   };
-
-  if (isVillagesLoading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-10 pb-20">

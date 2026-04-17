@@ -1,7 +1,7 @@
 
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup, Popup } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
@@ -56,10 +56,46 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
     };
 
     try {
-      if (f.type === 'marker') return <Marker key={f.id} position={pos} eventHandlers={eventHandlers}><LeafletTooltip direction="top"><span className="font-bold text-[9px] uppercase">{f.name}</span></LeafletTooltip></Marker>;
-      if (f.type === 'polyline') return <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }} eventHandlers={eventHandlers} />;
-      if (f.type === 'circle') return <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />;
-      if (f.type === 'polygon' || f.type === 'rectangle') return <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />;
+      if (f.type === 'marker') {
+        return (
+          <Marker key={f.id} position={pos} eventHandlers={eventHandlers}>
+            <LeafletTooltip direction="top">
+              <span className="font-bold text-[9px] uppercase">{f.name}</span>
+            </LeafletTooltip>
+          </Marker>
+        );
+      }
+      if (f.type === 'polyline') {
+        return (
+          <Polyline 
+            key={f.id} 
+            positions={f.geometry.map((p: any) => [p.lat, p.lng])} 
+            pathOptions={{ color: '#3b82f6', weight: 4 }} 
+            eventHandlers={eventHandlers} 
+          />
+        );
+      }
+      if (f.type === 'circle') {
+        return (
+          <Circle 
+            key={f.id} 
+            center={pos} 
+            radius={f.properties?.radius || 100} 
+            pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }} 
+            eventHandlers={eventHandlers} 
+          />
+        );
+      }
+      if (f.type === 'polygon' || f.type === 'rectangle') {
+        return (
+          <Polygon 
+            key={f.id} 
+            positions={f.geometry.map((p: any) => [p.lat, p.lng])} 
+            pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }} 
+            eventHandlers={eventHandlers} 
+          />
+        );
+      }
     } catch (e) {
       return null;
     }
