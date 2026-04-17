@@ -17,9 +17,9 @@ import { collection, query, orderBy, doc } from 'firebase/firestore';
 import * as LucideIcons from 'lucide-react';
 import Link from 'next/link';
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Badge } from "@/badge";
-import { Separator } from "@/separator";
-import { ScrollArea } from "@/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   BarChart, Bar, XAxis, CartesianGrid, ResponsiveContainer, Cell, PieChart, Pie, Radar, RadarChart, PolarGrid, PolarAngleAxis, LineChart, Line
 } from 'recharts';
@@ -291,19 +291,19 @@ export default function HomePage() {
 
         <aside className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-5 text-left">
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
-            <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white/70"}>
+            <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
             </ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white/70"}><Landmark className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white/70"}><Construction className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white/70"}><TreePine className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white"}><Landmark className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-4 w-4" /></ToolbarButton>
           </div>
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl ring-1 ring-white/10">
-            <ToolbarButton tooltip="Reset Pandangan" onClick={() => window.location.reload()} className="text-white/70"><LocateFixed className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Reset Pandangan" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-4 w-4" /></ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Perbesar Peta" className="text-white/70"><Plus className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Perkecil Peta" className="text-white/70"><Minus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perbesar Peta" className="text-white"><Plus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perkecil Peta" className="text-white"><Minus className="h-4 w-4" /></ToolbarButton>
           </div>
         </aside>
 
@@ -332,7 +332,7 @@ export default function HomePage() {
                         {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
                       </Badge>
                       <h2 className="text-3xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
-                      {itemDetail.province && <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
+                      {itemDetail.province && <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
                       {itemDetail.category && <p className="text-primary/80 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
                     </div>
                   </div>
