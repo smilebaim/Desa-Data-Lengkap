@@ -1,7 +1,7 @@
 
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Marker, Popup, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
@@ -9,16 +9,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useMemo } from 'react';
 import * as LucideIcons from 'lucide-react';
-import { HelpCircle, BarChart3 } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { 
-  BarChart, Bar, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area,
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  ScatterChart, Scatter, ComposedChart
-} from 'recharts';
-
-const CHART_COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+import { HelpCircle } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -29,92 +20,23 @@ if (typeof window !== 'undefined') {
   });
 }
 
-const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
-  const IconComponent = (LucideIcons as any)[name];
-  if (!IconComponent) return <HelpCircle className={className || "h-4 w-4"} />;
-  return <IconComponent className={className || "h-4 w-4"} />;
-};
-
-const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
-  if (!config || !data.length) return null;
-  const metric = config.metric || 'population';
-  const type = config.chartType || 'bar';
-
-  return (
-    <div className="h-40 w-full mt-3 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-inner">
-      <p className="text-[8px] font-black uppercase text-slate-400 mb-2 tracking-widest">{config.title}</p>
-      <ResponsiveContainer width="100%" height="100%">
-        {type === 'bar' ? (
-          <BarChart data={data}>
-            <Bar dataKey={metric} radius={[2, 2, 0, 0]}>
-              {data.map((_, index) => <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
-            </Bar>
-          </BarChart>
-        ) : type === 'pie' ? (
-          <PieChart>
-            <Pie data={data} dataKey={metric} nameKey="name" cx="50%" cy="50%" outerRadius={30}>
-              {data.map((_, index) => <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
-            </Pie>
-          </PieChart>
-        ) : type === 'area' ? (
-          <AreaChart data={data}>
-            <Area type="monotone" dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} />
-          </AreaChart>
-        ) : type === 'radar' ? (
-          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="name" fontSize={8} />
-            <Radar name={metric} dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
-          </RadarChart>
-        ) : type === 'composed' ? (
-          <ComposedChart data={data}>
-            <Bar dataKey={metric} fill="#3b82f6" barSize={15} />
-            <Line type="monotone" dataKey={metric} stroke="#ef4444" strokeWidth={2} />
-          </ComposedChart>
-        ) : type === 'scatter' ? (
-          <ScatterChart>
-            <Scatter name={metric} data={data} fill="#f59e0b" />
-          </ScatterChart>
-        ) : (
-          <LineChart data={data}>
-            <Line type="monotone" dataKey={metric} stroke="#22c55e" strokeWidth={2} dot={false} />
-          </LineChart>
-        )}
-      </ResponsiveContainer>
-    </div>
-  );
-};
-
 interface LeafletMapProps {
   villages?: any[];
   showVillages?: boolean;
+  onSelectVillage?: (id: string) => void;
+  onSelectFeature?: (id: string) => void;
 }
 
-const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => {
+const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSelectFeature }: LeafletMapProps) => {
   const db = useFirestore();
   
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
   const { data: features } = useCollection(featuresQuery);
 
-  const visualizersQuery = useMemo(() => query(collection(db, 'visualizers')), [db]);
-  const { data: visualizers } = useCollection(visualizersQuery);
-
   const indonesiaBounds: LatLngBoundsExpression = [
     [-11.0, 94.0],
     [6.5, 141.5]
   ];
-
-  const statsData = useMemo(() => {
-    if (!villages) return [];
-    return villages.map(v => ({
-      name: v.name,
-      population: v.population || 0,
-      area: v.area || 0,
-      idmScore: v.idmScore || 0,
-      budgetAllocation: v.budgetAllocation || 0,
-      density: v.area > 0 ? parseFloat(((v.population || 0) / v.area).toFixed(2)) : 0
-    }));
-  }, [villages]);
 
   const categories = useMemo(() => {
     const groups: Record<string, any[]> = {};
@@ -126,65 +48,18 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
     return groups;
   }, [features]);
 
-  const renderTextWithCharts = (content: string) => {
-    if (!content) return null;
-    const regex = /(\[CHART:[a-zA-Z0-9_-]+\])/g;
-    const parts = content.split(regex);
-    
-    return parts.map((part, index) => {
-      const match = part.match(/\[CHART:([a-zA-Z0-9_-]+)\]/);
-      if (match) {
-        const chartId = match[1];
-        const config = visualizers?.find(v => v.id === chartId);
-        return config ? <MiniChart key={index} config={config} data={statsData} /> : null;
-      }
-      return <span key={index}>{part}</span>;
-    });
-  };
-
   const renderFeature = (f: any) => {
-    const popupContent = (
-      <div className="p-1 min-w-[220px] max-w-[280px] font-body">
-        <div className="flex items-center gap-2 font-bold text-slate-900 border-b pb-2 mb-2">
-          <div className="h-7 w-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-sm">
-            <DynamicIcon name={f.icon || 'MapPin'} className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="text-xs leading-none">{f.name}</p>
-            <p className="text-[8px] text-slate-400 font-black uppercase mt-1 tracking-widest">{f.category?.replace('_', ' ')}</p>
-          </div>
-        </div>
-        <div className="text-[11px] text-slate-600 leading-relaxed whitespace-pre-line">
-          {renderTextWithCharts(f.description)}
-        </div>
-        {f.showStats && (
-           <div className="mt-4 pt-3 border-t border-dashed border-slate-200">
-             <div className="flex items-center gap-2 mb-2 text-[9px] font-bold text-primary">
-               <BarChart3 className="h-3 w-3" /> ANALISIS AGREGAT
-             </div>
-             <div className="grid grid-cols-2 gap-2">
-                <div className="bg-slate-50 p-2 rounded-lg border">
-                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Populasi</p>
-                  <p className="text-[10px] font-bold text-slate-700">{statsData.reduce((a,b) => a + b.population, 0).toLocaleString()} Jiwa</p>
-                </div>
-                <div className="bg-slate-50 p-2 rounded-lg border">
-                  <p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Anggaran</p>
-                  <p className="text-[10px] font-bold text-slate-700">Rp{(statsData.reduce((a,b) => a + b.budgetAllocation, 0) / 1000000).toFixed(1)}jt</p>
-                </div>
-             </div>
-           </div>
-        )}
-      </div>
-    );
-
     if (!f.geometry) return null;
     const pos: LatLngExpression = [f.geometry.lat || 0, f.geometry.lng || 0];
+    const eventHandlers = {
+      click: () => onSelectFeature?.(f.id),
+    };
 
     try {
-      if (f.type === 'marker') return <Marker key={f.id} position={pos}><Popup>{popupContent}</Popup></Marker>;
-      if (f.type === 'polyline') return <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }}><Popup>{popupContent}</Popup></Polyline>;
-      if (f.type === 'circle') return <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }}><Popup>{popupContent}</Popup></Circle>;
-      if (f.type === 'polygon' || f.type === 'rectangle') return <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }}><Popup>{popupContent}</Popup></Polygon>;
+      if (f.type === 'marker') return <Marker key={f.id} position={pos} eventHandlers={eventHandlers}><LeafletTooltip direction="top"><span className="font-bold text-[9px] uppercase">{f.name}</span></LeafletTooltip></Marker>;
+      if (f.type === 'polyline') return <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }} eventHandlers={eventHandlers} />;
+      if (f.type === 'circle') return <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />;
+      if (f.type === 'polygon' || f.type === 'rectangle') return <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />;
     } catch (e) {
       return null;
     }
@@ -214,20 +89,17 @@ const LeafletMap = ({ villages = [], showVillages = true }: LeafletMapProps) => 
               {(villages || []).map((village) => (
                 <div key={village.id}>
                   {village.boundary && (
-                    <Polygon positions={village.boundary.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#22c55e', fillOpacity: 0.3 }}>
-                      <Popup>
-                        <div className="p-1 min-w-[200px] font-body">
-                          <h3 className="font-bold text-slate-900">{village.name}</h3>
-                          <p className="text-[10px] text-primary font-bold uppercase mb-4 tracking-widest">{village.province}</p>
-                          <Link href={`/village/${village.id}`}>
-                            <Button size="sm" className="w-full text-[10px] h-8 bg-primary rounded-xl font-bold">BUKA PROFIL LENGKAP</Button>
-                          </Link>
-                        </div>
-                      </Popup>
-                    </Polygon>
+                    <Polygon 
+                      positions={village.boundary.map((p: any) => [p.lat, p.lng])} 
+                      pathOptions={{ color: '#22c55e', fillOpacity: 0.3 }}
+                      eventHandlers={{ click: () => onSelectVillage?.(village.id) }}
+                    />
                   )}
                   {village.location && (
-                    <Marker position={[village.location.lat, village.location.lng]}>
+                    <Marker 
+                      position={[village.location.lat, village.location.lng]}
+                      eventHandlers={{ click: () => onSelectVillage?.(village.id) }}
+                    >
                       <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase tracking-wider">{village.name}</span></LeafletTooltip>
                     </Marker>
                   )}
