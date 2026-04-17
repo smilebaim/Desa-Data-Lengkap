@@ -289,21 +289,20 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Toolbar Kiri Unifikasi dengan Efek Peek-a-boo di Mobile */}
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group">
           <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-3xl shadow-2xl ring-1 ring-white/10 transform transition-transform duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
-              {showVillages ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white"}><Landmark className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white"}><Landmark className="h-3.5 w-3.5" /></ToolbarButton>
+            <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-3.5 w-3.5" /></ToolbarButton>
+            <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-3.5 w-3.5" /></ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Reset Peta" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Reset Peta" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-3.5 w-3.5" /></ToolbarButton>
             <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Perbesar" className="text-white"><Plus className="h-4 w-4" /></ToolbarButton>
-            <ToolbarButton tooltip="Perkecil" className="text-white"><Minus className="h-4 w-4" /></ToolbarButton>
+            <ToolbarButton tooltip="Perbesar" className="text-white"><Plus className="h-3.5 w-3.5" /></ToolbarButton>
+            <ToolbarButton tooltip="Perkecil" className="text-white"><Minus className="h-3.5 w-3.5" /></ToolbarButton>
           </div>
         </aside>
 
@@ -311,7 +310,7 @@ export default function HomePage() {
           <nav className="flex items-center gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
-                <DynamicIcon name={menu.icon} className="h-4 w-4" />
+                <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
               </NavButton>
             ))}
           </nav>
@@ -396,7 +395,7 @@ function ToolbarButton({ children, tooltip, onClick, className }: { children: Re
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick} className={`h-10 w-10 hover:bg-white/10 transition-all rounded-2xl shrink-0 ${className}`}>
+        <Button variant="ghost" size="icon" onClick={onClick} className={`h-8 w-8 sm:h-9 sm:w-9 hover:bg-white/10 transition-all rounded-2xl shrink-0 ${className}`}>
           {children}
         </Button>
       </TooltipTrigger>
