@@ -21,21 +21,64 @@ export default function DashboardPage() {
       // 1. Data Desa Dasar untuk statistik
       const villagesRef = collection(db, 'villages');
       const villageData = [
-        { name: 'Desa Sukamaju', province: 'Jawa Barat', population: 4500, area: 12.5, idmScore: 0.82, budgetAllocation: 1200000000, location: { lat: -6.9175, lng: 107.6191 }, description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ], potentials: ['Pertanian Digital', 'Ekonomi Kreatif'] },
-        { name: 'Desa Mekarsari', province: 'Bali', population: 3200, area: 8.2, idmScore: 0.78, budgetAllocation: 950000000, location: { lat: -8.4095, lng: 115.1889 }, description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.', potentials: ['Pariwisata Budaya', 'Kerajinan Tangan'] },
-        { name: 'Desa Sejahtera', province: 'Sumatera Barat', population: 5800, area: 25.4, idmScore: 0.85, budgetAllocation: 1800000000, location: { lat: -0.9492, lng: 100.3543 }, description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.', potentials: ['Pangan Organik', 'Irigasi Modern'] }
+        { 
+          name: 'Desa Sukamaju', 
+          province: 'Jawa Barat', 
+          population: 4500, 
+          area: 12.5, 
+          idmScore: 0.82, 
+          budgetAllocation: 1200000000, 
+          location: { lat: -6.9175, lng: 107.6191 }, 
+          description: 'Pusat inovasi digital pedesaan dengan fokus pada ekonomi kreatif.', 
+          boundary: [ {lat: -6.9, lng: 107.6}, {lat: -6.9, lng: 107.65}, {lat: -6.95, lng: 107.65}, {lat: -6.95, lng: 107.6} ], 
+          potentials: ['Pertanian Digital', 'Ekonomi Kreatif'],
+          tagline: 'Maju Bersama Teknologi'
+        },
+        { 
+          name: 'Desa Mekarsari', 
+          province: 'Bali', 
+          population: 3200, 
+          area: 8.2, 
+          idmScore: 0.78, 
+          budgetAllocation: 950000000, 
+          location: { lat: -8.4095, lng: 115.1889 }, 
+          description: 'Sentra kerajinan dan pariwisata budaya berbasis komunitas.', 
+          potentials: ['Pariwisata Budaya', 'Kerajinan Tangan'],
+          tagline: 'Harmoni Budaya dan Alam'
+        },
+        { 
+          name: 'Desa Sejahtera', 
+          province: 'Sumatera Barat', 
+          population: 5800, 
+          area: 25.4, 
+          idmScore: 0.85, 
+          budgetAllocation: 1800000000, 
+          location: { lat: -0.9492, lng: 100.3543 }, 
+          description: 'Lumbung pangan organik nasional dengan sistem irigasi modern.', 
+          potentials: ['Pangan Organik', 'Irigasi Modern'],
+          tagline: 'Pangan Melimpah, Rakyat Sejahtera'
+        }
       ];
 
       for (const v of villageData) {
         await addDoc(villagesRef, v);
       }
 
-      // 2. Data Fitur Spasial (Aset Peta)
+      // 2. Data Fitur Spasial (Aset Peta) yang sinkron dengan Tool Kiri
       const featuresRef = collection(db, 'features');
       const featureData = [
-        { name: 'Jembatan Ciujung', category: 'infrastructure', type: 'marker', icon: 'Construction', geometry: { lat: -6.918, lng: 107.620 }, description: 'Jembatan penghubung utama antar wilayah.', showStats: true },
-        { name: 'Kantor Desa Sukamaju', category: 'public_facility', type: 'marker', icon: 'Landmark', geometry: { lat: -6.917, lng: 107.619 }, description: 'Pusat administrasi desa terintegrasi.', showStats: false },
-        { name: 'Hutan Konservasi', category: 'natural_resource', type: 'polygon', icon: 'TreePine', geometry: [ {lat: -6.92, lng: 107.63}, {lat: -6.92, lng: 107.635}, {lat: -6.925, lng: 107.635}, {lat: -6.925, lng: 107.63} ], properties: { area: 2.5 }, description: 'Area lindung sumber daya air.', showStats: true }
+        // Infrastruktur
+        { name: 'Jembatan Ciujung', category: 'infrastructure', type: 'marker', icon: 'Construction', geometry: { lat: -6.918, lng: 107.620 }, description: 'Jembatan penghubung utama antar dusun yang baru direnovasi.', showStats: true },
+        { name: 'Jalan Lingkar Desa', category: 'infrastructure', type: 'polyline', icon: 'Navigation', geometry: [{lat: -6.915, lng: 107.610}, {lat: -6.915, lng: 107.630}], description: 'Jalan lingkar untuk akses distribusi hasil tani.', showStats: false },
+        
+        // Fasilitas Umum
+        { name: 'Kantor Desa Sukamaju', category: 'public_facility', type: 'marker', icon: 'Landmark', geometry: { lat: -6.917, lng: 107.619 }, description: 'Pusat administrasi desa dengan pelayanan digital 24 jam.', showStats: false },
+        { name: 'Puskesmas Mekarsari', category: 'public_facility', type: 'marker', icon: 'Hospital', geometry: { lat: -8.410, lng: 115.190 }, description: 'Fasilitas kesehatan tingkat pertama desa.', showStats: true },
+        { name: 'SD Negeri 01 Sejahtera', category: 'public_facility', type: 'marker', icon: 'School', geometry: { lat: -0.950, lng: 100.355 }, description: 'Sekolah dasar unggulan di wilayah Nagari.', showStats: false },
+
+        // Sumber Daya Alam
+        { name: 'Hutan Konservasi Mangrove', category: 'natural_resource', type: 'polygon', icon: 'TreePine', geometry: [ {lat: -6.92, lng: 107.63}, {lat: -6.92, lng: 107.635}, {lat: -6.925, lng: 107.635}, {lat: -6.925, lng: 107.63} ], properties: { area: 2.5 }, description: 'Area lindung ekosistem pesisir dan sumber air.', showStats: true },
+        { name: 'Danau Biru Sejahtera', category: 'natural_resource', type: 'circle', icon: 'Droplets', geometry: { lat: -0.955, lng: 100.360 }, properties: { radius: 500 }, description: 'Sumber air irigasi dan potensi wisata air.', showStats: true }
       ];
 
       for (const f of featureData) {
@@ -46,12 +89,13 @@ export default function DashboardPage() {
       const vizRef = collection(db, 'visualizers');
       const vizPop = await addDoc(vizRef, { title: 'Perbandingan Populasi', metric: 'population', chartType: 'bar', createdAt: serverTimestamp() });
       const vizIdm = await addDoc(vizRef, { title: 'Analisis Skor IDM', metric: 'idmScore', chartType: 'radar', createdAt: serverTimestamp() });
+      const vizBudget = await addDoc(vizRef, { title: 'Alokasi Anggaran Desa', metric: 'budgetAllocation', chartType: 'pie', createdAt: serverTimestamp() });
 
       // 4. Buat Halaman Dinamis
       const pagesRef = collection(db, 'pages');
       const pStat = await addDoc(pagesRef, { 
-        title: 'Statistik Nasional Desa', 
-        content: `Laporan agregat data desa seluruh Indonesia periode 2024.\n\n### Analisis Populasi Terpadu\n[CHART:${vizPop.id}]\n\n### Kemandirian Desa\n[CHART:${vizIdm.id}]`, 
+        title: 'Laporan Strategis Desa', 
+        content: `Laporan pembangunan desa periode 2024.\n\n### Analisis Populasi & IDM\n[CHART:${vizPop.id}]\n\n[CHART:${vizIdm.id}]\n\n### Efisiensi Anggaran\n[CHART:${vizBudget.id}]`, 
         showStats: true, 
         updatedAt: serverTimestamp() 
       });
@@ -59,11 +103,12 @@ export default function DashboardPage() {
       // 5. Buat Menu Navigasi
       const menusRef = collection(db, 'menus');
       await addDoc(menusRef, { label: 'Statistik', icon: 'BarChart', href: `/p/${pStat.id}`, order: 1, position: 'bottom' });
+      await addDoc(menusRef, { label: 'Profil Pembangunan', icon: 'TrendingUp', href: `/p/${pStat.id}`, order: 2, position: 'header' });
 
-      toast({ title: "Berhasil!", description: "Ekosistem data dummy strategis telah disinkronkan.", variant: "default" });
+      toast({ title: "Berhasil!", description: "Seluruh ekosistem data dummy (Infrastruktur, Fasilitas Umum, SDA) telah disinkronkan.", variant: "default" });
     } catch (error) {
       console.error(error);
-      toast({ title: "Gagal!", description: "Terjadi kesalahan.", variant: "destructive" });
+      toast({ title: "Gagal!", description: "Terjadi kesalahan saat seeding data.", variant: "destructive" });
     } finally {
       setIsSeeding(false);
     }
@@ -82,7 +127,7 @@ export default function DashboardPage() {
           className="bg-primary hover:bg-primary/90 rounded-2xl shadow-xl h-12 px-6 font-bold"
         >
           {isSeeding ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-          Buat Data Demo (Dummy)
+          Buat Data Demo Lengkap
         </Button>
       </header>
 
@@ -133,21 +178,21 @@ export default function DashboardPage() {
           <div className="space-y-4">
             <div className="flex gap-4">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center font-bold">1</div>
-              <p className="text-sm text-slate-300">Buat grafik di <strong>Statistik & Data</strong> untuk mendapatkan kode sematan unik.</p>
+              <p className="text-sm text-slate-300">Buat grafik di <strong>Statistik & Data</strong> (mendukung IDM & Anggaran).</p>
             </div>
             <div className="flex gap-4">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center font-bold">2</div>
-              <p className="text-sm text-slate-300">Gunakan kode tersebut di <strong>Manajemen Halaman</strong> untuk membuat profil interaktif.</p>
+              <p className="text-sm text-slate-300">Gunakan kode tersebut di <strong>Manajemen Halaman</strong> untuk profil interaktif.</p>
             </div>
           </div>
           <div className="space-y-4">
             <div className="flex gap-4">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center font-bold">3</div>
-              <p className="text-sm text-slate-300">Tautkan halaman baru tersebut ke dock peta melalui <strong>Navigasi Publik</strong>.</p>
+              <p className="text-sm text-slate-300">Tautkan halaman baru tersebut melalui <strong>Navigasi Publik</strong>.</p>
             </div>
             <div className="flex gap-4">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center font-bold">4</div>
-              <p className="text-sm text-slate-300">Gambar aset atau batas wilayah desa menggunakan <strong>Editor Spasial</strong>.</p>
+              <p className="text-sm text-slate-300">Gambar aset kategori INFRA, FASUM, atau SDA di <strong>Editor Spasial</strong>.</p>
             </div>
           </div>
         </CardContent>

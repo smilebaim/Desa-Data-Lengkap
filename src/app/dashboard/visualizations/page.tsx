@@ -43,17 +43,6 @@ export default function VisualizationsPage() {
     setFormData({ title: '', metric: 'population', chartType: 'bar' });
   }, []);
 
-  const statsData = useMemo(() => {
-    if (!villages) return [];
-    return villages.map(v => ({
-      name: v.name,
-      population: v.population || 0,
-      area: v.area || 0,
-      idmScore: v.idmScore || 0,
-      budgetAllocation: v.budgetAllocation || 0
-    }));
-  }, [villages]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title) return toast({ title: "Galat", description: "Judul grafik harus diisi.", variant: "destructive" });
