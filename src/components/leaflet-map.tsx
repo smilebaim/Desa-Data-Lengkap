@@ -38,6 +38,7 @@ const LeafletMap = ({
 
   useEffect(() => {
     setIsMounted(true);
+    return () => setIsMounted(false);
   }, []);
 
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
@@ -88,7 +89,7 @@ const LeafletMap = ({
 
   return (
     <MapContainer 
-      key="main-map"
+      key="main-map-instance"
       className="h-full w-full z-10" 
       center={[-2.5489, 118.0149]} 
       zoom={5} 

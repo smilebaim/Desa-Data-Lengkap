@@ -200,19 +200,19 @@ export default function HomePage() {
 
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/70 backdrop-blur-3xl border border-white/10 p-1 rounded-full shadow-2xl ring-1 ring-white/10">
+            <div className="flex items-center justify-between gap-1.5 sm:gap-3 pointer-events-auto bg-slate-950/70 backdrop-blur-3xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
               <div className="flex items-center gap-2 pl-2">
-                <div className="h-7 w-7 sm:h-8 sm:w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
-                  <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
+                <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
+                  <Shield className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div className="hidden lg:block text-left">
-                  <h1 className="text-[10px] sm:text-xs font-bold tracking-tight text-white leading-none">Desa Lengkap</h1>
-                  <p className="text-[7px] sm:text-[8px] text-primary/80 font-bold uppercase tracking-widest mt-0.5">Informasi Spasial Nasional</p>
+                  <h1 className="text-xs font-bold tracking-tight text-white leading-none">Desa Lengkap</h1>
+                  <p className="text-[8px] text-primary/80 font-bold uppercase tracking-widest mt-0.5">Informasi Spasial Nasional</p>
                 </div>
               </div>
 
               <div className="flex-1 flex justify-center mx-2 pointer-events-auto relative">
-                <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-full max-w-md px-3 h-9 bg-white/20' : 'w-8 h-8 sm:w-9 sm:h-9 justify-center cursor-pointer hover:bg-white/15'}`}>
+                <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-full max-w-[140px] px-3 h-8 bg-white/20' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
                   <button 
                     onClick={() => setIsSearchFocused(!isSearchFocused)}
                     className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
@@ -223,8 +223,8 @@ export default function HomePage() {
                     <input 
                       autoFocus
                       type="text" 
-                      placeholder="Cari desa..." 
-                      className="bg-transparent text-[10px] sm:text-[11px] font-bold text-white outline-none placeholder:text-slate-500 w-full"
+                      placeholder="Cari..." 
+                      className="bg-transparent text-[10px] font-bold text-white outline-none placeholder:text-slate-500 w-full"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onBlur={() => {
@@ -235,44 +235,38 @@ export default function HomePage() {
                 </div>
 
                 {isSearchFocused && searchQuery.trim() && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-full max-w-md bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-full max-w-sm bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                     <ScrollArea className="max-h-[350px]">
-                      {searchResults.villages.length === 0 && searchResults.features.length === 0 ? (
-                        <div className="p-8 text-center">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tidak ada hasil</p>
-                        </div>
-                      ) : (
-                        <div className="p-2 space-y-4">
-                          {searchResults.villages.length > 0 && (
-                            <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah Desa</p>
-                              {searchResults.villages.map(v => (
-                                <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between text-left">
-                                  <div>
-                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
-                                    <p className="text-[9px] text-slate-500">{v.province}</p>
-                                  </div>
-                                  <ChevronRight className="h-3 w-3 text-slate-700" />
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                          {searchResults.features.length > 0 && (
-                            <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset Peta</p>
-                              {searchResults.features.map(f => (
-                                <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between text-left">
-                                  <div>
-                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
-                                    <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
-                                  </div>
-                                  <ChevronRight className="h-3 w-3 text-slate-700" />
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      <div className="p-2 space-y-4">
+                        {searchResults.villages.length > 0 && (
+                          <div>
+                            <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah</p>
+                            {searchResults.villages.map(v => (
+                              <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                <div>
+                                  <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
+                                  <p className="text-[9px] text-slate-500">{v.province}</p>
+                                </div>
+                                <ChevronRight className="h-3 w-3 text-slate-700" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {searchResults.features.length > 0 && (
+                          <div>
+                            <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset</p>
+                            {searchResults.features.map(f => (
+                              <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
+                                <div>
+                                  <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
+                                  <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
+                                </div>
+                                <ChevronRight className="h-3 w-3 text-slate-700" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </ScrollArea>
                   </div>
                 )}
@@ -280,14 +274,14 @@ export default function HomePage() {
 
               <div className="flex items-center gap-1 pr-1 pointer-events-auto">
                 {headerMenus?.map((menu: any) => (
-                  <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-7 sm:h-8 rounded-full px-2 sm:px-4 text-[9px] sm:text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
+                  <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-8 rounded-full px-3 text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
                     <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 text-primary" />
                     <span className="hidden md:inline">{menu.label}</span>
                   </Button>
                 ))}
                 {!isAuthLoading && (
                   <Link href={user ? "/dashboard" : "/login"}>
-                    <Button className="h-7 sm:h-8 px-2 sm:px-4 rounded-full text-[9px] sm:text-[10px] font-bold gap-2 bg-primary hover:bg-primary/90">
+                    <Button className="h-8 px-3 rounded-full text-[10px] font-bold gap-2 bg-primary hover:bg-primary/90">
                       {user ? <LayoutDashboard className="h-3.5 w-3.5" /> : <LogIn className="h-3.5 w-3.5" />}
                       <span className="hidden sm:inline">{user ? "Dasbor" : "Masuk"}</span>
                     </Button>
@@ -299,7 +293,7 @@ export default function HomePage() {
         </header>
 
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group">
-          <div className="flex flex-col gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-2xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-2xl">
+          <div className="flex flex-col gap-1 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-2xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-2xl">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
@@ -316,7 +310,7 @@ export default function HomePage() {
         </aside>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3 w-full px-4">
-          <nav className="flex items-center gap-1.5 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
+          <nav className="flex items-center gap-1 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
@@ -339,7 +333,7 @@ export default function HomePage() {
                       <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none text-white">
                         {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
                       </Badge>
-                      <h2 className="text-3xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
+                      <h2 className="text-2xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
                       {itemDetail.province && <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
                       {itemDetail.category && <p className="text-primary/80 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
                     </div>
@@ -350,11 +344,11 @@ export default function HomePage() {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Populasi</p>
-                            <p className="text-2xl font-bold text-slate-900 leading-none">{itemDetail.population?.toLocaleString()} <span className="text-[10px] text-slate-400 font-bold ml-1">JIWA</span></p>
+                            <p className="text-xl font-bold text-slate-900 leading-none">{itemDetail.population?.toLocaleString()} <span className="text-[10px] text-slate-400 font-bold ml-1">JIWA</span></p>
                           </div>
                           <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Skor IDM</p>
-                            <p className="text-2xl font-bold text-slate-900 leading-none">{(itemDetail.idmScore || 0).toFixed(2)}</p>
+                            <p className="text-xl font-bold text-slate-900 leading-none">{(itemDetail.idmScore || 0).toFixed(2)}</p>
                           </div>
                         </div>
                         <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold gap-3 shadow-xl transition-all">
@@ -404,7 +398,7 @@ function ToolbarButton({ children, tooltip, onClick, className }: { children: Re
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick} className={`h-8 w-8 sm:h-9 sm:w-9 hover:bg-white/10 transition-all rounded-xl shrink-0 ${className}`}>
+        <Button variant="ghost" size="icon" onClick={onClick} className={`h-8 w-8 hover:bg-white/10 transition-all rounded-xl shrink-0 ${className}`}>
           {children}
         </Button>
       </TooltipTrigger>
