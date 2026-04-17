@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
@@ -8,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { 
   Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
   Copy, CheckCheck, ExternalLink, Sparkles, Save,
-  Database, Edit2, X, PieChart, LayoutGrid, Trash2, Coins
+  Database, Edit2, X, PieChart, LayoutGrid, Trash2, Coins, Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,7 +100,7 @@ export default function VisualizationsPage() {
   };
 
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-10 pb-20 text-left">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pusat Statistik & Visualisasi</h1>
@@ -158,7 +157,7 @@ export default function VisualizationsPage() {
                 {editingId ? <Edit2 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
                 <span>{editingId ? 'Edit Diagram' : 'Buat Baru'}</span>
               </div>
-              {editingId && <Button variant="ghost" size="icon" onClick={resetForm}><X className="h-4 w-4" /></Button>}
+              {editingId && <Button variant="ghost" size="icon" onClick={resetForm} className="text-white hover:bg-white/10"><X className="h-4 w-4" /></Button>}
             </CardTitle>
             <CardDescription className="text-slate-400">Atur metrik dan gaya visual grafik.</CardDescription>
           </CardHeader>
@@ -220,7 +219,7 @@ export default function VisualizationsPage() {
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
                         {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChart className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
-                      <div>
+                      <div className="text-left">
                         <h4 className="font-bold text-slate-900 flex items-center gap-2">
                           {viz.title}
                           <span className="text-[9px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-500 border border-slate-200">{viz.metric}</span>
