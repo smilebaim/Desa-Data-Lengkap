@@ -19,7 +19,8 @@ import Link from 'next/link';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { 
-  BarChart, PieChart, RadarChart, LineChart
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, 
+  ResponsiveContainer, Cell, PieChart, Pie, Radar, RadarChart, PolarGrid, PolarAngleAxis, LineChart, Line
 } from 'recharts';
 
 export default function VisualizationsPage() {

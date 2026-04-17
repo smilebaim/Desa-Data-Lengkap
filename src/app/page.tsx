@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { 
@@ -211,12 +211,12 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="flex-1 relative max-w-md mx-2 pointer-events-auto text-left">
+              <div className="flex-1 relative max-w-[120px] sm:max-w-md mx-1 sm:mx-2 pointer-events-auto text-left">
                 <div className={`flex items-center bg-white/10 border border-white/5 rounded-full px-3 h-8 sm:h-9 transition-all ${isSearchFocused ? 'bg-white/20 border-primary/40 ring-2 ring-primary/20' : ''}`}>
                   <Search className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${isSearchFocused ? 'text-primary' : 'text-slate-400'}`} />
                   <input 
                     type="text" 
-                    placeholder="Cari desa atau aset..." 
+                    placeholder="Cari desa..." 
                     className="bg-transparent text-[9px] sm:text-[11px] font-bold text-white outline-none placeholder:text-slate-500 w-full ml-1.5 sm:ml-3"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -272,15 +272,15 @@ export default function HomePage() {
               <div className="flex items-center gap-1 pr-1 pointer-events-auto">
                 {headerMenus?.map((menu: any) => (
                   <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-7 sm:h-8 rounded-full px-2 sm:px-4 text-[9px] sm:text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
-                    <DynamicIcon name={menu.icon} className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
+                    <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 text-primary" />
                     <span className="hidden md:inline">{menu.label}</span>
                   </Button>
                 ))}
                 {!isAuthLoading && (
                   <Link href={user ? "/dashboard" : "/login"}>
-                    <Button className="h-7 sm:h-8 px-4 rounded-full text-[9px] sm:text-[10px] font-bold gap-2 bg-primary hover:bg-primary/90">
-                      {user ? <LayoutDashboard className="h-3 w-3" /> : <LogIn className="h-3 w-3" />}
-                      <span>{user ? "Dasbor" : "Masuk"}</span>
+                    <Button className="h-7 sm:h-8 px-2 sm:px-4 rounded-full text-[9px] sm:text-[10px] font-bold gap-2 bg-primary hover:bg-primary/90">
+                      {user ? <LayoutDashboard className="h-3.5 w-3.5" /> : <LogIn className="h-3.5 w-3.5" />}
+                      <span className="hidden sm:inline">{user ? "Dasbor" : "Masuk"}</span>
                     </Button>
                   </Link>
                 )}
