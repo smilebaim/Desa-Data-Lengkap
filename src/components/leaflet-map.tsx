@@ -1,4 +1,3 @@
-
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, LayersControl, FeatureGroup } from 'react-leaflet';
@@ -7,7 +6,7 @@ import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { useMemo } from 'react';
+import { useMemo, Fragment } from 'react';
 
 if (typeof window !== 'undefined') {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -71,6 +70,7 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
         );
       }
     } catch (e) {
+      console.error('Error rendering feature:', e);
       return null;
     }
     return null;
@@ -78,20 +78,30 @@ const LeafletMap = ({ villages = [], showVillages = true, onSelectVillage, onSel
 
   return (
     <MapContainer className="h-full w-full z-10" center={[-2.5489, 118.0149]} zoom={5} minZoom={5} maxBounds={indonesiaBounds} zoomControl={false}>
-      <TileLayer url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" subdomains={['mt0','mt1','mt2','mt3']} />
+      <TileLayer 
+        attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+        url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
+        subdomains={['mt0','mt1','mt2','mt3']} 
+      />
       <LayersControl position="topright">
         {showVillages && (
           <LayersControl.Overlay checked name="Batas Desa">
             <FeatureGroup>
               {(villages || []).map((v) => (
-                <div key={v.id}>
-                  {v.boundary && <Polygon positions={v.boundary.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#22c55e', fillOpacity: 0.3 }} eventHandlers={{ click: () => onSelectVillage?.(v.id) }} />}
+                <Fragment key={v.id}>
+                  {v.boundary && (
+                    <Polygon 
+                      positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
+                      pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }} 
+                      eventHandlers={{ click: () => onSelectVillage?.(v.id) }} 
+                    />
+                  )}
                   {v.location && (
                     <Marker position={[v.location.lat, v.location.lng]} eventHandlers={{ click: () => onSelectVillage?.(v.id) }}>
                       <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase">{v.name}</span></LeafletTooltip>
                     </Marker>
                   )}
-                </div>
+                </Fragment>
               ))}
             </FeatureGroup>
           </LayersControl.Overlay>

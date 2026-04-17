@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
@@ -192,9 +191,9 @@ export default function VisualizationsPage() {
                 </Select>
               </div>
             </div>
-            <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5 mr-2" />}
-              {editingId ? 'Simpan Perubahan' : 'Terbitkan'}
+            <Button className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="animate-spin h-5 w-5" /> : (editingId ? <Save className="h-5 w-5 mr-2" /> : <Sparkles className="h-5 w-5 mr-2" />)}
+              {editingId ? 'Simpan Perubahan' : 'Tambahkan ke Pustaka'}
             </Button>
           </form>
         </Card>
@@ -211,20 +210,24 @@ export default function VisualizationsPage() {
                 {visualizers?.map((viz: any) => (
                   <div key={viz.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 group">
                     <div className="flex items-center gap-5">
-                      <div className="h-12 w-12 bg-white border rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                      <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
                         {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChart className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900">{viz.title}</h4>
-                        <span className="text-[9px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-500">{viz.metric}</span>
+                        <h4 className="font-bold text-slate-900 flex items-center gap-2">
+                          {viz.title}
+                          <span className="text-[9px] font-black uppercase bg-slate-100 px-2 py-0.5 rounded text-slate-500 border border-slate-200">{viz.metric}</span>
+                        </h4>
+                        <p className="text-[10px] text-slate-400 font-medium">Tipe: {viz.chartType}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={() => handleCopy(`[CHART:${viz.id}]`, viz.id)}>
-                        {copiedId === viz.id ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />} SALIN
+                      <Button variant="outline" size="sm" className="rounded-xl gap-2 h-9 px-4 text-xs font-bold border-slate-200" onClick={() => handleCopy(`[CHART:${viz.id}]`, viz.id)}>
+                        {copiedId === viz.id ? <CheckCheck className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />} 
+                        {copiedId === viz.id ? 'TERSALIN' : 'SALIN KODE'}
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400" onClick={() => handleEdit(viz)}><Edit2 className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-red-300 hover:text-red-500" onClick={() => { if(confirm('Hapus?')) deleteDoc(doc(db, 'visualizers', viz.id)) }}><Trash2 className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl" onClick={() => handleEdit(viz)}><Edit2 className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl" onClick={() => { if(confirm('Hapus grafik ini?')) deleteDoc(doc(db, 'visualizers', viz.id)) }}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}
