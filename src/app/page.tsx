@@ -209,7 +209,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
               <div className="flex items-center gap-2 pl-2">
                 <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
-                  <Shield className="h-4 w-4 text-primary-foreground" />
+                  <Shield className="h-3.5 w-3.5 text-primary-foreground" />
                 </div>
                 <div className="hidden lg:block text-left">
                   <h1 className="text-xs font-bold tracking-tight text-white leading-none">Desa Lengkap</h1>
@@ -244,7 +244,7 @@ export default function HomePage() {
                   {isSearchFocused && searchQuery.trim() && (
                     <div className="absolute top-full right-0 mt-2 w-64 bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                       <ScrollArea className="max-h-[350px]">
-                        <div className="p-2 space-y-4">
+                        <div className="p-2 space-y-4 text-left">
                           {searchResults.villages.length > 0 && (
                             <div>
                               <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest text-left">Wilayah</p>
@@ -254,7 +254,7 @@ export default function HomePage() {
                                     <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
                                     <p className="text-[9px] text-slate-500">{v.province}</p>
                                   </div>
-                                  <ChevronRight className="h-3 w-3 text-slate-700" />
+                                  <ChevronRight className="h-3.5 w-3.5 text-slate-700" />
                                 </button>
                               ))}
                             </div>
@@ -268,7 +268,7 @@ export default function HomePage() {
                                     <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
                                     <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
                                   </div>
-                                  <ChevronRight className="h-3 w-3 text-slate-700" />
+                                  <ChevronRight className="h-3.5 w-3.5 text-slate-700" />
                                 </button>
                               ))}
                             </div>
@@ -282,7 +282,7 @@ export default function HomePage() {
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-200 hover:bg-white/10">
-                      <MenuIcon className="h-4 w-4" />
+                      <MenuIcon className="h-3.5 w-3.5" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent className="bg-slate-950/40 backdrop-blur-2xl border-white/10 text-white p-0 overflow-hidden">
@@ -308,7 +308,7 @@ export default function HomePage() {
                               onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} 
                               className="w-full justify-start h-12 rounded-xl text-xs font-bold gap-4 hover:bg-white/5"
                             >
-                              <DynamicIcon name={menu.icon} className="h-4 w-4 text-primary" />
+                              <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 text-primary" />
                               {menu.label}
                             </Button>
                           ))}
@@ -321,17 +321,17 @@ export default function HomePage() {
                             <div className="space-y-3">
                               <Link href="/dashboard" className="w-full block">
                                 <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-3">
-                                  <LayoutDashboard className="h-4 w-4" /> Buka Dasbor
+                                  <LayoutDashboard className="h-3.5 w-3.5" /> Buka Dasbor
                                 </Button>
                               </Link>
                               <Button variant="ghost" onClick={handleLogout} className="w-full h-12 rounded-xl text-red-400 hover:bg-red-500/10 font-bold gap-3">
-                                <LogOut className="h-4 w-4" /> Keluar
+                                <LogOut className="h-3.5 w-3.5" /> Keluar
                               </Button>
                             </div>
                           ) : (
                             <Link href="/login" className="w-full block">
                               <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-3">
-                                <LogIn className="h-4 w-4" /> Masuk Admin
+                                <LogIn className="h-3.5 w-3.5" /> Masuk Admin
                               </Button>
                             </Link>
                           )
@@ -405,13 +405,13 @@ export default function HomePage() {
                           </div>
                         </div>
                         <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold gap-3 shadow-xl transition-all">
-                          {isAiAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <BrainCircuit className="h-5 w-5 text-primary" />}
+                          {isAiAnalyzing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <BrainCircuit className="h-3.5 w-3.5 text-primary" />}
                           Analisis Strategis AI
                         </Button>
                         {aiAnalysisResult && (
                           <div className="p-8 bg-primary/5 rounded-3xl border border-primary/10 animate-in zoom-in-95 duration-300">
                             <div className="flex items-center gap-2 mb-4">
-                              <Sparkles className="h-4 w-4 text-primary" />
+                              <Sparkles className="h-3.5 w-3.5 text-primary" />
                               <p className="text-[10px] font-black text-primary uppercase tracking-widest">Saran AI</p>
                             </div>
                             <p className="text-sm text-slate-700 leading-relaxed font-medium">{aiAnalysisResult.analysis}</p>
@@ -423,7 +423,7 @@ export default function HomePage() {
                       {renderContentWithCharts(itemDetail.content || itemDetail.description)}
                     </div>
                     {itemDetail.potentials && itemDetail.potentials.length > 0 && (
-                      <div className="space-y-4">
+                      <div className="space-y-4 text-left">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Potensi Wilayah</p>
                         <div className="flex flex-wrap gap-2">
                           {itemDetail.potentials.map((pot: string, i: number) => (
