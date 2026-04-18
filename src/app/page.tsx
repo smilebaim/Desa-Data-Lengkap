@@ -219,7 +219,7 @@ export default function HomePage() {
 
               <div className="flex items-center gap-1.5 pr-1 pointer-events-auto">
                 <div className="relative flex items-center">
-                  <div className={`flex items-center bg-white/5 border border-white/5 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-40 sm:w-48 px-3 h-8 bg-white/10' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
+                  <div className={`flex items-center bg-white/5 border border-white/5 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-32 sm:w-48 px-3 h-8 bg-white/10' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
                     <button 
                       onClick={() => setIsSearchFocused(!isSearchFocused)}
                       className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}

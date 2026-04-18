@@ -88,51 +88,53 @@ const LeafletMap = ({
   if (!isMounted) return null;
 
   return (
-    <MapContainer 
-      key="main-map-static-id"
-      className="h-full w-full z-10" 
-      center={[-2.5489, 118.0149]} 
-      zoom={5} 
-      minZoom={5} 
-      maxBounds={indonesiaBounds} 
-      zoomControl={false}
-      scrollWheelZoom={true}
-    >
-      <TileLayer 
-        attribution='&copy; Google Satellite'
-        url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
-        subdomains={['mt0','mt1','mt2','mt3']} 
-      />
-      
-      {showVillages && (
+    <div className="h-full w-full">
+      <MapContainer 
+        key="main-map-container"
+        className="h-full w-full z-10" 
+        center={[-2.5489, 118.0149]} 
+        zoom={5} 
+        minZoom={5} 
+        maxBounds={indonesiaBounds} 
+        zoomControl={false}
+        scrollWheelZoom={true}
+      >
+        <TileLayer 
+          attribution='&copy; Google Satellite'
+          url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" 
+          subdomains={['mt0','mt1','mt2','mt3']} 
+        />
+        
+        {showVillages && (
+          <FeatureGroup>
+            {(villages || []).map((v) => (
+              <Fragment key={`v-${v.id}`}>
+                {v.boundary && Array.isArray(v.boundary) && (
+                  <Polygon 
+                    positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
+                    pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }} 
+                    eventHandlers={{ click: () => onSelectVillage?.(v.id) }} 
+                  />
+                )}
+                {v.location && (
+                  <Marker position={[v.location.lat, v.location.lng]} eventHandlers={{ click: () => onSelectVillage?.(v.id) }}>
+                    <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase">{v.name}</span></LeafletTooltip>
+                  </Marker>
+                )}
+              </Fragment>
+            ))}
+          </FeatureGroup>
+        )}
+
         <FeatureGroup>
-          {(villages || []).map((v) => (
-            <Fragment key={v.id}>
-              {v.boundary && Array.isArray(v.boundary) && (
-                <Polygon 
-                  positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
-                  pathOptions={{ color: '#22c55e', fillOpacity: 0.3, weight: 2 }} 
-                  eventHandlers={{ click: () => onSelectVillage?.(v.id) }} 
-                />
-              )}
-              {v.location && (
-                <Marker position={[v.location.lat, v.location.lng]} eventHandlers={{ click: () => onSelectVillage?.(v.id) }}>
-                  <LeafletTooltip direction="top"><span className="font-bold text-[10px] uppercase">{v.name}</span></LeafletTooltip>
-                </Marker>
-              )}
+          {filteredFeatures.map(f => (
+            <Fragment key={`f-${f.id}`}>
+              {renderFeature(f)}
             </Fragment>
           ))}
         </FeatureGroup>
-      )}
-
-      <FeatureGroup>
-        {filteredFeatures.map(f => (
-          <Fragment key={f.id}>
-            {renderFeature(f)}
-          </Fragment>
-        ))}
-      </FeatureGroup>
-    </MapContainer>
+      </MapContainer>
+    </div>
   );
 };
 
