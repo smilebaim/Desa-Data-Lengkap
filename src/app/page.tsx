@@ -16,7 +16,7 @@ import { useFirestore, useCollection, useUser, useDoc, useAuth } from '@/firebas
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import * as LucideIcons from 'lucide-react';
 import Link from 'next/link';
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -206,7 +206,7 @@ export default function HomePage() {
 
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/70 backdrop-blur-3xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
+            <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
               <div className="flex items-center gap-2 pl-2">
                 <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
                   <Shield className="h-4 w-4 text-primary-foreground" />
@@ -219,7 +219,7 @@ export default function HomePage() {
 
               <div className="flex items-center gap-1.5 pr-1 pointer-events-auto">
                 <div className="relative flex items-center">
-                  <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-40 sm:w-48 px-3 h-8 bg-white/20' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
+                  <div className={`flex items-center bg-white/5 border border-white/5 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-40 sm:w-48 px-3 h-8 bg-white/10' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
                     <button 
                       onClick={() => setIsSearchFocused(!isSearchFocused)}
                       className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
@@ -242,7 +242,7 @@ export default function HomePage() {
                   </div>
 
                   {isSearchFocused && searchQuery.trim() && (
-                    <div className="absolute top-full right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="absolute top-full right-0 mt-2 w-64 bg-slate-900/40 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                       <ScrollArea className="max-h-[350px]">
                         <div className="p-2 space-y-4">
                           {searchResults.villages.length > 0 && (
@@ -285,9 +285,9 @@ export default function HomePage() {
                       <MenuIcon className="h-4 w-4" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent className="bg-slate-950/95 border-white/10 text-white p-0 overflow-hidden">
+                  <SheetContent className="bg-slate-950/40 backdrop-blur-2xl border-white/10 text-white p-0 overflow-hidden">
                     <div className="flex flex-col h-full">
-                      <div className="p-8 border-b border-white/5 bg-slate-900/50">
+                      <div className="p-8 border-b border-white/5 bg-slate-900/20">
                         <div className="flex items-center gap-3 mb-6">
                            <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                              <Shield className="h-5 w-5 text-white" />
@@ -315,7 +315,7 @@ export default function HomePage() {
                         </div>
                       </ScrollArea>
 
-                      <div className="p-8 border-t border-white/5 bg-slate-900/50">
+                      <div className="p-8 border-t border-white/5 bg-slate-900/20">
                         {!isAuthLoading && (
                           user ? (
                             <div className="space-y-3">
@@ -346,7 +346,7 @@ export default function HomePage() {
         </header>
 
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group">
-          <div className="flex flex-col gap-1 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/10 rounded-r-2xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-2xl">
+          <div className="flex flex-col gap-1 p-1.5 bg-slate-950/40 backdrop-blur-xl border border-white/10 rounded-r-2xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-2xl">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
@@ -363,7 +363,7 @@ export default function HomePage() {
         </aside>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3 w-full px-4">
-          <nav className="flex items-center gap-1 p-1.5 bg-slate-950/70 backdrop-blur-3xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
+          <nav className="flex items-center gap-1 p-1.5 bg-slate-950/40 backdrop-blur-xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
@@ -473,4 +473,3 @@ function NavButton({ children, label, onClick }: { children: React.ReactNode, la
     </Tooltip>
   );
 }
-
