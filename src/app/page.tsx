@@ -9,17 +9,18 @@ import {
   LayoutDashboard, X, MapPin, BarChart3, 
   Users, TrendingUp, Info, Zap, 
   Navigation, Eye, EyeOff, Construction, TreePine, Sparkles, Loader2, BrainCircuit,
-  LocateFixed, ChevronRight
+  LocateFixed, ChevronRight, Menu as MenuIcon, LogOut
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useFirestore, useCollection, useUser, useDoc } from '@/firebase';
+import { useFirestore, useCollection, useUser, useDoc, useAuth } from '@/firebase';
 import { collection, query, orderBy, doc } from 'firebase/firestore';
 import * as LucideIcons from 'lucide-react';
 import Link from 'next/link';
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { signOut } from 'firebase/auth';
 import { 
   BarChart, Bar, XAxis, CartesianGrid, ResponsiveContainer, Cell, PieChart, Pie, Radar, RadarChart, PolarGrid, PolarAngleAxis, LineChart, Line
 } from 'recharts';
@@ -86,6 +87,7 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
 
 export default function HomePage() {
   const db = useFirestore();
+  const auth = useAuth();
   const { user, isLoading: isAuthLoading } = useUser();
   const [showVillages, setShowVillages] = useState(true);
   const [activeCategories, setActiveCategories] = useState<string[]>(['infrastructure', 'public_facility', 'natural_resource']);
@@ -171,6 +173,10 @@ export default function HomePage() {
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
   const renderContentWithCharts = (content: string) => {
     if (!content) return null;
     const parts = content.split(/(\[CHART:[a-zA-Z0-9_-]+\])/g);
@@ -212,9 +218,8 @@ export default function HomePage() {
               </div>
 
               <div className="flex items-center gap-1.5 pr-1 pointer-events-auto">
-                {/* Search Tool moved next to login */}
                 <div className="relative flex items-center">
-                  <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-48 px-3 h-8 bg-white/20' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
+                  <div className={`flex items-center bg-white/10 border border-white/10 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-40 sm:w-48 px-3 h-8 bg-white/20' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
                     <button 
                       onClick={() => setIsSearchFocused(!isSearchFocused)}
                       className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
@@ -242,7 +247,7 @@ export default function HomePage() {
                         <div className="p-2 space-y-4">
                           {searchResults.villages.length > 0 && (
                             <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah</p>
+                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest text-left">Wilayah</p>
                               {searchResults.villages.map(v => (
                                 <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
                                   <div>
@@ -256,7 +261,7 @@ export default function HomePage() {
                           )}
                           {searchResults.features.length > 0 && (
                             <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest">Aset</p>
+                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest text-left">Aset</p>
                               {searchResults.features.map(f => (
                                 <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
                                   <div>
@@ -274,20 +279,67 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {headerMenus?.map((menu: any) => (
-                  <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="h-8 rounded-full px-3 text-[10px] font-bold gap-2 text-slate-200 hover:bg-white/10">
-                    <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 text-primary" />
-                    <span className="hidden md:inline">{menu.label}</span>
-                  </Button>
-                ))}
-                {!isAuthLoading && (
-                  <Link href={user ? "/dashboard" : "/login"}>
-                    <Button className="h-8 px-3 rounded-full text-[10px] font-bold gap-2 bg-primary hover:bg-primary/90">
-                      {user ? <LayoutDashboard className="h-3.5 w-3.5" /> : <LogIn className="h-3.5 w-3.5" />}
-                      <span className="hidden sm:inline">{user ? "Dasbor" : "Masuk"}</span>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-slate-200 hover:bg-white/10">
+                      <MenuIcon className="h-4 w-4" />
                     </Button>
-                  </Link>
-                )}
+                  </SheetTrigger>
+                  <SheetContent className="bg-slate-950/95 border-white/10 text-white p-0 overflow-hidden">
+                    <div className="flex flex-col h-full">
+                      <div className="p-8 border-b border-white/5 bg-slate-900/50">
+                        <div className="flex items-center gap-3 mb-6">
+                           <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                             <Shield className="h-5 w-5 text-white" />
+                           </div>
+                           <div className="text-left">
+                              <h2 className="text-sm font-black uppercase tracking-widest text-white">Desa Lengkap</h2>
+                              <p className="text-[9px] font-bold text-primary/60 uppercase tracking-[0.3em]">Menu Navigasi</p>
+                           </div>
+                        </div>
+                      </div>
+                      
+                      <ScrollArea className="flex-1 px-4 py-6">
+                        <div className="space-y-1">
+                          {headerMenus?.map((menu: any) => (
+                            <Button 
+                              key={menu.id} 
+                              variant="ghost" 
+                              onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} 
+                              className="w-full justify-start h-12 rounded-xl text-xs font-bold gap-4 hover:bg-white/5"
+                            >
+                              <DynamicIcon name={menu.icon} className="h-4 w-4 text-primary" />
+                              {menu.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+
+                      <div className="p-8 border-t border-white/5 bg-slate-900/50">
+                        {!isAuthLoading && (
+                          user ? (
+                            <div className="space-y-3">
+                              <Link href="/dashboard" className="w-full block">
+                                <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-3">
+                                  <LayoutDashboard className="h-4 w-4" /> Buka Dasbor
+                                </Button>
+                              </Link>
+                              <Button variant="ghost" onClick={handleLogout} className="w-full h-12 rounded-xl text-red-400 hover:bg-red-500/10 font-bold gap-3">
+                                <LogOut className="h-4 w-4" /> Keluar
+                              </Button>
+                            </div>
+                          ) : (
+                            <Link href="/login" className="w-full block">
+                              <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-3">
+                                <LogIn className="h-4 w-4" /> Masuk Admin
+                              </Button>
+                            </Link>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
           </div>
@@ -335,8 +387,8 @@ export default function HomePage() {
                         {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
                       </Badge>
                       <h2 className="text-2xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
-                      {itemDetail.province && <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
-                      {itemDetail.category && <p className="text-primary/80 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
+                      {itemDetail.province && <p className="text-white text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
+                      {itemDetail.category && <p className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
                     </div>
                   </div>
                   <div className="px-8 py-10 space-y-8 text-left">
@@ -421,3 +473,4 @@ function NavButton({ children, label, onClick }: { children: React.ReactNode, la
     </Tooltip>
   );
 }
+

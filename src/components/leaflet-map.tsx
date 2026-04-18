@@ -89,7 +89,7 @@ const LeafletMap = ({
 
   return (
     <MapContainer 
-      key="main-map-instance"
+      key="main-map-static-key"
       className="h-full w-full z-10" 
       center={[-2.5489, 118.0149]} 
       zoom={5} 

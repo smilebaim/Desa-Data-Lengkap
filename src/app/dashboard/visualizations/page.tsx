@@ -4,11 +4,11 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  Loader2, BarChart3, TrendingUp, Users, Map as MapIcon, 
-  Copy, CheckCheck, ExternalLink, Sparkles, Save, Plus,
-  Database, Edit2, X, LayoutGrid, Trash2, Coins, PieChart as PieChartIcon
+  Loader2, BarChart3, TrendingUp, LayoutGrid, Trash2, 
+  Copy, CheckCheck, ExternalLink, Save, Plus, Edit2, X,
+  PieChart as PieIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +30,6 @@ export default function VisualizationsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const villageQuery = useMemo(() => query(collection(db, 'villages'), orderBy('name', 'asc')), [db]);
-  const { data: villages } = useCollection(villageQuery);
-
   const visualizerQuery = useMemo(() => query(collection(db, 'visualizers'), orderBy('createdAt', 'desc')), [db]);
   const { data: visualizers, isLoading: isVisualizersLoading } = useCollection(visualizerQuery);
 
@@ -52,28 +49,23 @@ export default function VisualizationsPage() {
     if (!formData.title) return toast({ title: "Galat", description: "Judul grafik harus diisi.", variant: "destructive" });
     
     setIsSubmitting(true);
-    const dataToSave = { 
-      ...formData, 
-      updatedAt: serverTimestamp() 
-    };
+    const dataToSave = { ...formData, updatedAt: serverTimestamp() };
 
-    if (editingId) {
-      const docRef = doc(db, 'visualizers', editingId);
-      updateDoc(docRef, dataToSave)
-        .then(() => {
-          toast({ title: "Berhasil", description: "Konfigurasi grafik diperbarui." });
-          resetForm();
-        })
-        .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: dataToSave })))
-        .finally(() => setIsSubmitting(false));
-    } else {
-      addDoc(collection(db, 'visualizers'), { ...dataToSave, createdAt: serverTimestamp() })
-        .then(() => {
-          toast({ title: "Berhasil", description: "Grafik baru ditambahkan." });
-          resetForm();
-        })
-        .catch(async () => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: 'visualizers', operation: 'create', requestResourceData: dataToSave })))
-        .finally(() => setIsSubmitting(false));
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, 'visualizers', editingId), dataToSave);
+        toast({ title: "Berhasil", description: "Konfigurasi grafik diperbarui." });
+      } else {
+        await addDoc(collection(db, 'visualizers'), { ...dataToSave, createdAt: serverTimestamp() });
+        toast({ title: "Berhasil", description: "Grafik baru ditambahkan." });
+      }
+      resetForm();
+    } catch (error) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({ 
+        path: 'visualizers', operation: editingId ? 'update' : 'create' 
+      }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,7 +157,7 @@ export default function VisualizationsPage() {
                   <div key={viz.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 group">
                     <div className="flex items-center gap-5">
                       <div className="h-12 w-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-primary shadow-sm transition-colors">
-                        {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieChartIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
+                        {viz.chartType === 'bar' ? <BarChart3 className="h-6 w-6" /> : viz.chartType === 'pie' ? <PieIcon className="h-6 w-6" /> : <TrendingUp className="h-6 w-6" />}
                       </div>
                       <div className="text-left">
                         <h4 className="font-bold text-slate-900">{viz.title}</h4>
