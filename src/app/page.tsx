@@ -111,7 +111,7 @@ export default function HomePage() {
   const { data: visualizers } = useCollection(query(collection(db, 'visualizers')));
 
   const bottomMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'bottom'), [menus]);
-  const headerMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'header'), [menus]);
+  const headerMenus = useMemo(() => (menus || []).filter((m: any) => (m.position === 'header' || m.position === 'left')), [menus]);
 
   const toggleCategory = (cat: string) => {
     setActiveCategories(prev => 
