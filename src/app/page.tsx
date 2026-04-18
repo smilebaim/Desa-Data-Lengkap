@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -362,7 +361,7 @@ export default function HomePage() {
           </div>
         </aside>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[5000] flex flex-col items-center gap-3 w-full px-4">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
           <nav className="flex items-center gap-1 p-1.5 bg-slate-950/40 backdrop-blur-xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
@@ -391,7 +390,7 @@ export default function HomePage() {
                       {itemDetail.category && <p className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
                     </div>
                   </div>
-                  <div className="px-8 py-10 space-y-8 text-left">
+                  <div className="px-8 py-10 pb-40 space-y-8 text-left">
                     {selectedItem?.type === 'village' && (
                       <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, FeatureGroup } from 'react-leaflet';
@@ -38,7 +37,9 @@ const LeafletMap = ({
 
   useEffect(() => {
     setIsMounted(true);
-    return () => setIsMounted(false);
+    return () => {
+      setIsMounted(false);
+    };
   }, []);
 
   const featuresQuery = useMemo(() => query(collection(db, 'features'), orderBy('name', 'asc')), [db]);
