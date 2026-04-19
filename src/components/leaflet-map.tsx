@@ -1,3 +1,4 @@
+
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Marker, Tooltip as LeafletTooltip, Polyline, Circle, FeatureGroup } from 'react-leaflet';
@@ -60,24 +61,24 @@ const LeafletMap = ({
     try {
       if (f.type === 'marker') {
         return (
-          <Marker key={f.id} position={pos} eventHandlers={eventHandlers}>
+          <Marker key={`feature-marker-${f.id}`} position={pos} eventHandlers={eventHandlers}>
             <LeafletTooltip direction="top"><span className="font-bold text-[9px] uppercase">{f.name}</span></LeafletTooltip>
           </Marker>
         );
       }
       if (f.type === 'polyline' && Array.isArray(f.geometry)) {
         return (
-          <Polyline key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }} eventHandlers={eventHandlers} />
+          <Polyline key={`feature-polyline-${f.id}`} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#3b82f6', weight: 4 }} eventHandlers={eventHandlers} />
         );
       }
       if (f.type === 'circle') {
         return (
-          <Circle key={f.id} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />
+          <Circle key={`feature-circle-${f.id}`} center={pos} radius={f.properties?.radius || 100} pathOptions={{ color: '#f59e0b', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />
         );
       }
       if ((f.type === 'polygon' || f.type === 'rectangle') && Array.isArray(f.geometry)) {
         return (
-          <Polygon key={f.id} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />
+          <Polygon key={`feature-polygon-${f.id}`} positions={f.geometry.map((p: any) => [p.lat, p.lng])} pathOptions={{ color: '#8b5cf6', fillOpacity: 0.2 }} eventHandlers={eventHandlers} />
         );
       }
     } catch (e) {
@@ -91,7 +92,7 @@ const LeafletMap = ({
   return (
     <div className="h-full w-full">
       <MapContainer 
-        key="main-map-container"
+        key="main-map-global-instance"
         className="h-full w-full z-10" 
         center={[-2.5489, 118.0149]} 
         zoom={5} 
@@ -109,7 +110,7 @@ const LeafletMap = ({
         {showVillages && (
           <FeatureGroup>
             {(villages || []).map((v) => (
-              <Fragment key={`v-${v.id}`}>
+              <Fragment key={`village-group-${v.id}`}>
                 {v.boundary && Array.isArray(v.boundary) && (
                   <Polygon 
                     positions={v.boundary.map((p: any) => [p.lat, p.lng])} 
@@ -129,7 +130,7 @@ const LeafletMap = ({
 
         <FeatureGroup>
           {filteredFeatures.map(f => (
-            <Fragment key={`f-${f.id}`}>
+            <Fragment key={`feature-fragment-${f.id}`}>
               {renderFeature(f)}
             </Fragment>
           ))}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -205,8 +206,8 @@ export default function HomePage() {
 
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
-              <div className="flex items-center gap-2 pl-2">
+            <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
+              <div className="flex items-center gap-2 pl-3">
                 <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
                   <Shield className="h-3.5 w-3.5 text-primary-foreground" />
                 </div>
@@ -284,7 +285,7 @@ export default function HomePage() {
                       <MenuIcon className="h-3.5 w-3.5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent className="bg-slate-950/40 backdrop-blur-2xl border-white/10 text-white p-0 overflow-hidden">
+                  <SheetContent className="bg-slate-950/40 backdrop-blur-2xl border-white/10 text-white p-0 overflow-hidden z-[9000]">
                     <div className="flex flex-col h-full">
                       <div className="p-8 border-b border-white/5 bg-slate-900/20">
                         <div className="flex items-center gap-3 mb-6">
@@ -344,8 +345,13 @@ export default function HomePage() {
           </div>
         </header>
 
-        <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group">
-          <div className="flex flex-col gap-1 p-1.5 bg-slate-950/40 backdrop-blur-xl border border-white/10 rounded-r-2xl shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-3/4 group-hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-2xl">
+        <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group pointer-events-none">
+          <div className="pointer-events-auto flex flex-col gap-1 p-2 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[78%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0 relative group/panel">
+            {/* Handle visual indicator */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 md:hidden">
+              <div className="w-1 h-10 bg-white/20 rounded-full group-hover/panel:opacity-0 transition-opacity duration-300" />
+            </div>
+            
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
@@ -362,7 +368,7 @@ export default function HomePage() {
         </aside>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
-          <nav className="flex items-center gap-1 p-1.5 bg-slate-950/40 backdrop-blur-xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
+          <nav className="flex items-center gap-1 p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
@@ -372,7 +378,7 @@ export default function HomePage() {
         </div>
 
         <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
-          <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none bg-white overflow-hidden shadow-2xl">
+          <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none bg-white overflow-hidden shadow-2xl z-[9000]">
             <ScrollArea className="h-full">
               {isDetailLoading ? (
                 <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
