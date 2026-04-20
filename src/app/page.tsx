@@ -346,7 +346,7 @@ export default function HomePage() {
         </header>
 
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group pointer-events-none">
-          <div className="pointer-events-auto flex flex-col gap-4 py-6 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[78%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0 relative group/panel">
+          <div className="pointer-events-auto flex flex-col gap-2.5 py-4 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[78%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0 relative group/panel">
             {/* Handle visual indicator */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 md:hidden">
               <div className="w-1 h-10 bg-white/20 rounded-full group-hover/panel:opacity-0 transition-opacity duration-300" />
@@ -368,7 +368,7 @@ export default function HomePage() {
         </aside>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
-          <nav className="flex items-center gap-6 p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
+          <nav className="flex items-center gap-4 p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
