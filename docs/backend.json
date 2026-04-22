@@ -12,6 +12,19 @@
       },
       "required": ["name", "role"]
     },
+    "AppSettings": {
+      "title": "App Settings",
+      "description": "Pengaturan identitas aplikasi global",
+      "type": "object",
+      "properties": {
+        "appName": { "type": "string" },
+        "appSlogan": { "type": "string" },
+        "logoType": { "type": "string", "enum": ["icon", "image"] },
+        "logoIcon": { "type": "string" },
+        "logoUrl": { "type": "string" }
+      },
+      "required": ["appName"]
+    },
     "MenuItem": {
       "title": "MenuItem",
       "description": "Konfigurasi item menu navigasi",
@@ -34,8 +47,8 @@
         "province": { "type": "string" },
         "population": { "type": "number" },
         "area": { "type": "number" },
-        "idmScore": { "type": "number", "description": "Indeks Desa Membangun (0.00 - 1.00)" },
-        "budgetAllocation": { "type": "number", "description": "Anggaran Desa (Rp)" },
+        "idmScore": { "type": "number" },
+        "budgetAllocation": { "type": "number" },
         "location": {
           "type": "object",
           "properties": {
@@ -43,16 +56,7 @@
             "lng": { "type": "number" }
           }
         },
-        "boundary": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "lat": { "type": "number" },
-              "lng": { "type": "number" }
-            }
-          }
-        },
+        "boundary": { "type": "array" },
         "description": { "type": "string" },
         "tagline": { "type": "string" },
         "potentials": { "type": "array", "items": { "type": "string" } }
@@ -65,9 +69,7 @@
       "type": "object",
       "properties": {
         "name": { "type": "string" },
-        "description": { "type": "string" },
-        "showStats": { "type": "boolean" },
-        "type": { "type": "string", "enum": ["marker", "polyline", "circle", "polygon", "rectangle"] },
+        "type": { "type": "string" },
         "category": { "type": "string" },
         "icon": { "type": "string" },
         "geometry": { "type": "object" },
@@ -93,8 +95,8 @@
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "metric": { "type": "string", "enum": ["population", "area", "density", "idmScore", "budgetAllocation"] },
-        "chartType": { "type": "string", "enum": ["bar", "pie", "line", "area", "radar", "composed", "scatter"] },
+        "metric": { "type": "string" },
+        "chartType": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "metric", "chartType"]
@@ -104,31 +106,12 @@
     "providers": ["password"]
   },
   "firestore": {
-    "/users/{userId}": {
-      "schema": { "$ref": "#/entities/UserProfile" },
-      "description": "Data pengguna"
-    },
-    "/menus/{menuId}": {
-      "schema": { "$ref": "#/entities/MenuItem" },
-      "description": "Navigasi"
-    },
-    "/villages/{villageId}": {
-      "schema": { "$ref": "#/entities/Village" },
-      "description": "Desa"
-    },
-    "/features/{featureId}": {
-      "schema": { "$ref": "#/entities/MapFeature" },
-      "description": "Aset Peta"
-    },
-    "/pages/{pageId}": {
-      "schema": { "$ref": "#/entities/DynamicPage" },
-      "description": "Halaman"
-    },
-    "/visualizers/{visualizerId}": {
-      "schema": { "$ref": "#/entities/Visualizer" },
-      "description": "Grafik"
-    }
+    "/users/{userId}": { "schema": { "$ref": "#/entities/UserProfile" }, "description": "Profil pengguna" },
+    "/settings/{settingId}": { "schema": { "$ref": "#/entities/AppSettings" }, "description": "Pengaturan Global" },
+    "/menus/{menuId}": { "schema": { "$ref": "#/entities/MenuItem" }, "description": "Navigasi" },
+    "/villages/{villageId}": { "schema": { "$ref": "#/entities/Village" }, "description": "Data Desa" },
+    "/features/{featureId}": { "schema": { "$ref": "#/entities/MapFeature" }, "description": "Fitur Peta" },
+    "/pages/{pageId}": { "schema": { "$ref": "#/entities/DynamicPage" }, "description": "Halaman" },
+    "/visualizers/{visualizerId}": { "schema": { "$ref": "#/entities/Visualizer" }, "description": "Visualisasi" }
   }
 }
-
-    

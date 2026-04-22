@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -16,7 +17,6 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Set loading ke true setiap kali kueri berubah
     setIsLoading(true);
 
     if (!query) {
@@ -36,21 +36,24 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
         setIsLoading(false);
       },
       async (serverError: any) => {
-        // Ekstraksi path dari query untuk konteks galat
         const path = (query as any)._query?.path?.segments?.join('/') || 'unknown';
-        
         const permissionError = new FirestorePermissionError({
           path: path,
           operation: 'list',
         } satisfies SecurityRuleContext);
-
         errorEmitter.emit('permission-error', permissionError);
         setError(permissionError);
         setIsLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      try {
+        unsubscribe();
+      } catch (e) {
+        // Safe cleanup for internal SDK crashes
+      }
+    };
   }, [query]);
 
   return { data, isLoading, error };

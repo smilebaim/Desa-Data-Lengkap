@@ -49,6 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/map-tools', label: 'Editor Spasial', icon: MapIcon },
     { href: '/dashboard/menus', label: 'Navigasi Publik', icon: MenuIcon },
     { href: '/dashboard/visualizations', label: 'Statistik & Data', icon: BarChart3 },
+    { href: '/dashboard/settings', label: 'Pengaturan App', icon: Settings },
   ];
 
   const SidebarContent = () => (
@@ -109,14 +110,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-slate-800 shadow-xl">
         <SidebarContent />
       </aside>
-
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <Shield className="h-6 w-6 text-primary" />
@@ -133,7 +130,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </SheetContent>
           </Sheet>
         </header>
-
         <main className="flex-1 overflow-auto bg-slate-50 p-6 md:p-10">
           <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
             {children}

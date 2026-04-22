@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -26,8 +27,8 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
 
     const unsubscribe = onSnapshot(
       ref,
-      (doc: DocumentSnapshot<T>) => {
-        setData(doc.exists() ? { ...doc.data(), id: doc.id } : null);
+      (docSnap: DocumentSnapshot<T>) => {
+        setData(docSnap.exists() ? { ...docSnap.data(), id: docSnap.id } : null);
         setIsLoading(false);
       },
       async (serverError: any) => {
@@ -35,14 +36,19 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
           path: ref.path,
           operation: 'get',
         } satisfies SecurityRuleContext);
-
         errorEmitter.emit('permission-error', permissionError);
         setError(permissionError);
         setIsLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      try {
+        unsubscribe();
+      } catch (e) {
+        // Safe cleanup
+      }
+    };
   }, [ref]);
 
   return { data, isLoading, error };

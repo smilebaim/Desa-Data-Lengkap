@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import { 
@@ -99,6 +99,9 @@ export default function HomePage() {
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<AnalyzeVillageOutput | null>(null);
 
+  // App Settings
+  const { data: appSettings } = useDoc(doc(db, 'settings', 'global'));
+
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: menus } = useCollection(menuQuery);
 
@@ -166,9 +169,7 @@ export default function HomePage() {
         potentials: itemDetail.potentials
       });
       setAiAnalysisResult(result);
-    } catch (e) {
-      console.error(e);
-    } finally {
+    } catch (e) {} finally {
       setIsAiAnalyzing(false);
     }
   };
@@ -207,23 +208,24 @@ export default function HomePage() {
         <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
-              <div className="flex items-center gap-2 pl-3">
-                <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
-                  <Shield className="h-3.5 w-3.5 text-primary-foreground" />
+              <div className="flex items-center gap-3 pl-3">
+                <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 overflow-hidden">
+                  {appSettings?.logoType === 'image' && appSettings?.logoUrl ? (
+                    <img src={appSettings.logoUrl} alt="Logo" className="h-5 w-5 object-contain" />
+                  ) : (
+                    <DynamicIcon name={appSettings?.logoIcon || 'Shield'} className="h-4 w-4 text-primary-foreground" />
+                  )}
                 </div>
                 <div className="hidden lg:block text-left">
-                  <h1 className="text-xs font-bold tracking-tight text-white leading-none">Desa Lengkap</h1>
-                  <p className="text-[8px] text-primary/80 font-bold uppercase tracking-widest mt-0.5">Informasi Spasial Nasional</p>
+                  <h1 className="text-[11px] font-black tracking-tight text-white leading-none uppercase">{appSettings?.appName || 'Desa Lengkap'}</h1>
+                  <p className="text-[7px] text-primary/80 font-bold uppercase tracking-[0.2em] mt-1">{appSettings?.appSlogan || 'Informasi Spasial Nasional'}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-1.5 pr-1 pointer-events-auto">
                 <div className="relative flex items-center">
                   <div className={`flex items-center bg-white/5 border border-white/5 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-32 sm:w-48 px-3 h-8 bg-white/10' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
-                    <button 
-                      onClick={() => setIsSearchFocused(!isSearchFocused)}
-                      className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}
-                    >
+                    <button onClick={() => setIsSearchFocused(!isSearchFocused)} className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}>
                       <Search className="h-3.5 w-3.5" />
                     </button>
                     {isSearchFocused && (
@@ -234,9 +236,6 @@ export default function HomePage() {
                         className="bg-transparent text-[10px] font-bold text-white outline-none placeholder:text-slate-500 w-full"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        onBlur={() => {
-                          if (!searchQuery) setTimeout(() => setIsSearchFocused(false), 200);
-                        }}
                       />
                     )}
                   </div>
@@ -253,20 +252,6 @@ export default function HomePage() {
                                   <div>
                                     <p className="text-[11px] font-bold text-white group-hover:text-primary">{v.name}</p>
                                     <p className="text-[9px] text-slate-500">{v.province}</p>
-                                  </div>
-                                  <ChevronRight className="h-3.5 w-3.5 text-slate-700" />
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                          {searchResults.features.length > 0 && (
-                            <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-blue-400 uppercase tracking-widest text-left">Aset</p>
-                              {searchResults.features.map(f => (
-                                <button key={f.id} onClick={() => handleSelectItem('feature', f.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
-                                  <div>
-                                    <p className="text-[11px] font-bold text-white group-hover:text-primary">{f.name}</p>
-                                    <p className="text-[9px] text-slate-500 uppercase">{f.category?.replace('_', ' ')}</p>
                                   </div>
                                   <ChevronRight className="h-3.5 w-3.5 text-slate-700" />
                                 </button>
@@ -290,10 +275,10 @@ export default function HomePage() {
                       <div className="p-8 border-b border-white/5 bg-slate-900/20">
                         <div className="flex items-center gap-3 mb-6">
                            <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                             <Shield className="h-5 w-5 text-white" />
+                             <DynamicIcon name={appSettings?.logoIcon || 'Shield'} className="h-5 w-5 text-white" />
                            </div>
                            <div className="text-left">
-                              <h2 className="text-sm font-black uppercase tracking-widest text-white">Desa Lengkap</h2>
+                              <h2 className="text-sm font-black uppercase tracking-widest text-white">{appSettings?.appName || 'Desa Lengkap'}</h2>
                               <p className="text-[9px] font-bold text-primary/60 uppercase tracking-[0.3em]">Menu Navigasi</p>
                            </div>
                         </div>
@@ -302,12 +287,7 @@ export default function HomePage() {
                       <ScrollArea className="flex-1 px-4 py-6">
                         <div className="space-y-1">
                           {headerMenus?.map((menu: any) => (
-                            <Button 
-                              key={menu.id} 
-                              variant="ghost" 
-                              onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} 
-                              className="w-full justify-start h-12 rounded-xl text-xs font-bold gap-4 hover:bg-white/5"
-                            >
+                            <Button key={menu.id} variant="ghost" onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')} className="w-full justify-start h-12 rounded-xl text-xs font-bold gap-4 hover:bg-white/5">
                               <DynamicIcon name={menu.icon} className="h-3.5 w-3.5 text-primary" />
                               {menu.label}
                             </Button>
@@ -346,29 +326,21 @@ export default function HomePage() {
         </header>
 
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group pointer-events-none">
-          <div className="pointer-events-auto flex flex-col gap-2.5 py-4 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[78%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0 relative group/panel">
-            {/* Handle visual indicator */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 md:hidden">
-              <div className="w-1 h-10 bg-white/20 rounded-full group-hover/panel:opacity-0 transition-opacity duration-300" />
-            </div>
-            
+          <div className="pointer-events-auto flex flex-col gap-3 py-6 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0 relative group/panel">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
-            <Separator className="bg-white/5 mx-2 my-0.5" />
+            <Separator className="bg-white/10 mx-2 my-0.5" />
             <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white"}><Landmark className="h-3.5 w-3.5" /></ToolbarButton>
             <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-3.5 w-3.5" /></ToolbarButton>
             <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-3.5 w-3.5" /></ToolbarButton>
-            <Separator className="bg-white/5 mx-2 my-0.5" />
+            <Separator className="bg-white/10 mx-2 my-0.5" />
             <ToolbarButton tooltip="Reset Peta" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-3.5 w-3.5" /></ToolbarButton>
-            <Separator className="bg-white/5 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Perbesar" className="text-white"><Plus className="h-3.5 w-3.5" /></ToolbarButton>
-            <ToolbarButton tooltip="Perkecil" className="text-white"><Minus className="h-3.5 w-3.5" /></ToolbarButton>
           </div>
         </aside>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
-          <nav className="flex items-center gap-4 p-1.5 bg-slate-950/40 backdrop-blur-2xl border border-white/15 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
+          <nav className="flex items-center gap-4 p-2 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
               <NavButton key={menu.id} label={menu.label} onClick={() => menu.href?.startsWith('/p/') ? handleSelectItem('page', menu.href.replace('/p/', '')) : window.open(menu.href, '_blank')}>
                 <DynamicIcon name={menu.icon} className="h-3.5 w-3.5" />
@@ -393,7 +365,6 @@ export default function HomePage() {
                       </Badge>
                       <h2 className="text-2xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
                       {itemDetail.province && <p className="text-white text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
-                      {itemDetail.category && <p className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.category?.replace('_', ' ')}</p>}
                     </div>
                   </div>
                   <div className="px-8 py-10 pb-40 space-y-8 text-left">
@@ -439,8 +410,6 @@ export default function HomePage() {
                         </div>
                       </div>
                     )}
-                    <Separator className="bg-slate-100" />
-                    <Button variant="outline" className="w-full rounded-2xl h-12 border-slate-200 text-slate-500 font-bold hover:bg-slate-50 transition-colors" onClick={() => setPanelOpen(false)}>Tutup Detail</Button>
                   </div>
                 </div>
               ) : null}
