@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -48,10 +47,13 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
     );
 
     return () => {
+      // Safe cleanup for internal SDK consistency
       try {
-        unsubscribe();
+        if (typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
       } catch (e) {
-        // Safe cleanup for internal SDK crashes
+        // Silently catch to prevent crash during unmount
       }
     };
   }, [query]);

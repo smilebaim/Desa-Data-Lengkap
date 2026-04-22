@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -43,10 +42,13 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
     );
 
     return () => {
+      // Safe cleanup for internal SDK consistency
       try {
-        unsubscribe();
+        if (typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
       } catch (e) {
-        // Safe cleanup
+        // Silently catch to prevent crash during unmount
       }
     };
   }, [ref]);

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -13,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator';
 import { 
   Save, Loader2, Sparkles, Shield, Image as ImageIcon, 
-  Search, HelpCircle, Palette, Globe, Monitor, Type
+  Search, HelpCircle, Palette, Globe, Monitor, Type, Menu
 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -77,14 +76,14 @@ export default function AppSettingsPage() {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-left">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pengaturan Identitas App</h1>
         <p className="text-muted-foreground">Kelola bagaimana publik melihat nama, slogan, dan logo aplikasi Anda.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
         <div className="lg:col-span-5 space-y-6">
-          <Card className="shadow-xl border-primary/10 overflow-hidden">
+          <Card className="shadow-xl border-primary/10 overflow-hidden text-left">
             <CardHeader className="bg-slate-50/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Palette className="h-5 w-5 text-primary" />
@@ -153,7 +152,7 @@ export default function AppSettingsPage() {
 
         <div className="lg:col-span-7">
           <Card className="shadow-2xl border-none bg-slate-900 overflow-hidden rounded-[2rem] sticky top-6">
-            <CardHeader className="bg-white/5 border-b border-white/10 px-8 py-6">
+            <CardHeader className="bg-white/5 border-b border-white/10 px-8 py-6 text-left">
               <CardTitle className="text-white flex items-center gap-3 text-base">
                 <Monitor className="h-5 w-5 text-primary" />
                 Pratinjau Visual (Halaman Utama)
@@ -165,9 +164,9 @@ export default function AppSettingsPage() {
                   <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-950" />
                   
                   {/* Mockup Header */}
-                  <div className="relative z-10 w-full max-w-md bg-slate-950/40 backdrop-blur-3xl border border-white/10 p-4 rounded-full flex items-center justify-between gap-4">
-                     <div className="flex items-center gap-3 pl-2">
-                        <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                  <div className="relative z-10 w-full max-w-md bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full flex items-center justify-between gap-4">
+                     <div className="flex items-center gap-3 pl-3">
+                        <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
                            {formData.logoType === 'icon' ? (
                              <DynamicIcon name={formData.logoIcon} className="h-4 w-4 text-white" />
                            ) : formData.logoUrl ? (
@@ -177,12 +176,12 @@ export default function AppSettingsPage() {
                            )}
                         </div>
                         <div className="text-left">
-                           <h2 className="text-xs font-black uppercase tracking-tight text-white leading-none">{formData.appName}</h2>
-                           <p className="text-[8px] text-primary/80 font-bold uppercase tracking-widest mt-1">{formData.appSlogan}</p>
+                           <h2 className="text-[11px] font-black uppercase tracking-tight text-white leading-none">{formData.appName}</h2>
+                           <p className="text-[7px] text-primary/80 font-bold uppercase tracking-widest mt-1">{formData.appSlogan}</p>
                         </div>
                      </div>
                      <div className="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center mr-1">
-                        <LucideIcons.Menu className="h-4 w-4 text-white/60" />
+                        <Menu className="h-3.5 w-3.5 text-white/60" />
                      </div>
                   </div>
 

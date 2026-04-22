@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -99,8 +98,9 @@ export default function HomePage() {
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<AnalyzeVillageOutput | null>(null);
 
-  // App Settings
-  const { data: appSettings } = useDoc(doc(db, 'settings', 'global'));
+  // App Settings reaktif
+  const settingsRef = useMemo(() => doc(db, 'settings', 'global'), [db]);
+  const { data: appSettings } = useDoc(settingsRef);
 
   const menuQuery = useMemo(() => query(collection(db, 'menus'), orderBy('order', 'asc')), [db]);
   const { data: menus } = useCollection(menuQuery);
@@ -205,7 +205,8 @@ export default function HomePage() {
           />
         </div>
 
-        <header className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
+        {/* Header Reaktif dengan Kontrol Logo */}
+        <header className="absolute top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
               <div className="flex items-center gap-3 pl-3">
@@ -224,7 +225,7 @@ export default function HomePage() {
 
               <div className="flex items-center gap-1.5 pr-1 pointer-events-auto">
                 <div className="relative flex items-center">
-                  <div className={`flex items-center bg-white/5 border border-white/5 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-32 sm:w-48 px-3 h-8 bg-white/10' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
+                  <div className={`flex items-center bg-white/5 border border-white/5 rounded-full transition-all duration-300 ${isSearchFocused ? 'w-48 px-3 h-8 bg-white/10' : 'w-8 h-8 justify-center cursor-pointer hover:bg-white/15'}`}>
                     <button onClick={() => setIsSearchFocused(!isSearchFocused)} className={`flex items-center justify-center transition-colors ${isSearchFocused ? 'text-primary mr-2' : 'text-slate-200'}`}>
                       <Search className="h-3.5 w-3.5" />
                     </button>
@@ -246,7 +247,7 @@ export default function HomePage() {
                         <div className="p-2 space-y-4 text-left">
                           {searchResults.villages.length > 0 && (
                             <div>
-                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest text-left">Wilayah</p>
+                              <p className="px-3 py-1 text-[8px] font-black text-primary uppercase tracking-widest">Wilayah</p>
                               {searchResults.villages.map(v => (
                                 <button key={v.id} onClick={() => handleSelectItem('village', v.id)} className="w-full text-left p-3 rounded-xl hover:bg-white/10 transition-colors group flex items-center justify-between">
                                   <div>
@@ -272,14 +273,14 @@ export default function HomePage() {
                   </SheetTrigger>
                   <SheetContent className="bg-slate-950/40 backdrop-blur-2xl border-white/10 text-white p-0 overflow-hidden z-[9000]">
                     <div className="flex flex-col h-full">
-                      <div className="p-8 border-b border-white/5 bg-slate-900/20">
+                      <div className="p-8 border-b border-white/5 bg-slate-900/20 text-left">
                         <div className="flex items-center gap-3 mb-6">
                            <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                              <DynamicIcon name={appSettings?.logoIcon || 'Shield'} className="h-5 w-5 text-white" />
                            </div>
-                           <div className="text-left">
-                              <h2 className="text-sm font-black uppercase tracking-widest text-white">{appSettings?.appName || 'Desa Lengkap'}</h2>
-                              <p className="text-[9px] font-bold text-primary/60 uppercase tracking-[0.3em]">Menu Navigasi</p>
+                           <div>
+                              <h2 className="text-sm font-black uppercase tracking-widest text-white leading-none">{appSettings?.appName || 'Desa Lengkap'}</h2>
+                              <p className="text-[9px] font-bold text-primary/60 uppercase tracking-[0.3em] mt-1">Menu Navigasi</p>
                            </div>
                         </div>
                       </div>
@@ -325,8 +326,9 @@ export default function HomePage() {
           </div>
         </header>
 
-        <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 group pointer-events-none">
-          <div className="pointer-events-auto flex flex-col gap-3 py-6 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0 relative group/panel">
+        {/* Toolbar Kiri - Spasi gap-3 */}
+        <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 pointer-events-none">
+          <div className="pointer-events-auto flex flex-col gap-2.5 py-4 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
@@ -339,6 +341,7 @@ export default function HomePage() {
           </div>
         </aside>
 
+        {/* Dock Bawah - Glassmorphism 40% */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
           <nav className="flex items-center gap-4 p-2 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
@@ -349,6 +352,7 @@ export default function HomePage() {
           </nav>
         </div>
 
+        {/* Panel Informasi - pb-40 agar tidak tertutup dock */}
         <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
           <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none bg-white overflow-hidden shadow-2xl z-[9000]">
             <ScrollArea className="h-full">
