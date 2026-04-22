@@ -53,7 +53,7 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
           unsubscribe();
         }
       } catch (e) {
-        // Silently catch to prevent crash during unmount
+        // Silently catch to prevent crash during unmount when SDK is in a weird state
       }
     };
   }, [query]);

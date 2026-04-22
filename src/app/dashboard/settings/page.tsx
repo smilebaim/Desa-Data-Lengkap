@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const ICON_OPTIONS = [
   'Shield', 'Landmark', 'Map', 'Globe', 'Navigation', 'Info', 'Mountain', 
-  'Home', 'Flag', 'Layers', 'Activity', 'Zap', 'Compass', 'TreePine'
+  'Home', 'Flag', 'Layers', 'Activity', 'Zap', 'Compass', 'TreePine', 'Zap'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -60,9 +60,9 @@ export default function AppSettingsPage() {
     setIsSubmitting(true);
     try {
       await setDoc(settingsRef, formData, { merge: true });
-      toast({ title: "Berhasil", description: "Pengaturan identitas telah diperbarui global." });
+      toast({ title: "Berhasil", description: "Identitas aplikasi telah diperbarui secara global." });
     } catch (e) {
-      toast({ title: "Galat", description: "Gagal menyimpan pengaturan.", variant: "destructive" });
+      toast({ title: "Galat", description: "Gagal menyimpan konfigurasi branding.", variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -77,17 +77,17 @@ export default function AppSettingsPage() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1 text-left">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Pengaturan Identitas App</h1>
-        <p className="text-muted-foreground">Kelola bagaimana publik melihat nama, slogan, dan logo aplikasi Anda.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Identitas & Branding App</h1>
+        <p className="text-muted-foreground">Konfigurasikan bagaimana publik melihat nama, slogan, dan logo aplikasi Anda secara global.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
-        <div className="lg:col-span-5 space-y-6">
-          <Card className="shadow-xl border-primary/10 overflow-hidden text-left">
+        <div className="lg:col-span-5 space-y-6 text-left">
+          <Card className="shadow-xl border-primary/10 overflow-hidden">
             <CardHeader className="bg-slate-50/50">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Palette className="h-5 w-5 text-primary" />
-                Konfigurasi Branding
+                Branding Global
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
@@ -102,15 +102,15 @@ export default function AppSettingsPage() {
               </div>
 
               <div className="space-y-4">
-                <Label className="text-xs font-bold uppercase text-slate-500">Tipe Logo</Label>
+                <Label className="text-xs font-bold uppercase text-slate-500">Tipe Logo Utama</Label>
                 <Tabs value={formData.logoType} onValueChange={(v: any) => setFormData({...formData, logoType: v})}>
                   <TabsList className="grid grid-cols-2 h-11">
-                    <TabsTrigger value="icon" className="gap-2"><Type className="h-4 w-4" /> Ikon Lucide</TabsTrigger>
-                    <TabsTrigger value="image" className="gap-2"><ImageIcon className="h-4 w-4" /> Gambar URL</TabsTrigger>
+                    <TabsTrigger value="icon" className="gap-2"><Type className="h-4 w-4" /> Ikon</TabsTrigger>
+                    <TabsTrigger value="image" className="gap-2"><ImageIcon className="h-4 w-4" /> Gambar</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="icon" className="pt-4 space-y-3">
-                    <Label className="text-[10px] text-slate-400 font-bold uppercase">Pilih Ikon</Label>
+                    <Label className="text-[10px] text-slate-400 font-bold uppercase">Pilih Ikon Lucide</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-between h-12">
@@ -135,9 +135,8 @@ export default function AppSettingsPage() {
                   </TabsContent>
 
                   <TabsContent value="image" className="pt-4 space-y-3">
-                    <Label className="text-[10px] text-slate-400 font-bold uppercase">URL Gambar Logo</Label>
+                    <Label className="text-[10px] text-slate-400 font-bold uppercase">URL Gambar Logo (PNG/SVG)</Label>
                     <Input placeholder="https://..." value={formData.logoUrl} onChange={e => setFormData({...formData, logoUrl: e.target.value})} className="h-12" />
-                    <p className="text-[10px] text-muted-foreground italic">Gunakan URL gambar PNG atau SVG dengan latar transparan.</p>
                   </TabsContent>
                 </Tabs>
               </div>
@@ -155,7 +154,7 @@ export default function AppSettingsPage() {
             <CardHeader className="bg-white/5 border-b border-white/10 px-8 py-6 text-left">
               <CardTitle className="text-white flex items-center gap-3 text-base">
                 <Monitor className="h-5 w-5 text-primary" />
-                Pratinjau Visual (Halaman Utama)
+                Pratinjau Visual (Live)
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 bg-slate-950/20">
@@ -163,10 +162,10 @@ export default function AppSettingsPage() {
                   <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2013')] bg-cover bg-center opacity-30 blur-[2px]" />
                   <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-950" />
                   
-                  {/* Mockup Header */}
+                  {/* Mockup Header Publik */}
                   <div className="relative z-10 w-full max-w-md bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full flex items-center justify-between gap-4">
                      <div className="flex items-center gap-3 pl-3">
-                        <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                        <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg">
                            {formData.logoType === 'icon' ? (
                              <DynamicIcon name={formData.logoIcon} className="h-4 w-4 text-white" />
                            ) : formData.logoUrl ? (

@@ -33,7 +33,7 @@ const LeafletMap = dynamic(() => import('@/components/leaflet-map'), {
     <div className="h-full w-full bg-slate-950 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-primary/60 font-medium tracking-[0.2em] uppercase text-[10px]">Memuat Antarmuka...</p>
+        <p className="text-primary/60 font-medium tracking-[0.2em] uppercase text-[10px]">Memuat Antarmuka Spasial...</p>
       </div>
     </div>
   ),
@@ -98,7 +98,7 @@ export default function HomePage() {
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<AnalyzeVillageOutput | null>(null);
 
-  // App Settings reaktif
+  // App Settings Reaktif
   const settingsRef = useMemo(() => doc(db, 'settings', 'global'), [db]);
   const { data: appSettings } = useDoc(settingsRef);
 
@@ -205,19 +205,19 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Header Reaktif dengan Kontrol Logo */}
+        {/* Header Reaktif dengan Glassmorphism 40% */}
         <header className="absolute top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
-              <div className="flex items-center gap-3 pl-3">
-                <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 overflow-hidden">
-                  {appSettings?.logoType === 'image' && appSettings?.logoUrl ? (
-                    <img src={appSettings.logoUrl} alt="Logo" className="h-5 w-5 object-contain" />
-                  ) : (
-                    <DynamicIcon name={appSettings?.logoIcon || 'Shield'} className="h-4 w-4 text-primary-foreground" />
-                  )}
+              <div className="flex items-center gap-3 pl-3 text-left">
+                <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg shrink-0 overflow-hidden">
+                   {appSettings?.logoType === 'image' && appSettings?.logoUrl ? (
+                     <img src={appSettings.logoUrl} alt="Logo" className="h-5 w-5 object-contain" />
+                   ) : (
+                     <DynamicIcon name={appSettings?.logoIcon || 'Shield'} className="h-4 w-4 text-white" />
+                   )}
                 </div>
-                <div className="hidden lg:block text-left">
+                <div className="hidden lg:block">
                   <h1 className="text-[11px] font-black tracking-tight text-white leading-none uppercase">{appSettings?.appName || 'Desa Lengkap'}</h1>
                   <p className="text-[7px] text-primary/80 font-bold uppercase tracking-[0.2em] mt-1">{appSettings?.appSlogan || 'Informasi Spasial Nasional'}</p>
                 </div>
@@ -272,15 +272,15 @@ export default function HomePage() {
                     </Button>
                   </SheetTrigger>
                   <SheetContent className="bg-slate-950/40 backdrop-blur-2xl border-white/10 text-white p-0 overflow-hidden z-[9000]">
-                    <div className="flex flex-col h-full">
-                      <div className="p-8 border-b border-white/5 bg-slate-900/20 text-left">
+                    <div className="flex flex-col h-full text-left">
+                      <div className="p-8 border-b border-white/5 bg-slate-900/20">
                         <div className="flex items-center gap-3 mb-6">
                            <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                              <DynamicIcon name={appSettings?.logoIcon || 'Shield'} className="h-5 w-5 text-white" />
                            </div>
                            <div>
                               <h2 className="text-sm font-black uppercase tracking-widest text-white leading-none">{appSettings?.appName || 'Desa Lengkap'}</h2>
-                              <p className="text-[9px] font-bold text-primary/60 uppercase tracking-[0.3em] mt-1">Menu Navigasi</p>
+                              <p className="text-[9px] font-bold text-primary/60 uppercase tracking-[0.3em] mt-1">Navigasi Utama</p>
                            </div>
                         </div>
                       </div>
@@ -326,9 +326,9 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Toolbar Kiri - Spasi gap-3 */}
+        {/* Toolbar Kiri - Jarak Seimbang gap-3 */}
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 pointer-events-none">
-          <div className="pointer-events-auto flex flex-col gap-2.5 py-4 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0 md:ml-6 md:rounded-3xl border-l-0">
+          <div className="pointer-events-auto flex flex-col gap-2.5 py-4 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 md:ml-6 md:rounded-3xl border-l-0 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
@@ -337,11 +337,11 @@ export default function HomePage() {
             <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-3.5 w-3.5" /></ToolbarButton>
             <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-3.5 w-3.5" /></ToolbarButton>
             <Separator className="bg-white/10 mx-2 my-0.5" />
-            <ToolbarButton tooltip="Reset Peta" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-3.5 w-3.5" /></ToolbarButton>
+            <ToolbarButton tooltip="Reset Tampilan" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-3.5 w-3.5" /></ToolbarButton>
           </div>
         </aside>
 
-        {/* Dock Bawah - Glassmorphism 40% */}
+        {/* Dock Navigasi Bawah - Glassmorphism 40% */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
           <nav className="flex items-center gap-4 p-2 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
@@ -352,39 +352,39 @@ export default function HomePage() {
           </nav>
         </div>
 
-        {/* Panel Informasi - pb-40 agar tidak tertutup dock */}
+        {/* Panel Informasi - pb-40 agar teks tidak tertutup dock */}
         <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
           <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none bg-white overflow-hidden shadow-2xl z-[9000]">
             <ScrollArea className="h-full">
               {isDetailLoading ? (
                 <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : itemDetail ? (
-                <div className="flex flex-col h-full animate-in fade-in duration-500">
-                  <div className="relative h-56 bg-slate-900 shrink-0 overflow-hidden text-left">
+                <div className="flex flex-col h-full animate-in fade-in duration-500 text-left">
+                  <div className="relative h-56 bg-slate-900 shrink-0 overflow-hidden">
                     <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
                     <div className="absolute bottom-6 left-8 right-8 z-10">
-                      <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none text-white">
+                      <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none text-white shadow-lg">
                         {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
                       </Badge>
                       <h2 className="text-2xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
-                      {itemDetail.province && <p className="text-white text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{itemDetail.province}</p>}
+                      {itemDetail.province && <p className="text-white text-[10px] font-bold uppercase tracking-[0.2em] mt-1 opacity-70">{itemDetail.province}</p>}
                     </div>
                   </div>
-                  <div className="px-8 py-10 pb-40 space-y-8 text-left">
+                  <div className="px-8 py-10 pb-40 space-y-8">
                     {selectedItem?.type === 'village' && (
                       <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Populasi</p>
                             <p className="text-xl font-bold text-slate-900 leading-none">{itemDetail.population?.toLocaleString()} <span className="text-[10px] text-slate-400 font-bold ml-1">JIWA</span></p>
                           </div>
-                          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Skor IDM</p>
                             <p className="text-xl font-bold text-slate-900 leading-none">{(itemDetail.idmScore || 0).toFixed(2)}</p>
                           </div>
                         </div>
-                        <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold gap-3 shadow-xl transition-all">
+                        <Button onClick={runAiAnalysis} disabled={isAiAnalyzing} className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold gap-3 shadow-xl">
                           {isAiAnalyzing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <BrainCircuit className="h-3.5 w-3.5 text-primary" />}
                           Analisis Strategis AI
                         </Button>
@@ -392,7 +392,7 @@ export default function HomePage() {
                           <div className="p-8 bg-primary/5 rounded-3xl border border-primary/10 animate-in zoom-in-95 duration-300">
                             <div className="flex items-center gap-2 mb-4">
                               <Sparkles className="h-3.5 w-3.5 text-primary" />
-                              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Saran AI</p>
+                              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Kesimpulan AI</p>
                             </div>
                             <p className="text-sm text-slate-700 leading-relaxed font-medium">{aiAnalysisResult.analysis}</p>
                           </div>
@@ -403,11 +403,11 @@ export default function HomePage() {
                       {renderContentWithCharts(itemDetail.content || itemDetail.description)}
                     </div>
                     {itemDetail.potentials && itemDetail.potentials.length > 0 && (
-                      <div className="space-y-4 text-left">
+                      <div className="space-y-4">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Potensi Wilayah</p>
                         <div className="flex flex-wrap gap-2">
                           {itemDetail.potentials.map((pot: string, i: number) => (
-                            <Badge key={i} variant="outline" className="rounded-full px-4 py-1.5 text-slate-600 border-slate-200 bg-slate-50 font-bold text-[10px] uppercase">
+                            <Badge key={i} variant="outline" className="rounded-full px-4 py-1.5 text-slate-600 border-slate-200 bg-slate-50 font-bold text-[10px] uppercase shadow-sm">
                               {pot}
                             </Badge>
                           ))}

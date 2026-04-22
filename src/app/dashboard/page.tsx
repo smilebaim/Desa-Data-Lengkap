@@ -38,7 +38,7 @@ export default function DashboardPage() {
         logoUrl: ''
       });
 
-      // 1. Data Desa (38 Provinsi)
+      // 1. Data Desa (38 Provinsi Lengkap)
       const villagesRef = collection(db, 'villages');
       const provinces = [
         { name: 'Gampong Lampuuk', prov: 'Aceh', lat: 5.4842, lng: 95.2345 },
@@ -89,8 +89,8 @@ export default function DashboardPage() {
           budgetAllocation: Math.floor(Math.random() * 1000000000) + 800000000, 
           location: { lat: p.lat, lng: p.lng }, 
           tagline: `Membangun ${p.prov} dari Desa`,
-          potentials: ['Pertanian', 'Wisata Alam'], 
-          description: `Desa percontohan pembangunan berkelanjutan di wilayah ${p.prov}.`,
+          potentials: ['Pertanian', 'Wisata Alam', 'Budaya'], 
+          description: `Desa ${p.name} merupakan salah satu entitas pembangunan strategis di wilayah ${p.prov}. Desa ini memiliki karakteristik geospasial unik dengan potensi sumber daya lokal yang melimpah. Melalui sinkronisasi data nasional, desa ini terus berupaya mencapai status Desa Mandiri dengan efisiensi anggaran dan pemberdayaan masyarakat yang berkelanjutan.`,
           boundary: [ 
             {lat: p.lat + 0.02, lng: p.lng + 0.02}, 
             {lat: p.lat + 0.02, lng: p.lng - 0.02}, 
@@ -102,7 +102,7 @@ export default function DashboardPage() {
 
       // 2. Data Fitur Spasial
       const featuresRef = collection(db, 'features');
-      await addDoc(featuresRef, { name: 'Kantor Pusat GIS', category: 'infrastructure', type: 'marker', icon: 'Shield', geometry: { lat: -2.5489, lng: 118.0149 }, description: 'Pusat kendali data geospasial nasional.', showStats: true });
+      await addDoc(featuresRef, { name: 'Kantor Pusat GIS', category: 'infrastructure', type: 'marker', icon: 'Shield', geometry: { lat: -2.5489, lng: 118.0149 }, description: 'Pusat kendali data geospasial nasional yang memantau perkembangan 38 provinsi di Indonesia.', showStats: true });
 
       // 3. Visualizers
       const vizRef = collection(db, 'visualizers');
@@ -112,7 +112,7 @@ export default function DashboardPage() {
       const pagesRef = collection(db, 'pages');
       const pId = await addDoc(pagesRef, { 
         title: 'Laporan Strategis Desa Indonesia 2024', 
-        content: `Indonesia terdiri dari beragam desa dengan potensi luar biasa.\n\n### Statistik Populasi Terkini\n[CHART:${vPop.id}]\n\nVisualisasi ini mencakup seluruh provinsi di tanah air.`, 
+        content: `Indonesia memiliki kekayaan data spasial yang sangat besar, mencakup seluruh wilayah dari Sabang sampai Merauke.\n\n### Analisis Populasi Terkini\n[CHART:${vPop.id}]\n\nVisualisasi di atas menunjukkan keberagaman demografi di 38 provinsi yang menjadi dasar kebijakan pembangunan nasional.`, 
         showStats: true, updatedAt: serverTimestamp() 
       });
 
@@ -120,9 +120,9 @@ export default function DashboardPage() {
       const menusRef = collection(db, 'menus');
       await addDoc(menusRef, { label: 'Analisis Nasional', icon: 'BarChart', href: `/p/${pId.id}`, order: 1, position: 'bottom' });
 
-      toast({ title: "Sinkronisasi Berhasil", description: "38 Desa dari seluruh Provinsi telah ditambahkan." });
+      toast({ title: "Sinkronisasi Berhasil", description: "38 Desa dari seluruh Provinsi Indonesia telah berhasil ditambahkan." });
     } catch (error) {
-      toast({ title: "Gagal Seeding", description: "Terjadi kesalahan koneksi database.", variant: "destructive" });
+      toast({ title: "Gagal Seeding", description: "Terjadi kesalahan saat menyuntikkan data ke Firestore.", variant: "destructive" });
     } finally { setIsSeeding(false); }
   };
 
@@ -131,7 +131,7 @@ export default function DashboardPage() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dasbor Operasional Nasional</h1>
-          <p className="text-muted-foreground">Kelola data 38 provinsi dan profil publikasi strategis desa.</p>
+          <p className="text-muted-foreground">Pusat kendali data 38 provinsi dan manajemen profil publikasi strategis desa.</p>
         </div>
         <Button onClick={seedDemoData} disabled={isSeeding} className="bg-primary hover:bg-primary/90 rounded-2xl shadow-xl h-12 px-6 font-bold">
           {isSeeding ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
@@ -171,7 +171,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-slate-900">Siap</div>
-            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Rekomendasi IDM Otomatis</p>
+            <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Analisis IDM Aktif</p>
           </CardContent>
         </Card>
 
