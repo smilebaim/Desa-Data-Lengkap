@@ -47,13 +47,12 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
     );
 
     return () => {
-      // Safe cleanup for internal SDK consistency
       try {
         if (typeof unsubscribe === 'function') {
           unsubscribe();
         }
       } catch (e) {
-        // Silently catch to prevent crash during unmount when SDK is in a weird state
+        // Safe cleanup for potential assertion errors during unmount
       }
     };
   }, [query]);

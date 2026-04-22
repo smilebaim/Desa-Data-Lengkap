@@ -42,13 +42,12 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
     );
 
     return () => {
-      // Safe cleanup for internal SDK consistency
       try {
         if (typeof unsubscribe === 'function') {
           unsubscribe();
         }
       } catch (e) {
-        // Silently catch to prevent crash during unmount
+        // Safe cleanup
       }
     };
   }, [ref]);

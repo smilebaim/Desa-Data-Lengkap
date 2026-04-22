@@ -205,7 +205,6 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Header Reaktif dengan Glassmorphism 40% */}
         <header className="absolute top-6 left-1/2 -translate-x-1/2 z-[5000] w-full max-w-5xl px-4 pointer-events-none">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-3 pointer-events-auto bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full shadow-2xl ring-1 ring-white/10">
@@ -326,22 +325,20 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Toolbar Kiri - Jarak Seimbang gap-3 */}
         <aside className="absolute left-0 top-1/2 -translate-y-1/2 z-[5000] flex flex-col gap-3 transition-all duration-500 pointer-events-none">
-          <div className="pointer-events-auto flex flex-col gap-2.5 py-4 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 md:ml-6 md:rounded-3xl border-l-0 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0">
+          <div className="pointer-events-auto flex flex-col gap-3 py-6 px-2.5 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-r-[2rem] shadow-2xl ring-1 ring-white/10 md:ml-6 md:rounded-3xl border-l-0 transform transition-all duration-500 -translate-x-[75%] hover:translate-x-0 md:translate-x-0">
             <ToolbarButton tooltip={showVillages ? "Sembunyikan Batas" : "Tampilkan Batas"} onClick={() => setShowVillages(!showVillages)} className={showVillages ? "bg-primary text-primary-foreground" : "text-white"}>
               {showVillages ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </ToolbarButton>
-            <Separator className="bg-white/10 mx-2 my-0.5" />
+            <Separator className="bg-white/10 mx-2 my-1" />
             <ToolbarButton tooltip="Fasilitas Umum" onClick={() => toggleCategory('public_facility')} className={activeCategories.includes('public_facility') ? "text-blue-400 bg-blue-400/20" : "text-white"}><Landmark className="h-3.5 w-3.5" /></ToolbarButton>
             <ToolbarButton tooltip="Infrastruktur" onClick={() => toggleCategory('infrastructure')} className={activeCategories.includes('infrastructure') ? "text-amber-400 bg-amber-400/20" : "text-white"}><Construction className="h-3.5 w-3.5" /></ToolbarButton>
             <ToolbarButton tooltip="Sumber Daya Alam" onClick={() => toggleCategory('natural_resource')} className={activeCategories.includes('natural_resource') ? "text-green-400 bg-green-400/20" : "text-white"}><TreePine className="h-3.5 w-3.5" /></ToolbarButton>
-            <Separator className="bg-white/10 mx-2 my-0.5" />
+            <Separator className="bg-white/10 mx-2 my-1" />
             <ToolbarButton tooltip="Reset Tampilan" onClick={() => window.location.reload()} className="text-white"><LocateFixed className="h-3.5 w-3.5" /></ToolbarButton>
           </div>
         </aside>
 
-        {/* Dock Navigasi Bawah - Glassmorphism 40% */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[4000] flex flex-col items-center gap-3 w-full px-4">
           <nav className="flex items-center gap-4 p-2 bg-slate-950/40 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl ring-1 ring-white/10 overflow-x-auto no-scrollbar max-w-[95vw]">
             {bottomMenus?.map((menu: any) => (
@@ -352,7 +349,6 @@ export default function HomePage() {
           </nav>
         </div>
 
-        {/* Panel Informasi - pb-40 agar teks tidak tertutup dock */}
         <Sheet open={panelOpen} onOpenChange={setPanelOpen}>
           <SheetContent side="right" className="w-full sm:max-w-xl p-0 border-none bg-white overflow-hidden shadow-2xl z-[9000]">
             <ScrollArea className="h-full">

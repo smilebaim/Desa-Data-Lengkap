@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useUser, useFirestore } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, getDocs, deleteDoc, setDoc, doc } from 'firebase/firestore';
-import { LayoutDashboard, Map as MapIcon, Menu as MenuIcon, Sparkles, Loader2, CheckCircle2, Settings } from 'lucide-react';
+import { LayoutDashboard, Map as MapIcon, Menu as MenuIcon, Sparkles, Loader2, CheckCircle2, Settings, BarChart3, Globe, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
@@ -116,13 +116,23 @@ export default function DashboardPage() {
         showStats: true, updatedAt: serverTimestamp() 
       });
 
-      // 5. Menus
+      // 5. Menus (DOCK BAWAH)
       const menusRef = collection(db, 'menus');
-      await addDoc(menusRef, { label: 'Analisis Nasional', icon: 'BarChart', href: `/p/${pId.id}`, order: 1, position: 'bottom' });
+      const menuData = [
+        { label: 'Analisis Nasional', icon: 'BarChart', href: `/p/${pId.id}`, order: 1, position: 'bottom' },
+        { label: 'Peta Infrastruktur', icon: 'Database', href: '#', order: 2, position: 'bottom' },
+        { label: 'Cakupan Wilayah', icon: 'Globe', href: '/visualizations', order: 3, position: 'bottom' },
+        { label: 'Potensi Desa', icon: 'Sparkles', href: '#', order: 4, position: 'bottom' },
+        { label: 'Pusat Bantuan', icon: 'Info', href: '#', order: 5, position: 'bottom' }
+      ];
 
-      toast({ title: "Sinkronisasi Berhasil", description: "38 Desa dari seluruh Provinsi Indonesia telah berhasil ditambahkan." });
+      for (const m of menuData) {
+        await addDoc(menusRef, m);
+      }
+
+      toast({ title: "Sinkronisasi Berhasil", description: "38 Desa dan Navigasi telah berhasil diperbarui." });
     } catch (error) {
-      toast({ title: "Gagal Seeding", description: "Terjadi kesalahan saat menyuntikkan data ke Firestore.", variant: "destructive" });
+      toast({ title: "Gagal Seeding", description: "Terjadi kesalahan saat menyuntikkan data.", variant: "destructive" });
     } finally { setIsSeeding(false); }
   };
 
@@ -131,11 +141,11 @@ export default function DashboardPage() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dasbor Operasional Nasional</h1>
-          <p className="text-muted-foreground">Pusat kendali data 38 provinsi dan manajemen profil publikasi strategis desa.</p>
+          <p className="text-muted-foreground">Pusat kendali data 38 provinsi dan manajemen profil publikasi desa.</p>
         </div>
         <Button onClick={seedDemoData} disabled={isSeeding} className="bg-primary hover:bg-primary/90 rounded-2xl shadow-xl h-12 px-6 font-bold">
           {isSeeding ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-          Buat Data 38 Provinsi
+          Sinkronisasi 38 Provinsi
         </Button>
       </header>
 
@@ -182,7 +192,7 @@ export default function DashboardPage() {
               <Settings className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black text-slate-900">Aktif</div>
+              <div className="text-3xl font-black text-slate-900">Konfigurasi</div>
               <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Branding & Logo Global</p>
             </CardContent>
           </Card>

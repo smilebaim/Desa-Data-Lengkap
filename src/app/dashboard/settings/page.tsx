@@ -162,7 +162,6 @@ export default function AppSettingsPage() {
                   <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2013')] bg-cover bg-center opacity-30 blur-[2px]" />
                   <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-950" />
                   
-                  {/* Mockup Header Publik */}
                   <div className="relative z-10 w-full max-w-md bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full flex items-center justify-between gap-4">
                      <div className="flex items-center gap-3 pl-3">
                         <div className="h-9 w-9 bg-primary rounded-full flex items-center justify-center shadow-lg">
@@ -185,9 +184,9 @@ export default function AppSettingsPage() {
                   </div>
 
                   <div className="mt-16 w-full max-w-xs space-y-4">
-                    <Separator className="bg-white/5" />
+                    <Separator className="bg-white/10" />
                     <div className="flex items-center justify-between text-[10px] text-white/30 uppercase font-black tracking-widest">
-                       <span>Device Target:</span>
+                       <span>Target Perangkat:</span>
                        <div className="flex gap-2">
                           <Monitor className="h-3 w-3" />
                           <Globe className="h-3 w-3" />
