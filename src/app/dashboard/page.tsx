@@ -90,7 +90,7 @@ export default function DashboardPage() {
           location: { lat: p.lat, lng: p.lng }, 
           tagline: `Membangun ${p.prov} dari Desa`,
           potentials: ['Pertanian', 'Wisata Alam', 'Budaya'], 
-          description: `Desa ${p.name} merupakan salah satu entitas pembangunan strategis di wilayah ${p.prov}. Desa ini memiliki karakteristik geospasial unik dengan potensi sumber daya lokal yang melimpah. Melalui sinkronisasi data nasional, desa ini terus berupaya mencapai status Desa Mandiri dengan efisiensi anggaran dan pemberdayaan masyarakat yang berkelanjutan.`,
+          description: `Desa ${p.name} merupakan entitas pembangunan strategis di ${p.prov}.`,
           boundary: [ 
             {lat: p.lat + 0.02, lng: p.lng + 0.02}, 
             {lat: p.lat + 0.02, lng: p.lng - 0.02}, 
@@ -102,7 +102,7 @@ export default function DashboardPage() {
 
       // 2. Data Fitur Spasial
       const featuresRef = collection(db, 'features');
-      await addDoc(featuresRef, { name: 'Kantor Pusat GIS', category: 'infrastructure', type: 'marker', icon: 'Shield', geometry: { lat: -2.5489, lng: 118.0149 }, description: 'Pusat kendali data geospasial nasional yang memantau perkembangan 38 provinsi di Indonesia.', showStats: true });
+      await addDoc(featuresRef, { name: 'Kantor Pusat GIS', category: 'infrastructure', type: 'marker', icon: 'Shield', geometry: { lat: -2.5489, lng: 118.0149 }, description: 'Pusat kendali data geospasial nasional.', showStats: true });
 
       // 3. Visualizers
       const vizRef = collection(db, 'visualizers');
@@ -112,7 +112,7 @@ export default function DashboardPage() {
       const pagesRef = collection(db, 'pages');
       const pId = await addDoc(pagesRef, { 
         title: 'Laporan Strategis Desa Indonesia 2024', 
-        content: `Indonesia memiliki kekayaan data spasial yang sangat besar, mencakup seluruh wilayah dari Sabang sampai Merauke.\n\n### Analisis Populasi Terkini\n[CHART:${vPop.id}]\n\nVisualisasi di atas menunjukkan keberagaman demografi di 38 provinsi yang menjadi dasar kebijakan pembangunan nasional.`, 
+        content: `Indonesia memiliki kekayaan data spasial yang sangat besar.\n\n### Analisis Populasi Terkini\n[CHART:${vPop.id}]`, 
         showStats: true, updatedAt: serverTimestamp() 
       });
 
@@ -130,7 +130,7 @@ export default function DashboardPage() {
         await addDoc(menusRef, m);
       }
 
-      toast({ title: "Sinkronisasi Berhasil", description: "38 Desa dan Navigasi telah berhasil diperbarui." });
+      toast({ title: "Sinkronisasi Berhasil", description: "38 Desa dan Navigasi telah diperbarui." });
     } catch (error) {
       toast({ title: "Gagal Seeding", description: "Terjadi kesalahan saat menyuntikkan data.", variant: "destructive" });
     } finally { setIsSeeding(false); }
@@ -192,8 +192,8 @@ export default function DashboardPage() {
               <Settings className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black text-slate-900">Konfigurasi</div>
-              <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Branding & Logo Global</p>
+              <div className="text-3xl font-black text-slate-900">Atur Logo</div>
+              <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Identitas Global</p>
             </CardContent>
           </Card>
         </Link>

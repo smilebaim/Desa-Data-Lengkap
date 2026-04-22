@@ -35,6 +35,7 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
           path: ref.path,
           operation: 'get',
         } satisfies SecurityRuleContext);
+        
         errorEmitter.emit('permission-error', permissionError);
         setError(permissionError);
         setIsLoading(false);
@@ -47,7 +48,7 @@ export function useDoc<T = DocumentData>(ref: DocumentReference<T> | null) {
           unsubscribe();
         }
       } catch (e) {
-        // Safe cleanup
+        // Safe cleanup for potential assertion errors during unmount
       }
     };
   }, [ref]);

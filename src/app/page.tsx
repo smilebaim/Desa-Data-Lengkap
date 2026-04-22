@@ -68,12 +68,6 @@ const MiniChart = ({ config, data }: { config: any, data: any[] }) => {
               {data.map((_, index) => <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
             </Pie>
           </PieChart>
-        ) : type === 'radar' ? (
-          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="name" fontSize={8} />
-            <Radar name={metric} dataKey={metric} stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
-          </RadarChart>
         ) : (
           <LineChart data={data}>
             <Line type="monotone" dataKey={metric} stroke="#22c55e" strokeWidth={2} dot={false} />
@@ -98,7 +92,6 @@ export default function HomePage() {
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState<AnalyzeVillageOutput | null>(null);
 
-  // App Settings Reaktif
   const settingsRef = useMemo(() => doc(db, 'settings', 'global'), [db]);
   const { data: appSettings } = useDoc(settingsRef);
 
@@ -116,12 +109,6 @@ export default function HomePage() {
   const bottomMenus = useMemo(() => (menus || []).filter((m: any) => m.position === 'bottom'), [menus]);
   const headerMenus = useMemo(() => (menus || []).filter((m: any) => (m.position === 'header' || m.position === 'left')), [menus]);
 
-  const toggleCategory = (cat: string) => {
-    setActiveCategories(prev => 
-      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-    );
-  };
-
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return { villages: [], features: [] };
     const q = searchQuery.toLowerCase();
@@ -133,8 +120,8 @@ export default function HomePage() {
 
   const selectedDocRef = useMemo(() => {
     if (!selectedItem) return null;
-    const collectionName = selectedItem.type === 'page' ? 'pages' : selectedItem.type === 'village' ? 'villages' : 'features';
-    return doc(db, collectionName, selectedItem.id);
+    const collName = selectedItem.type === 'page' ? 'pages' : selectedItem.type === 'village' ? 'villages' : 'features';
+    return doc(db, collName, selectedItem.id);
   }, [selectedItem, db]);
 
   const { data: itemDetail, isLoading: isDetailLoading } = useDoc(selectedDocRef);
@@ -184,8 +171,7 @@ export default function HomePage() {
     return parts.map((part, index) => {
       const match = part.match(/\[CHART:([a-zA-Z0-9_-]+)\]/);
       if (match) {
-        const chartId = match[1];
-        const config = visualizers?.find(v => v.id === chartId);
+        const config = visualizers?.find(v => v.id === match[1]);
         return config ? <MiniChart key={index} config={config} data={statsData} /> : null;
       }
       return <span key={index}>{part}</span>;
@@ -301,7 +287,7 @@ export default function HomePage() {
                             <div className="space-y-3">
                               <Link href="/dashboard" className="w-full block">
                                 <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-3">
-                                  <LayoutDashboard className="h-3.5 w-3.5" /> Buka Dasbor
+                                  <LayoutDashboard className="h-3.5 w-3.5" /> Dasbor
                                 </Button>
                               </Link>
                               <Button variant="ghost" onClick={handleLogout} className="w-full h-12 rounded-xl text-red-400 hover:bg-red-500/10 font-bold gap-3">
@@ -357,11 +343,11 @@ export default function HomePage() {
               ) : itemDetail ? (
                 <div className="flex flex-col h-full animate-in fade-in duration-500 text-left">
                   <div className="relative h-56 bg-slate-900 shrink-0 overflow-hidden">
-                    <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=1200')] bg-cover bg-center" />
+                    <div className="absolute inset-0 opacity-20 bg-[url('https://picsum.photos/seed/detail/1200/800')] bg-cover bg-center" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent" />
                     <div className="absolute bottom-6 left-8 right-8 z-10">
                       <Badge className="bg-primary hover:bg-primary uppercase text-[8px] font-black tracking-widest px-3 mb-3 border-none text-white shadow-lg">
-                        {selectedItem?.type === 'village' ? 'Profil Wilayah' : selectedItem?.type === 'feature' ? 'Informasi Aset' : 'Informasi Publik'}
+                        {selectedItem?.type === 'village' ? 'Profil Wilayah' : 'Informasi'}
                       </Badge>
                       <h2 className="text-2xl font-black text-white leading-tight uppercase tracking-tight">{itemDetail.name || itemDetail.title}</h2>
                       {itemDetail.province && <p className="text-white text-[10px] font-bold uppercase tracking-[0.2em] mt-1 opacity-70">{itemDetail.province}</p>}
@@ -376,7 +362,7 @@ export default function HomePage() {
                             <p className="text-xl font-bold text-slate-900 leading-none">{itemDetail.population?.toLocaleString()} <span className="text-[10px] text-slate-400 font-bold ml-1">JIWA</span></p>
                           </div>
                           <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm">
-                            <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Skor IDM</p>
+                            <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">IDM</p>
                             <p className="text-xl font-bold text-slate-900 leading-none">{(itemDetail.idmScore || 0).toFixed(2)}</p>
                           </div>
                         </div>
@@ -398,18 +384,6 @@ export default function HomePage() {
                     <div className="whitespace-pre-line text-slate-700 leading-relaxed text-lg font-medium">
                       {renderContentWithCharts(itemDetail.content || itemDetail.description)}
                     </div>
-                    {itemDetail.potentials && itemDetail.potentials.length > 0 && (
-                      <div className="space-y-4">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Potensi Wilayah</p>
-                        <div className="flex flex-wrap gap-2">
-                          {itemDetail.potentials.map((pot: string, i: number) => (
-                            <Badge key={i} variant="outline" className="rounded-full px-4 py-1.5 text-slate-600 border-slate-200 bg-slate-50 font-bold text-[10px] uppercase shadow-sm">
-                              {pot}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               ) : null}

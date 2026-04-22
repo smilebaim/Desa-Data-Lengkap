@@ -35,11 +35,13 @@ export function useCollection<T = DocumentData>(query: Query<T> | null) {
         setIsLoading(false);
       },
       async (serverError: any) => {
+        // Safe path extraction
         const path = (query as any)._query?.path?.segments?.join('/') || 'unknown';
         const permissionError = new FirestorePermissionError({
           path: path,
           operation: 'list',
         } satisfies SecurityRuleContext);
+        
         errorEmitter.emit('permission-error', permissionError);
         setError(permissionError);
         setIsLoading(false);

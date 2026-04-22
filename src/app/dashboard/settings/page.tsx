@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const ICON_OPTIONS = [
   'Shield', 'Landmark', 'Map', 'Globe', 'Navigation', 'Info', 'Mountain', 
-  'Home', 'Flag', 'Layers', 'Activity', 'Zap', 'Compass', 'TreePine', 'Zap'
+  'Home', 'Flag', 'Layers', 'Activity', 'Zap', 'Compass', 'TreePine'
 ];
 
 const DynamicIcon = ({ name, className }: { name: string, className?: string }) => {
@@ -78,7 +78,7 @@ export default function AppSettingsPage() {
     <div className="space-y-8 pb-10">
       <div className="flex flex-col gap-1 text-left">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Identitas & Branding App</h1>
-        <p className="text-muted-foreground">Konfigurasikan bagaimana publik melihat nama, slogan, dan logo aplikasi Anda secara global.</p>
+        <p className="text-muted-foreground">Konfigurasikan logo, nama, dan slogan aplikasi secara global.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -159,7 +159,7 @@ export default function AppSettingsPage() {
             </CardHeader>
             <CardContent className="p-0 bg-slate-950/20">
                <div className="relative h-[400px] w-full flex items-center justify-center p-12">
-                  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2013')] bg-cover bg-center opacity-30 blur-[2px]" />
+                  <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/setting/1200/800')] bg-cover bg-center opacity-30 blur-[2px]" />
                   <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 to-slate-950" />
                   
                   <div className="relative z-10 w-full max-w-md bg-slate-950/40 backdrop-blur-2xl border border-white/10 p-1.5 rounded-full flex items-center justify-between gap-4">
